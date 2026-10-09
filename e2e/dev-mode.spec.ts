@@ -31,6 +31,11 @@ test.describe('dev mode', () => {
         'web_app_set_background_color',
       ]),
     );
+
+    // Both colours come from the --color-bg design token.
+    const params = await page.evaluate(() => window.__tgMockParams ?? {});
+    expect(params.web_app_set_header_color).toEqual({ color: '#f3f5f7' });
+    expect(params.web_app_set_background_color).toEqual({ color: '#f3f5f7' });
   });
 });
 
@@ -45,7 +50,7 @@ test.describe('dev mode: mock API errors', () => {
     expect(box?.height).toBeGreaterThanOrEqual(44);
 
     await retry.click();
-    await expect(page.getByText('Загрузка…')).toBeVisible();
+    await expect(page.getByRole('status')).toContainText('Загрузка…');
     await expect(page.getByText('Привет, Борис!')).toBeVisible();
   });
 });

@@ -7,6 +7,8 @@ declare global {
   interface Window {
     /** Mini Apps methods called by the app in mock mode, for e2e checks. */
     __tgMockCalls?: string[];
+    /** Parameters of the last call of each Mini Apps method in mock mode, for e2e checks. */
+    __tgMockParams?: Record<string, unknown>;
   }
 }
 
@@ -41,7 +43,9 @@ const contentSafeArea = { top: 0, bottom: 0, left: 0, right: 0 };
 export function mockTelegram(): void {
   const user = resolveTestUser(window.location.search);
   const calls: string[] = [];
+  const params: Record<string, unknown> = {};
   window.__tgMockCalls = calls;
+  window.__tgMockParams = params;
 
   mockTelegramEnv({
     launchParams: {
@@ -52,6 +56,7 @@ export function mockTelegram(): void {
     },
     onEvent(event) {
       calls.push(event.name);
+      params[event.name] = 'params' in event ? event.params : undefined;
       switch (event.name) {
         case 'web_app_request_theme':
           emitEvent('theme_changed', { theme_params: themeParams });

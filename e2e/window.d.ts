@@ -4,5 +4,6 @@ export {};
 declare global {
   interface Window {
     __tgMockCalls?: string[];
+    __tgMockParams?: Record<string, unknown>;
   }
 }

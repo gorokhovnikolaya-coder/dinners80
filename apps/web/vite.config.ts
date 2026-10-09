@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
+/// <reference types="vitest/config" />
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 
@@ -50,11 +52,15 @@ export default defineConfig(({ command, mode }) => {
   }
 
   return {
-    plugins: [react(), mswWorker()],
+    plugins: [react(), tailwindcss(), mswWorker()],
     envDir,
     build: {
       // dist/.vite/manifest.json — size-limit uses it to find the initial chunks.
       manifest: true,
+    },
+    test: {
+      // jest-dom matchers and Testing Library cleanup; component tests opt into jsdom per file.
+      setupFiles: ['./src/test/setup.ts'],
     },
   };
 });

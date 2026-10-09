@@ -1,8 +1,9 @@
 import { useAuthQuery } from '../api/auth.ts';
+import { ErrorState } from '../components/ErrorState.tsx';
+import { Skeleton, SkeletonGroup } from '../components/Skeleton.tsx';
 import { ru } from '../i18n/ru.ts';
 
-/** Minimal touch target until the design components of task 3. */
-const TOUCH_TARGET = { minWidth: 44, minHeight: 44 } as const;
+const screen = 'min-h-dvh bg-bg px-5 pt-14 pb-8';
 
 export function App() {
   const { data, isFetching, isError, refetch } = useAuthQuery(undefined);
@@ -10,28 +11,29 @@ export function App() {
   // `isFetching` (not only `isLoading`) so a retry after an error shows the loading state too.
   if (isFetching && !data) {
     return (
-      <main aria-busy="true">
-        <p>{ru.common.loading}</p>
+      <main className={screen}>
+        <SkeletonGroup label={ru.common.loading} className="flex flex-col gap-4">
+          <Skeleton shape="text" width="60%" className="text-4xl" />
+          <Skeleton shape="text" width="40%" className="text-lg" />
+          <Skeleton height={150} className="mt-2" />
+        </SkeletonGroup>
       </main>
     );
   }
 
   if (isError || !data) {
     return (
-      <main>
-        <p role="alert">{ru.common.error}</p>
-        <button type="button" style={TOUCH_TARGET} onClick={() => void refetch()}>
-          {ru.common.retry}
-        </button>
+      <main className={screen}>
+        <ErrorState onRetry={() => void refetch()} />
       </main>
     );
   }
 
   return (
-    <main>
-      <h1>{ru.app.title}</h1>
-      <p>{ru.app.greeting(data.user.firstName)}</p>
-      <p>{ru.app.placeholder}</p>
+    <main className={`${screen} flex flex-col gap-3`}>
+      <h1 className="font-display text-4xl font-bold">{ru.app.title}</h1>
+      <p className="text-xl font-bold">{ru.app.greeting(data.user.firstName)}</p>
+      <p className="text-base text-ink-2">{ru.app.placeholder}</p>
     </main>
   );
 }

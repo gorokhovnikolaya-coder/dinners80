@@ -4,7 +4,8 @@
 
 Проблемы и идеи, замеченные вне текущей задачи. Пункт удаляется, когда его взяли в работу.
 
-- Задача 3: заменить «Загрузка…» на скелетон и временный inline-стиль 44 × 44 у кнопки «Повторить» в `apps/web/src/app/App.tsx` на компоненты; цвет шапки и фона Telegram (`APP_BACKGROUND_COLOR` в `apps/web/src/telegram/sdk.ts`) брать из токенов.
+- Задачи 4–5: при введении React Router перенести `/dev/ui` в роутер (оставить под `import.meta.env.DEV` и с ленивым импортом) и подключить `TabBar.onNavigate` к `navigate`.
+- Экраны 1 и 6: сегментный переключатель («Будни · до 30 мин / Выходные», «Эта неделя / Всё время») в задачу 3 не входил — собрать на экране или вынести в компонент.
 
 ## Журнал
 
@@ -17,6 +18,12 @@
 - Решения: docs/decisions/NNNN-… (если были)
 - Осталось / сомнения: …
 ```
+
+### Задача 03 — Дизайн-токены и базовые компоненты (2026-10-09, ветка task/03-design-system)
+- Сделано: Tailwind CSS 4.3 (`@tailwindcss/vite`), токены из макета в `@theme static` (`apps/web/src/styles/index.css`: палитра, шрифты, шкала текста, радиусы, тени; дефолты Tailwind сброшены); самохостинг Manrope и Unbounded (вариативные woff2, только кириллица + латиница, `font-display: swap`); компоненты `Button`/`IconButton`, `Card`, `Chip`, `TabBar`, `ProgressBar`, `Checkbox`, `Skeleton`/`SkeletonGroup`, `ErrorState`, иконки; dev-only галерея `/dev/ui` (без React Router, выпиливается из сборки); заглушка `App.tsx` на `Skeleton`/`ErrorState`; цвет шапки и фона Telegram читается из `--color-bg`; size-limit считает и стартовый CSS (≤ 20 КБ). Тесты: Testing Library + jsdom (ProgressBar, Checkbox, Chip, TabBar, Skeleton, ErrorState, Button, чтение токенов), e2e `e2e/dev-ui.spec.ts` (8 компонентов, взаимодействие, зоны 44 × 44) и проверка цветов Telegram из токена.
+- Проверено: npm run check ✓ (стартовый JS 116.67 kB gzip из 200 kB, CSS 4.8 kB из 20 kB, `/dev/ui` и `ruDevUi` в `dist` нет), npm run e2e ✓ (7 сценариев), браузер 390 × 844 mock-режим, скриншоты docs/screens/task-03/
+- Решения: docs/decisions/0004-design-tokens-components.md
+- Осталось / сомнения: цвет `#8A94A3` (зачёркнутые покупки в макете) не проходит контраст — заменён на `muted`; высота строки ингредиента 40 px в макете → 44 px; компонента пустого состояния и сегментного переключателя нет (не входили в задачу).
 
 ### Задача 02 — Dev-режим (2026-10-09, ветка task/02-dev-mode)
 - Сделано: mock-окружение Telegram на `@tma.js/sdk-react` (`mockTelegramEnv`: тема, viewport, safe area; `?user=<id>` + sessionStorage); запуск SDK в `src/telegram/sdk.ts` (`ready`, `expand`, `setHeaderColor`/`setBgColor`, CSS-переменные safe area, всё через `isAvailable`/`ifAvailable`); схемы в `packages/shared` (страна, блюдо, готовка, профиль, подписка, ответ `POST /auth`, ошибки API, константы); фикстуры: 12 стран, 36 блюд, 5 тестовых пользователей + 3 друга; MSW `POST /api/auth` по `Authorization: tma <initData>`; RTK Query (`src/api/`) и store (`src/store/`); экран-заглушка с именем пользователя и состояниями загрузки/ошибки (повтор показывает загрузку, кнопка 44 × 44); управление моком `?mock_error=` / `?mock_delay=`; `npm run e2e` (Playwright, 4 сценария). Попутно: `<link rel="icon" href="data:,">` в `apps/web/index.html` (не было 404 на favicon в консоли); в `eslint.config.js` `allowDefaultProject` сужен до `*.js` и `vitest.config.ts` (`playwright.config.ts` входит в TS-проект `e2e/`), `e2e/**` добавлен к node globals. После ревью: ТЗ обновлено с согласия владельца — SDK `@tma.js/sdk-react`, проверка доступности методов вместо `isVersionAtLeast`, правило «свинина — тоже мясо» (`pork` ⇒ `meat`); фикстуры исправлены (теги, Глеб без свинины, Жанна без глютена — 8 стран), добавлены инварианты; код ошибки `internal` в shared.

@@ -34,7 +34,7 @@
 | `npm run typecheck`                 | TypeScript по всем пакетам (`tsc -b`, project references)                                                                                                                                  | 1      |
 | `npm run lint`                      | ESLint (flat config, typescript-eslint strict type-checked, React для `apps/web`)                                                                                                          | 1      |
 | `npm run test`                      | Vitest по всем пакетам (`packages/*`, `apps/*` — отдельные projects)                                                                                                                       | 1      |
-| `npm run size`                      | Сборка web + size-limit: стартовый JS ≤ 200 КБ gzip                                                                                                                                        | 1      |
+| `npm run size`                      | Сборка web + size-limit: стартовый JS ≤ 200 КБ, CSS ≤ 20 КБ gzip                                                                                                                           | 1      |
 | `npm run check`                     | typecheck + lint + test + size                                                                                                                                                             | 1      |
 | `npm run format`                    | Prettier по всему репозиторию (кроме `docs/`, `.claude/`)                                                                                                                                  | 1      |
 | `npm run db:up` / `npm run db:down` | Локальный Postgres 17 в Docker Compose (`127.0.0.1:5433`, том `postgres-data`)                                                                                                             | 1      |
@@ -51,7 +51,10 @@
 apps/web/            мини-апп (React 19, Vite, Redux Toolkit + RTK Query, Tailwind)
   src/app/           роутинг, провайдеры
   src/screens/       по папке на экран
-  src/components/    общие компоненты UI
+  src/components/    общие компоненты UI (Button, Card, Chip, TabBar, ProgressBar, Checkbox, Skeleton, ErrorState, иконки)
+  src/styles/        Tailwind v4: дизайн-токены в `@theme` (index.css), самохостинг шрифтов (fonts.css)
+  src/theme/         чтение токенов из JS (цвет шапки/фона Telegram)
+  src/dev/           dev-only страницы (`/dev/ui` — галерея компонентов), в продакшен не попадают
   src/store/         Redux store, слайсы
   src/api/           RTK Query: API-слайс и эндпоинты
   src/telegram/      обёртки SDK, mock-окружение
@@ -82,6 +85,7 @@ docs/                ТЗ, решения, прогресс, скриншоты
 - Клиент обращается к бэкенду только через базовый URL из `VITE_API_URL`.
 - Серверные данные на клиенте — через RTK Query (`src/api/`), не дублируются в слайсах; слайсы — для клиентского состояния (порции, таймеры, черновики).
 - Все строки UI — в `src/i18n/ru.ts`. Никакого текста в JSX.
+- Стили — классы Tailwind на токенах из `src/styles/index.css` (решение 0004): цвета, шрифты, размеры текста, радиусы и тени — только из `@theme`; палитра Tailwind по умолчанию отключена. Новый токен добавляется в `@theme` (проверь контраст текста ≥ 4.5:1), а не хардкодится в компоненте. Сначала ищи готовый компонент в `src/components/`.
 - Интерактивные элементы — настоящие `button`/`input`/`label`, у иконок без подписи — `aria-label`, зоны нажатия от 44 × 44 px.
 - У экранов с данными — состояния загрузки, ошибки и пустое.
 - Методы Telegram SDK (`@tma.js/sdk-react`), которых может не быть в старом клиенте, — через проверку доступности SDK (`fn.isAvailable()` / `fn.ifAvailable()` / `fn.supports(...)`) и с запасным вариантом.
@@ -100,4 +104,5 @@ docs/                ТЗ, решения, прогресс, скриншоты
 - Ошибки и загрузка в моке: `?mock_error=auth` — первый запрос к эндпоинту `auth` отвечает 500 (`{error: {code: 'internal'}}`), повтор проходит; `?mock_error=auth:always` — падает всегда; несколько ключей — через запятую; `?mock_delay=<мс>` — задержка всех ответов. `page.route` в e2e запросы MSW не перехватывает, поэтому используйте эти параметры. Новые обработчики вызывают `takeFailure(controls, '<ключ>')` (`src/mocks/controls.ts`).
 - Mock-код подключается только динамическим импортом под флагами в `src/main.tsx` и в продакшен-сборку не попадает; `mockServiceWorker.js` отдаёт dev-сервер из `node_modules/msw`.
 - `VITE_API=local` — локальный Node-сервер и Postgres в Docker; initData подписывается тестовым токеном.
+- `/dev/ui` — галерея токенов и базовых компонентов во всех вариантах (только `npm run dev`; ветка в `src/main.tsx` под `import.meta.env.DEV`).
 - Проверка в браузере — вьюпорт 390 × 844 (iPhone 14), светлая тема.
