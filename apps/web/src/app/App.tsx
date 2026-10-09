@@ -13,7 +13,7 @@ export function App() {
     return (
       <main className={screen}>
         <SkeletonGroup label={ru.common.loading} className="flex flex-col gap-4">
-          <Skeleton shape="text" width="60%" className="text-4xl" />
+          <Skeleton shape="text" width="60%" className="text-6xl" />
           <Skeleton shape="text" width="40%" className="text-lg" />
           <Skeleton height={150} className="mt-2" />
         </SkeletonGroup>
@@ -24,14 +24,14 @@ export function App() {
   if (isError || !data) {
     return (
       <main className={screen}>
-        <ErrorState onRetry={() => void refetch()} />
+        <ErrorState description={ru.common.errorHint} onRetry={() => void refetch()} />
       </main>
     );
   }
 
   return (
     <main className={`${screen} flex flex-col gap-3`}>
-      <h1 className="font-display text-4xl font-bold">{ru.app.title}</h1>
+      <h1 className="font-display text-6xl font-bold">{ru.app.title}</h1>
       <p className="text-xl font-bold">{ru.app.greeting(data.user.firstName)}</p>
       <p className="text-base text-ink-2">{ru.app.placeholder}</p>
     </main>

@@ -1,5 +1,5 @@
 /**
- * Access to the design tokens from JS. The tokens themselves live only in `styles/index.css`
+ * Access to the design tokens from JS. The tokens themselves live only in `styles/theme.css`
  * (`@theme static`, so every token is emitted as a CSS variable on `:root`).
  */
 

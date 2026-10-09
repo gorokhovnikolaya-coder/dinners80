@@ -8,6 +8,7 @@ export const ru = {
   common: {
     loading: 'Загрузка…',
     error: 'Не удалось загрузить данные.',
+    errorHint: 'Проверьте интернет и попробуйте ещё раз.',
     retry: 'Повторить',
   },
   tabs: {
@@ -95,7 +96,6 @@ export const ruDevUi = {
     dishCard: 'Загрузка карточки блюда',
   },
   errorState: {
-    description: 'Проверьте интернет и попробуйте ещё раз.',
     retried: (count: number) => `Нажато «Повторить»: ${String(count)}`,
   },
 } as const;

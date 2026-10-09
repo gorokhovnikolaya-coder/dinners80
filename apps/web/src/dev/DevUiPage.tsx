@@ -1,3 +1,5 @@
+import './dev-ui.css';
+
 import { useState, type ReactNode } from 'react';
 
 import { Button, IconButton } from '../components/Button.tsx';
@@ -51,7 +53,7 @@ const TABS: readonly TabBarItem[] = [
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
     <section aria-labelledby={id} className="flex flex-col gap-3">
-      <h2 id={id} className="font-display text-3xl font-bold">
+      <h2 id={id} className="font-display text-4xl font-bold">
         {title}
       </h2>
       {children}
@@ -76,9 +78,9 @@ export function DevUiPage() {
   };
 
   return (
-    <main className="mx-auto flex max-w-[430px] flex-col gap-8 px-5 pt-10 pb-12">
+    <main className="mx-auto flex max-w-md flex-col gap-8 px-5 pt-10 pb-12">
       <header className="flex flex-col gap-1.5">
-        <h1 className="font-display text-4xl font-bold">{t.title}</h1>
+        <h1 className="font-display text-6xl font-bold">{t.title}</h1>
         <p className="text-md font-semibold text-muted">{t.subtitle}</p>
       </header>
 
@@ -97,7 +99,7 @@ export function DevUiPage() {
       </Section>
 
       <Section id="ui-typography" title={t.sections.typography}>
-        <p className="font-display text-4xl font-bold">{t.typography.display}</p>
+        <p className="font-display text-6xl font-bold">{t.typography.display}</p>
         <p className="text-base text-ink-2">{t.typography.body}</p>
         <p className="text-md font-semibold text-muted">{t.typography.caption}</p>
       </Section>
@@ -130,24 +132,24 @@ export function DevUiPage() {
           />
           <IconButton label={t.buttons.close} icon={<IconClose size={18} />} variant="muted" />
         </div>
-        <div className="flex flex-col gap-3 rounded-card bg-ink p-4">
+        <Card tone="inverse" className="flex flex-col gap-3">
           <Button variant="inverse" size="lg" fullWidth>
             {t.buttons.inverse}
           </Button>
           <IconButton label={t.buttons.close} icon={<IconClose size={18} />} variant="dark" />
-        </div>
+        </Card>
       </Section>
 
       <Section id="ui-card" title={t.sections.card}>
         <Card as="article" padding="none" radius="lg">
-          <div className="relative flex h-[150px] items-start bg-track p-3">
+          <div className="relative flex h-37.5 items-start bg-track p-3">
             <Chip tone="badge">{t.card.newCountry}</Chip>
           </div>
           <div className="flex flex-col gap-2 px-4 pt-3.5 pb-4">
-            <p className="text-sm font-bold tracking-[0.04em] text-muted uppercase">
+            <p className="text-sm font-bold tracking-caps text-muted uppercase">
               {t.card.country}
             </p>
-            <h3 className="font-display text-2xl font-bold">{t.card.dish}</h3>
+            <h3 className="font-display text-3xl font-bold">{t.card.dish}</h3>
             <div className="flex flex-wrap gap-2">
               <Chip>{t.card.time}</Chip>
               <Chip tone="primary">{t.card.weekday}</Chip>
@@ -155,10 +157,10 @@ export function DevUiPage() {
             </div>
           </div>
         </Card>
-        <Card tone="inverse" radius="lg" className="flex items-center gap-4 p-[18px]">
-          <p className="font-display text-[40px] leading-none font-bold">
+        <Card tone="inverse" radius="lg" className="flex items-center gap-4 p-4.5">
+          <p className="font-display text-9xl font-bold">
             {t.card.passportCount}
-            <span className="text-[18px] text-on-dark-muted">{t.card.passportTotal}</span>
+            <span className="text-2xl text-on-dark-muted">{t.card.passportTotal}</span>
           </p>
           <div className="flex flex-1 flex-col gap-2">
             <p className="text-md font-bold">{t.card.passportTitle}</p>
@@ -235,7 +237,7 @@ export function DevUiPage() {
           label={t.progress.steps}
           valueText={t.progress.stepsValue(3, 6)}
         />
-        <div className="rounded-card bg-ink p-4">
+        <Card tone="inverse">
           <ProgressBar
             value={1}
             max={3}
@@ -245,7 +247,7 @@ export function DevUiPage() {
             label={t.progress.onboarding}
             valueText={t.progress.stepsValue(1, 3)}
           />
-        </div>
+        </Card>
       </Section>
 
       <Section id="ui-checkbox" title={t.sections.checkbox}>
@@ -297,7 +299,7 @@ export function DevUiPage() {
             <Skeleton height={150} />
             <div className="flex flex-col gap-2.5 p-4">
               <Skeleton shape="text" width="30%" className="text-sm" />
-              <Skeleton shape="text" width="70%" className="text-2xl" />
+              <Skeleton shape="text" width="70%" className="text-3xl" />
               <div className="flex gap-2">
                 <Skeleton shape="text" width={64} height={28} />
                 <Skeleton shape="text" width={96} height={28} />
@@ -317,7 +319,7 @@ export function DevUiPage() {
       <Section id="ui-error" title={t.sections.errorState}>
         <Card>
           <ErrorState
-            description={t.errorState.description}
+            description={ru.common.errorHint}
             onRetry={() => {
               setRetries((count) => count + 1);
             }}

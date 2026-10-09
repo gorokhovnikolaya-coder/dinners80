@@ -8,7 +8,8 @@ export type ButtonSize = 'md' | 'lg';
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /**
    * `primary` — teal action; `accent` — the main orange CTA of a screen; `secondary` — outline;
-   * `ghost` — text-only; `inverse` — amber CTA on dark (navy) screens.
+   * `ghost` — text-only; `inverse` — amber CTA on dark (navy) screens; put it inside a `surface-dark` container
+   * (e.g. `Card tone="inverse"`) so the focus ring turns amber.
    */
   variant?: ButtonVariant;
   /** `md` — 48 px high, `lg` — 56 px (bottom-bar actions). */
@@ -32,7 +33,7 @@ const variants: Record<ButtonVariant, string> = {
     'border-[1.5px] border-border bg-transparent font-bold text-ink enabled:hover:bg-track/60 enabled:active:bg-track',
   ghost: 'bg-transparent font-bold text-primary enabled:hover:bg-primary-soft',
   inverse:
-    'bg-amber font-extrabold text-ink focus-visible:outline-amber enabled:hover:brightness-105 enabled:active:brightness-95',
+    'bg-amber font-extrabold text-ink enabled:hover:brightness-105 enabled:active:brightness-95',
 };
 
 // Disabled controls are exempt from WCAG contrast, but the pair still passes 4.5:1 (muted on track).
@@ -96,7 +97,7 @@ const iconVariants: Record<IconButtonVariant, string> = {
   outline:
     'rounded-button border-[1.5px] border-border bg-transparent text-ink enabled:hover:bg-track/60',
   muted: 'rounded-full bg-bg text-ink enabled:hover:bg-track',
-  dark: 'rounded-full bg-navy-2 text-border focus-visible:outline-amber enabled:hover:bg-navy-3',
+  dark: 'rounded-full bg-navy-2 text-border enabled:hover:bg-navy-3',
 };
 
 const iconSizes: Record<ButtonSize, string> = {

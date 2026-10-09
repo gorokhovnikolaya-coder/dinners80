@@ -40,7 +40,9 @@ export function Checkbox({
   return (
     <label
       className={cx(
-        'flex min-h-11 items-center gap-3 py-1.5 text-base',
+        // The whole row is the touch target, so it also carries the focus ring.
+        'flex min-h-11 items-center gap-3 py-1.5 text-base outline-offset-2 has-[input:focus-visible]:rounded-tile',
+        'has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-(--focus-ring)',
         disabled ? 'cursor-not-allowed text-muted' : 'cursor-pointer',
         divider && 'border-t border-divider',
         className,
@@ -54,12 +56,12 @@ export function Checkbox({
         onChange={(event) => {
           onChange(event.target.checked);
         }}
-        className="size-5.5 shrink-0 cursor-[inherit] accent-primary"
+        className="size-5.5 shrink-0 cursor-[inherit] accent-primary focus-visible:outline-none"
       />
       <span className="flex min-w-0 flex-1 flex-col">
         <span
           className={cx(
-            checked ? 'text-muted' : 'text-ink',
+            checked || disabled ? 'text-muted' : 'text-ink',
             checked && strikeWhenChecked && 'line-through',
             description !== undefined && 'font-bold',
           )}

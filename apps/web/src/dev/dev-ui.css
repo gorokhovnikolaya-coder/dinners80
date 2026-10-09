@@ -1,0 +1,12 @@
+/*
+ * Dev-only stylesheet of the component gallery `/dev/ui`. The app stylesheet excludes src/dev
+ * (`@source not`), so classes used only here are generated in this file, which is imported by
+ * DevUiPage and never reaches a production build. Same tokens, utilities only (no preflight).
+ */
+@layer theme, base, components, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import '../styles/theme.css';
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+
+@source './';

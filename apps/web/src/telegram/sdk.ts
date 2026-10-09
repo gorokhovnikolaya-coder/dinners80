@@ -5,7 +5,7 @@ import { CHROME_COLOR_TOKEN, readColorToken } from '../theme/tokens.ts';
 /**
  * Header and background colour of the Telegram chrome. The MVP theme is light and fixed, so
  * Telegram theme colours are not used: both take the screen background token `--color-bg`
- * (styles/index.css). Without it (CSS not loaded) the header falls back to the theme key.
+ * (styles/theme.css). Without it (CSS not loaded) the header falls back to the theme key.
  */
 const setChromeColors = () => {
   const color = readColorToken(CHROME_COLOR_TOKEN);

@@ -103,6 +103,9 @@ describe('Checkbox', () => {
     render(<Checkbox checked={false} onChange={onChange} label="Соус" disabled />);
     await userEvent.click(screen.getByRole('checkbox', { name: 'Соус' }));
     expect(onChange).not.toHaveBeenCalled();
+    // Dimmed like the rest of the row, not drawn as an active item.
+    expect(screen.getByText('Соус')).toHaveClass('text-muted');
+    expect(screen.getByText('Соус')).not.toHaveClass('text-ink');
   });
 });
 

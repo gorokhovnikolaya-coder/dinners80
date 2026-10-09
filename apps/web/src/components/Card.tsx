@@ -19,7 +19,8 @@ export interface CardProps extends HTMLAttributes<HTMLElement> {
 
 const tones: Record<CardTone, string> = {
   surface: 'bg-surface text-ink shadow-card',
-  inverse: 'bg-ink text-white',
+  // `surface-dark` switches the focus ring of every focusable descendant to amber.
+  inverse: 'surface-dark bg-ink text-white',
 };
 
 const paddings: Record<CardPadding, string> = {
