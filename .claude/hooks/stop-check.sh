@@ -18,7 +18,7 @@ state_dir="$root/.claude/.state"
 mkdir -p "$state_dir"
 counter="$state_dir/stop-check-failures"
 
-out=$( { pnpm -s typecheck && pnpm -s lint; } 2>&1 )
+out=$( { npm run -s typecheck && npm run -s lint; } 2>&1 )
 if [ $? -eq 0 ]; then
   rm -f "$counter"
   exit 0
@@ -33,7 +33,7 @@ if [ "$n" -ge 3 ]; then
 fi
 
 {
-  echo "pnpm typecheck / pnpm lint не проходят (попытка $n из 3). Исправь ошибки, прежде чем заканчивать:"
+  echo "npm run typecheck / npm run lint не проходят (попытка $n из 3). Исправь ошибки, прежде чем заканчивать:"
   echo "$out" | tail -n 60
 } >&2
 exit 2

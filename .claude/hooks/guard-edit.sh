@@ -18,7 +18,7 @@ case "$name" in
 esac
 
 case "$rel" in
-  supabase/migrations/*.sql)
+  apps/server/migrations/*.sql)
     if git -C "$root" cat-file -e "main:$rel" 2>/dev/null; then
       echo "Миграция $rel уже в main — её нельзя менять. Создай новую миграцию." >&2
       exit 2

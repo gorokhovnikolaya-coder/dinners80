@@ -9,51 +9,59 @@
 - Каждая задача — отдельная ветка `task/NN-<slug>` от `main`, один или несколько коммитов. В `main` не коммитим, не мёржим и не пушим: ветку принимает и мёржит человек.
 - Делай только то, что входит в задачу. Замеченные проблемы вне задачи — в раздел «Заметки» `docs/progress.md`, не в код.
 - Технические решения, которые не следуют из ТЗ (выбор библиотеки, формат данных, отклонение от ТЗ), записываются в `docs/decisions/NNNN-<slug>.md` (шаблон — `docs/decisions/README.md`).
-- Методы Telegram (Bot API, Mini Apps SDK) и Supabase сверяй с актуальной документацией (core.telegram.org, docs.telegram-mini-apps.com, supabase.com/docs) перед реализацией, а не по памяти.
+- Методы Telegram (Bot API, Mini Apps SDK) и API библиотек (Redux Toolkit, Fastify, Drizzle, grammY, nginx) сверяй с актуальной документацией (core.telegram.org, docs.telegram-mini-apps.com, redux-toolkit.js.org, fastify.dev, orm.drizzle.team, grammy.dev, nginx.org) перед реализацией, а не по памяти.
 
 ## Готовность задачи
 
 Задача готова, когда выполнено всё:
 
 1. Критерий «Готово» из ТЗ для этой задачи выполнен.
-2. `pnpm check` зелёный (типы + линтер + юнит-тесты).
-3. Если менялся UI: `pnpm e2e` зелёный, экран проверен в браузере в mock-режиме (субагент `ui-verifier`), скриншоты сохранены в `docs/screens/task-NN/`.
+2. `npm run check` зелёный (типы + линтер + юнит-тесты).
+3. Если менялся UI: `npm run e2e` зелёный, экран проверен в браузере в mock-режиме (субагент `ui-verifier`), скриншоты сохранены в `docs/screens/task-NN/`.
 4. Субагент `spec-reviewer` не нашёл расхождений с ТЗ и этими правилами (или они исправлены).
 5. В ТЗ отмечен чекбокс задачи, в `docs/progress.md` добавлена запись.
 6. Изменения закоммичены в ветке задачи.
 
 ## Команды
 
-Появляются по мере выполнения задач 1–2; если команды ещё нет — задача, которая её вводит, ещё не сделана.
+Появляются по мере выполнения задач 1, 2 и 14; если команды ещё нет — задача, которая её вводит, ещё не сделана.
 
 | Команда | Что делает |
 | --- | --- |
-| `pnpm install` | Установка зависимостей (pnpm через corepack, Node 24) |
-| `pnpm dev` | Мини-апп в браузере; по умолчанию `VITE_TG_MOCK=1 VITE_API=mock` |
-| `pnpm typecheck` | TypeScript по всем пакетам (project references) |
-| `pnpm lint` | ESLint |
-| `pnpm test` | Vitest |
-| `pnpm check` | typecheck + lint + test + size-limit |
-| `pnpm e2e` | Playwright по основным сценариям в mock-режиме |
-| `pnpm supabase start` / `db reset` | Локальный Supabase (нужен Docker) |
+| `npm install` | Установка зависимостей (npm из поставки Node 24, lock-файл `package-lock.json`) |
+| `npm run dev` | Мини-апп в браузере; по умолчанию `VITE_TG_MOCK=1 VITE_API=mock` |
+| `npm run typecheck` | TypeScript по всем пакетам (project references) |
+| `npm run lint` | ESLint |
+| `npm run test` | Vitest |
+| `npm run check` | typecheck + lint + test + size-limit |
+| `npm run e2e` | Playwright по основным сценариям в mock-режиме |
+| `npm run db:up` / `npm run db:down` | Локальный Postgres в Docker Compose |
+| `npm run db:migrate` | Применить миграции к локальной базе |
+| `npm run db:reset` | Пересоздать локальную базу: миграции + seed из `content/` |
+| `npm run dev:server` | Node-сервер и воркер локально (для `VITE_API=local`) |
 
 ## Структура
 
 ```
-apps/web/            мини-апп (React 19, Vite, TanStack Query, Zustand, Tailwind)
+apps/web/            мини-апп (React 19, Vite, Redux Toolkit + RTK Query, Tailwind)
   src/app/           роутинг, провайдеры
   src/screens/       по папке на экран
   src/components/    общие компоненты UI
-  src/api/           клиент API + хуки TanStack Query
+  src/store/         Redux store, слайсы
+  src/api/           RTK Query: API-слайс и эндпоинты
   src/telegram/      обёртки SDK, mock-окружение
   src/mocks/         MSW-обработчики и фикстуры
   src/i18n/ru.ts     все строки интерфейса
-supabase/
+apps/server/         Node-сервер (Node 24, Fastify, Drizzle, grammY)
+  src/routes/        эндпоинты API
+  src/bot/           бот
+  src/worker/        воркер: напоминания, очистка share
+  src/db/            схема Drizzle, запросы
   migrations/        SQL-миграции
-  functions/         auth, api, bot, cron-reminders (Deno)
   seed/              загрузка content/ в базу
 packages/shared/     zod-схемы API, типы, константы, чистая логика (подбор блюд, порции, покупки)
 content/             рецепты: content/<страна>/<блюдо>.json + фото
+deploy/              nginx.conf, docker-compose для VPS
 docs/                ТЗ, решения, прогресс, скриншоты
 ```
 
@@ -62,8 +70,9 @@ docs/                ТЗ, решения, прогресс, скриншоты
 - TypeScript strict, без `any` и `@ts-ignore`; если без них никак — комментарий с причиной.
 - Контракт API — только zod-схемы из `packages/shared`; клиент и сервер импортируют их, а не дублируют типы.
 - Чистая бизнес-логика (алгоритм подбора, пересчёт порций, суммирование покупок, `overtook`) живёт в `packages/shared` и покрыта юнит-тестами.
-- Сервер не доверяет клиенту: доступ, штампы, подписка — только на сервере. Клиент не пишет в базу напрямую.
-- Клиент обращается к бэкенду только через базовый URL из `VITE_API_URL` (прокси), никогда — к `*.supabase.co` напрямую.
+- Сервер не доверяет клиенту: доступ, штампы, подписка — только на сервере. Клиент не подключается к базе: всё через API.
+- Клиент обращается к бэкенду только через базовый URL из `VITE_API_URL`.
+- Серверные данные на клиенте — через RTK Query (`src/api/`), не дублируются в слайсах; слайсы — для клиентского состояния (порции, таймеры, черновики).
 - Все строки UI — в `src/i18n/ru.ts`. Никакого текста в JSX.
 - Интерактивные элементы — настоящие `button`/`input`/`label`, у иконок без подписи — `aria-label`, зоны нажатия от 44 × 44 px.
 - У экранов с данными — состояния загрузки, ошибки и пустое.
@@ -72,13 +81,13 @@ docs/                ТЗ, решения, прогресс, скриншоты
 
 ## Секреты и окружение
 
-- Токен бота и ключи Supabase — только в серверном окружении и `.env*` (в git не попадают). В клиентской сборке — только `VITE_*` без секретов.
+- Токен бота, пароль базы и ключ подписи ссылок — только в серверном окружении и `.env*` (в git не попадают). В клиентской сборке — только `VITE_*` без секретов.
 - Агент не читает и не выводит содержимое `.env`, `.env.local` и подобных файлов; для примеров — `.env.example`.
-- Агент не выполняет действий с облаком: `supabase link`, `db push`, `functions deploy`, `secrets set`, деплой хостинга, `git push` — только человек.
+- Агент не трогает VPS и прод: `ssh`, `scp`/`rsync` на сервер, деплой, миграции на проде, `git push` — только человек. Docker — только для локального окружения.
 
 ## Dev-режим
 
 - `VITE_TG_MOCK=1` — подставное окружение Telegram, пользователь выбирается `?user=<id>`.
 - `VITE_API=mock` — MSW по фикстурам (12 стран, 36 блюд, 3 друга, состояния из ТЗ).
-- `VITE_API=local` — локальный Supabase; initData подписывается тестовым токеном.
+- `VITE_API=local` — локальный Node-сервер и Postgres в Docker; initData подписывается тестовым токеном.
 - Проверка в браузере — вьюпорт 390 × 844 (iPhone 14), светлая тема.
