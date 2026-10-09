@@ -38,6 +38,8 @@
 **Прочее:**
 
 - Один `.env` в корне репозитория: Vite читает его через `envDir: '../..'`, сервер — через `--env-file-if-exists`, Docker Compose — сам.
+- Mock-флаги действуют только в dev. `apps/web/vite.config.ts` при `vite` (serve) подставляет `VITE_TG_MOCK=1` и `VITE_API=mock`, если они не заданы в `.env` или окружении, а продакшен-сборка (`vite build`, mode `production`) падает с ошибкой, если `VITE_TG_MOCK=1` или `VITE_API=mock` всё же пришли из `.env`. В `.env.example` эти строки закомментированы. Закоммиченный `.env.development` не подошёл: `.gitignore` и хук `guard-edit.sh` закрывают все `.env.*`, кроме `.env.example`. Флаги в скрипте `dev` тоже не подошли: переменные из окружения важнее `.env`, и переключить dev на `VITE_API=local` через `.env` стало бы нельзя.
+- `GET /api/health` — служебный эндпоинт для проверки, что сервер жив (в ТЗ его нет). В задаче 23 он используется как healthcheck для Docker и nginx.
 - Локальный Postgres слушает `127.0.0.1:5433`, а не 5432, чтобы не конфликтовать с системным Postgres. Порт меняется переменной `POSTGRES_PORT`.
 - Сервер по умолчанию слушает порт 3080, переменная `PORT`.
 - ESLint: `strictTypeChecked` + `stylisticTypeChecked`, для `apps/web/src` — react, react-hooks, react-refresh (vite), в конце — `eslint-config-prettier`.

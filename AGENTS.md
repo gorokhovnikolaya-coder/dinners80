@@ -26,22 +26,22 @@
 
 Команды из колонки «Задача» с номером больше выполненных ещё не существуют. Окружение: Node ≥ 24.12, npm workspaces, Docker для локальной базы; переменные — в `.env` в корне (образец — `.env.example`).
 
-| Команда                             | Что делает                                                                                                    | Задача |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------ |
-| `npm install`                       | Установка зависимостей (npm из поставки Node 24, lock-файл `package-lock.json`)                               | 1      |
-| `npm run dev`                       | Мини-апп в браузере (Vite, `apps/web`); mock-режим по умолчанию (`VITE_TG_MOCK=1 VITE_API=mock`) — с задачи 2 | 1      |
-| `npm run build`                     | `tsc -b` + продакшен-сборка мини-аппа в `apps/web/dist`                                                       | 1      |
-| `npm run typecheck`                 | TypeScript по всем пакетам (`tsc -b`, project references)                                                     | 1      |
-| `npm run lint`                      | ESLint (flat config, typescript-eslint strict type-checked, React для `apps/web`)                             | 1      |
-| `npm run test`                      | Vitest по всем пакетам (`packages/*`, `apps/*` — отдельные projects)                                          | 1      |
-| `npm run size`                      | Сборка web + size-limit: стартовый JS ≤ 200 КБ gzip                                                           | 1      |
-| `npm run check`                     | typecheck + lint + test + size                                                                                | 1      |
-| `npm run format`                    | Prettier по всему репозиторию (кроме `docs/`, `.claude/`)                                                     | 1      |
-| `npm run db:up` / `npm run db:down` | Локальный Postgres 17 в Docker Compose (`127.0.0.1:5433`, том `postgres-data`)                                | 1      |
-| `npm run dev:server`                | Node-сервер локально (`node --watch`, порт 3080, `GET /api/health`); воркер — с задачи 14                     | 1      |
-| `npm run e2e`                       | Playwright по основным сценариям в mock-режиме                                                                | 2      |
-| `npm run db:migrate`                | Применить миграции к локальной базе                                                                           | 14     |
-| `npm run db:reset`                  | Пересоздать локальную базу: миграции + seed из `content/`                                                     | 14     |
+| Команда                             | Что делает                                                                                                                                      | Задача |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| `npm install`                       | Установка зависимостей (npm из поставки Node 24, lock-файл `package-lock.json`)                                                                 | 1      |
+| `npm run dev`                       | Мини-апп в браузере (Vite, `apps/web`); по умолчанию `VITE_TG_MOCK=1 VITE_API=mock` (только dev, в `vite.config.ts`); сам mock-режим — задача 2 | 1      |
+| `npm run build`                     | `tsc -b` + продакшен-сборка мини-аппа в `apps/web/dist`                                                                                         | 1      |
+| `npm run typecheck`                 | TypeScript по всем пакетам (`tsc -b`, project references)                                                                                       | 1      |
+| `npm run lint`                      | ESLint (flat config, typescript-eslint strict type-checked, React для `apps/web`)                                                               | 1      |
+| `npm run test`                      | Vitest по всем пакетам (`packages/*`, `apps/*` — отдельные projects)                                                                            | 1      |
+| `npm run size`                      | Сборка web + size-limit: стартовый JS ≤ 200 КБ gzip                                                                                             | 1      |
+| `npm run check`                     | typecheck + lint + test + size                                                                                                                  | 1      |
+| `npm run format`                    | Prettier по всему репозиторию (кроме `docs/`, `.claude/`)                                                                                       | 1      |
+| `npm run db:up` / `npm run db:down` | Локальный Postgres 17 в Docker Compose (`127.0.0.1:5433`, том `postgres-data`)                                                                  | 1      |
+| `npm run dev:server`                | Node-сервер локально (`node --watch`, порт 3080, `GET /api/health`); воркер — с задачи 21                                                       | 1      |
+| `npm run e2e`                       | Playwright по основным сценариям в mock-режиме                                                                                                  | 2      |
+| `npm run db:migrate`                | Применить миграции к локальной базе                                                                                                             | 14     |
+| `npm run db:reset`                  | Пересоздать локальную базу: миграции + seed из `content/`                                                                                       | 14     |
 
 Скрипт отдельного пакета: `npm run <скрипт> -w @tma80/web` (`@tma80/server`, `@tma80/shared`).
 
