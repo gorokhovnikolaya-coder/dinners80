@@ -2,7 +2,7 @@ import { authResponseSchema, type AuthResponse } from '@tma80/shared';
 
 import { api } from './api.ts';
 
-const authApi = api.injectEndpoints({
+export const authApi = api.injectEndpoints({
   endpoints: (build) => ({
     /**
      * `POST /auth`: the server checks initData and returns the profile. A query (not a mutation)

@@ -2,7 +2,7 @@
  * Dev switches of the mock API, read from the page URL at MSW start:
  * - `?mock_error=auth` — the first request to the `auth` endpoint fails with HTTP 500
  *   (`{error: {code: 'internal'}}`), the retry succeeds; `auth:always` fails every time.
- *   Several endpoints: `?mock_error=auth,home`.
+ *   Several endpoints: `?mock_error=auth,me`. Keys: `auth` (`POST /auth`), `me` (`PATCH /me`).
  * - `?mock_delay=<ms>` — delay of every mock response, to see loading states.
  */
 export interface MockControls {

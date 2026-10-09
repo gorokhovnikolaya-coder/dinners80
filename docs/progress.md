@@ -4,7 +4,8 @@
 
 Проблемы и идеи, замеченные вне текущей задачи. Пункт удаляется, когда его взяли в работу.
 
-- Задачи 4–5: при введении React Router перенести `/dev/ui` в роутер (оставить под `import.meta.env.DEV` и с ленивым импортом) и подключить `TabBar.onNavigate` к `navigate`.
+- Задача 5: подключить `TabBar.onNavigate` к `navigate` из React Router (роутер и `/dev/ui` в нём — с задачи 4).
+- e2e: под высокой нагрузкой машины (load average > 15) сценарии изредка падали по таймауту `page.goto` на холодном dev-сервере; на свободной машине стабильно зелёные. Если повторится в CI — поднять `timeout`/`navigationTimeout` в `playwright.config.ts`.
 - Экраны 1 и 6: сегментный переключатель («Будни · до 30 мин / Выходные», «Эта неделя / Всё время») в задачу 3 не входил — собрать на экране или вынести в компонент.
 
 ## Журнал
@@ -18,6 +19,12 @@
 - Решения: docs/decisions/NNNN-… (если были)
 - Осталось / сомнения: …
 ```
+
+### Задача 04 — Онбординг (2026-10-09, ветка task/04-onboarding)
+- Сделано: React Router 8.4 (декларативный режим): `/` — заглушка «Ужин сегодня», `/onboarding` — ленивый экран онбординга, перенаправления по `needsOnboarding`, dev-only `/dev/ui` в роутере; онбординг по макету (тёмный экран, сегменты прогресса, «Вопрос N из 3», карточки-варианты, «Дальше»), 3 вопроса, назад — системная кнопка Telegram (шаги 2–3); черновик — ленивый Redux-слайс (`combineSlices` + `injectInto`); `PATCH /me` (схемы `updateMeRequestSchema`/`meResponseSchema`, часовой пояс из `Intl`), обновление кеша `auth` без перезапроса; состояния «Сохраняем…» и ошибка с «Повторить»; правило «мясо ⇒ свинина» в UI (свинина отмечена и заблокирована) и нормализация исключений (`normalizeExclusions`) в `packages/shared`; переиспользуемые контролы `HouseholdField`/`WeekdayMinutesField`/`ExclusionsField` на новом `OptionCard` (тёмный и светлый тон, для профиля); шапка Telegram navy на онбординге; мок: `mocks/db.ts` с sessionStorage, `PATCH /me`, `?mock_error=me`, `?mock_reset=1`, кнопка «Назад» Telegram в mock-окружении; токены `navy-selected`, `on-dark`, `ProgressBar size="xs"`, тёмное неактивное состояние `Button inverse`. Тесты: shared (нормализация, схемы), логика шагов и слайс, контролы (Testing Library), MSW `PATCH /me`; e2e `e2e/onboarding.spec.ts` (4 сценария), `dev-mode.spec.ts` переведён с новичка на 1005.
+- Проверено: npm run check ✓ (стартовый JS 132.79 kB gzip из 200 kB, CSS 5.11 kB из 20 kB; чанк онбординга 3.25 kB), npm run e2e ✓ (11 сценариев), браузер 390 × 844 mock-режим `?user=1001`, скриншоты docs/screens/task-04/
+- Решения: docs/decisions/0005-onboarding-routing-patch-me.md
+- Осталось / сомнения: вопросы владельцу — подпись «без острого» у «Семья с детьми» из макета не выведена (семья не исключает острое по ТЗ); блокировка свинины при выборе мяса; текст кнопки на последнем шаге («Дальше» по ТЗ); тексты шагов 2–3 и подсказок под вариантами придуманы (в макете только шаг 1).
 
 ### Задача 03 — Дизайн-токены и базовые компоненты (2026-10-09, ветка task/03-design-system)
 - Сделано: Tailwind CSS 4.3 (`@tailwindcss/vite`), токены из макета в `@theme static` (`apps/web/src/styles/theme.css`: палитра, шрифты, полная шкала текста 10–40 px, интервалы, радиусы, тени; дефолты Tailwind сброшены; кольцо фокуса — переменная, на тёмных поверхностях `surface-dark` → amber); самохостинг Manrope и Unbounded (вариативные woff2, только кириллица + латиница, `font-display: swap`); компоненты `Button`/`IconButton`, `Card`, `Chip`, `TabBar`, `ProgressBar`, `Checkbox`, `Skeleton`/`SkeletonGroup`, `ErrorState`, иконки; dev-only галерея `/dev/ui` (без React Router, выпиливается из сборки); заглушка `App.tsx` на `Skeleton`/`ErrorState`; цвет шапки и фона Telegram читается из `--color-bg`; size-limit считает и стартовый CSS (≤ 20 КБ). Тесты: Testing Library + jsdom (ProgressBar, Checkbox, Chip, TabBar, Skeleton, ErrorState, Button, чтение токенов), e2e `e2e/dev-ui.spec.ts` (8 компонентов, взаимодействие, зоны 44 × 44) и проверка цветов Telegram из токена.

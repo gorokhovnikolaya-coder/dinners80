@@ -1,5 +1,6 @@
 import './dev-ui.css';
 
+import type { DishTag, Household } from '@tma80/shared';
 import { useState, type ReactNode } from 'react';
 
 import { Button, IconButton } from '../components/Button.tsx';
@@ -18,6 +19,7 @@ import {
   IconRefresh,
 } from '../components/icons.tsx';
 import { ProgressBar } from '../components/ProgressBar.tsx';
+import { ExclusionsField, HouseholdField } from '../components/preferences/PreferenceFields.tsx';
 import { Skeleton, SkeletonGroup } from '../components/Skeleton.tsx';
 import { TabBar, type TabBarItem } from '../components/TabBar.tsx';
 import { ru, ruDevUi as t } from '../i18n/ru.ts';
@@ -40,6 +42,8 @@ const SWATCHES = [
   'accent-soft',
   'navy-2',
   'navy-3',
+  'navy-selected',
+  'on-dark',
   'on-dark-muted',
   'amber',
 ] as const;
@@ -72,6 +76,8 @@ export function DevUiPage() {
   });
   const [tab, setTab] = useState('dinner');
   const [retries, setRetries] = useState(0);
+  const [household, setHousehold] = useState<Household | null>('couple');
+  const [exclusions, setExclusions] = useState<DishTag[]>(['meat']);
 
   const toggleCheck = (key: string) => (checked: boolean) => {
     setChecks((prev) => ({ ...prev, [key]: checked }));
@@ -146,9 +152,7 @@ export function DevUiPage() {
             <Chip tone="badge">{t.card.newCountry}</Chip>
           </div>
           <div className="flex flex-col gap-2 px-4 pt-3.5 pb-4">
-            <p className="text-sm font-bold tracking-caps text-muted uppercase">
-              {t.card.country}
-            </p>
+            <p className="text-sm font-bold tracking-caps text-muted uppercase">{t.card.country}</p>
             <h3 className="font-display text-3xl font-bold">{t.card.dish}</h3>
             <div className="flex flex-wrap gap-2">
               <Chip>{t.card.time}</Chip>
@@ -291,6 +295,28 @@ export function DevUiPage() {
             label={t.checkbox.disabled}
           />
         </Card>
+      </Section>
+
+      <Section id="ui-option-card" title={t.sections.optionCard}>
+        <Card tone="inverse" className="flex flex-col gap-3">
+          <p id="ui-option-question" className="text-lg font-bold">
+            {t.optionCard.question}
+          </p>
+          <HouseholdField
+            value={household}
+            onChange={setHousehold}
+            labelledBy="ui-option-question"
+          />
+        </Card>
+        <p id="ui-option-exclusions" className="text-lg font-bold">
+          {t.optionCard.exclusionsQuestion}
+        </p>
+        <ExclusionsField
+          tone="light"
+          value={exclusions}
+          onChange={setExclusions}
+          labelledBy="ui-option-exclusions"
+        />
       </Section>
 
       <Section id="ui-skeleton" title={t.sections.skeleton}>

@@ -11,6 +11,47 @@ export const ru = {
     errorHint: 'Проверьте интернет и попробуйте ещё раз.',
     retry: 'Повторить',
   },
+  preferences: {
+    household: {
+      solo: { title: 'Я один', description: '1 порция' },
+      couple: { title: 'Мы вдвоём', description: '2 порции' },
+      family: { title: 'Семья с детьми', description: '3–4 порции' },
+    },
+    weekdayMinutes: (minutes: number) => `${String(minutes)} минут`,
+    exclusions: {
+      pork: { title: 'Свинина' },
+      meat: { title: 'Мясо', description: 'Включая свинину' },
+      spicy: { title: 'Острое' },
+      gluten: { title: 'Глютен', description: 'Мука, паста, хлеб, соевый соус' },
+    },
+    /** Shown on pork while meat is excluded. */
+    impliedByMeat: 'Уже исключена вместе с мясом',
+  },
+  onboarding: {
+    progress: 'Вопросы онбординга',
+    counter: (step: number, total: number) => `Вопрос ${String(step)} из ${String(total)}`,
+    steps: {
+      household: {
+        title: 'Кто ест за вашим столом?',
+        description: 'Подстроим порции и подскажем блюда, которые понравятся всем.',
+        hint: 'Дальше: время на ужин в будни и что вы не едите',
+      },
+      weekdayMinutes: {
+        title: 'Сколько времени на ужин в будни?',
+        description: 'По будням предложим блюда, которые успеете приготовить за это время.',
+        hint: 'Дальше: что вы не едите',
+      },
+      exclusions: {
+        title: 'Что вы не едите?',
+        description: 'Уберём такие блюда из подборки. Можно ничего не выбирать.',
+        hint: 'Ответы можно изменить в профиле',
+      },
+    },
+    next: 'Дальше',
+    saving: 'Сохраняем…',
+    saveError: 'Не удалось сохранить ответы.',
+    retry: 'Повторить',
+  },
   tabs: {
     label: 'Разделы',
     dinner: 'Ужин',
@@ -37,6 +78,7 @@ export const ruDevUi = {
     checkbox: 'Checkbox',
     skeleton: 'Skeleton',
     errorState: 'ErrorState',
+    optionCard: 'OptionCard',
   },
   typography: {
     display: 'Что на ужин сегодня?',
@@ -94,6 +136,14 @@ export const ruDevUi = {
   },
   skeleton: {
     dishCard: 'Загрузка карточки блюда',
+  },
+  optionCard: {
+    question: 'Кто ест за вашим столом?',
+    exclusionsQuestion: 'Что вы не едите?',
+  },
+  tgMock: {
+    /** Stand-in for the Telegram BackButton in the browser (mock Telegram environment). */
+    back: 'Назад (кнопка Telegram)',
   },
   errorState: {
     retried: (count: number) => `Нажато «Повторить»: ${String(count)}`,

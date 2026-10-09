@@ -2,6 +2,12 @@ import { z } from 'zod/mini';
 
 import { DISH_TAGS, HOUSEHOLDS, SUBSCRIPTION_PLANS, WEEKDAY_MINUTES } from './constants.ts';
 
+/** IANA time zone, e.g. `Europe/Moscow` (`users.timezone`). */
+export const timezoneSchema = z.string().check(z.minLength(1), z.maxLength(64));
+
+/** Dinner reminder time `HH:MM`, step 30 minutes (`users.reminder_time`). */
+export const reminderTimeSchema = z.string().check(z.regex(/^([01]\d|2[0-3]):(00|30)$/));
+
 /** The current user's profile and settings, as the client sees it (`users`). */
 export const userProfileSchema = z.object({
   id: z.string().check(z.minLength(1)),
@@ -14,10 +20,10 @@ export const userProfileSchema = z.object({
   weekdayMinutes: z.nullable(z.literal(WEEKDAY_MINUTES)),
   exclusions: z.array(z.enum(DISH_TAGS)),
   /** IANA time zone, e.g. `Europe/Moscow`. */
-  timezone: z.string().check(z.minLength(1)),
+  timezone: timezoneSchema,
   reminderEnabled: z.boolean(),
   /** `HH:MM`, step 30 minutes. */
-  reminderTime: z.string().check(z.regex(/^([01]\d|2[0-3]):(00|30)$/)),
+  reminderTime: reminderTimeSchema,
   botCanWrite: z.boolean(),
   inviteCode: z.string().check(z.minLength(1)),
 });

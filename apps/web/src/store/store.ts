@@ -1,13 +1,21 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { combineSlices, configureStore } from '@reduxjs/toolkit';
 
 import { api } from '../api/api.ts';
 
+/**
+ * Slices of lazily loaded screens. A screen adds its slice by module augmentation
+ * (`interface LazyLoadedSlices extends WithSlice<typeof slice> {}`) and `slice.injectInto(rootReducer)`
+ * in its own chunk, so the slice code stays out of the initial bundle.
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- extended by lazy screens (RTK `combineSlices` pattern)
+export interface LazyLoadedSlices {}
+
+export const rootReducer = combineSlices(api).withLazyLoadedSlices<LazyLoadedSlices>();
+
 export const store = configureStore({
-  reducer: {
-    [api.reducerPath]: api.reducer,
-  },
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(api.middleware),
 });
 
-export type RootState = ReturnType<typeof store.getState>;
+export type RootState = ReturnType<typeof rootReducer>;
 export type AppDispatch = typeof store.dispatch;

@@ -2,7 +2,7 @@ import { cx } from './cx.ts';
 import { MAX_STEP_SEGMENTS, normalizeProgress } from './progress.ts';
 
 export type ProgressTone = 'light' | 'dark';
-export type ProgressSize = 'sm' | 'md';
+export type ProgressSize = 'xs' | 'sm' | 'md';
 
 export interface ProgressBarProps {
   value: number;
@@ -16,7 +16,7 @@ export interface ProgressBarProps {
   variant?: 'bar' | 'steps';
   /** `light` — teal on a grey track; `dark` — amber on navy. */
   tone?: ProgressTone;
-  /** Track height: `sm` — 6 px, `md` — 10 px. */
+  /** Track height: `xs` — 4 px (onboarding segments), `sm` — 6 px, `md` — 10 px. */
   size?: ProgressSize;
   className?: string;
 }
@@ -32,6 +32,7 @@ const fillTones: Record<ProgressTone, string> = {
 };
 
 const heights: Record<ProgressSize, string> = {
+  xs: 'h-1',
   sm: 'h-1.5',
   md: 'h-2.5',
 };

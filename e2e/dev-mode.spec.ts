@@ -5,8 +5,8 @@ test.describe('dev mode', () => {
     await page.goto('/?user=1002');
     await expect(page.getByText('Привет, Борис!')).toBeVisible();
 
-    await page.goto('/?user=1001');
-    await expect(page.getByText('Привет, Аня!')).toBeVisible();
+    await page.goto('/?user=1005');
+    await expect(page.getByText('Привет, Дина!')).toBeVisible();
     await expect(page.getByText('Привет, Борис!')).toHaveCount(0);
   });
 

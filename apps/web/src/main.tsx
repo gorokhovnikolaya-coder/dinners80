@@ -1,28 +1,13 @@
 import './styles/index.css';
 
-import { StrictMode, type ReactNode } from 'react';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router';
 
 import { App } from './app/App.tsx';
 import { store } from './store/store.ts';
 import { initTelegram } from './telegram/sdk.ts';
-
-/**
- * Root element: the app, or the component gallery `/dev/ui` in dev. `import.meta.env.DEV` is
- * false in `vite build`, so the branch and the gallery chunk are dropped from production.
- */
-async function resolveRoot(): Promise<ReactNode> {
-  if (import.meta.env.DEV && window.location.pathname === '/dev/ui') {
-    const { DevUiPage } = await import('./dev/DevUiPage.tsx');
-    return <DevUiPage />;
-  }
-  return (
-    <Provider store={store}>
-      <App />
-    </Provider>
-  );
-}
 
 async function bootstrap() {
   // Dev-only mocks are loaded dynamically under build-time flags, so a production build
@@ -42,7 +27,15 @@ async function bootstrap() {
     throw new Error('Root element #root not found');
   }
 
-  createRoot(container).render(<StrictMode>{await resolveRoot()}</StrictMode>);
+  createRoot(container).render(
+    <StrictMode>
+      <Provider store={store}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </Provider>
+    </StrictMode>,
+  );
 }
 
 void bootstrap();

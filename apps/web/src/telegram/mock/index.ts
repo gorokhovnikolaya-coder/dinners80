@@ -1,5 +1,6 @@
 import { emitEvent, mockTelegramEnv } from '@tma.js/sdk-react';
 
+import { setMockBackButtonVisible } from './backButton.ts';
 import { buildMockInitData } from './initData.ts';
 import { resolveTestUser } from './testUser.ts';
 
@@ -74,6 +75,14 @@ export function mockTelegram(): void {
           return;
         case 'web_app_request_content_safe_area':
           emitEvent('content_safe_area_changed', contentSafeArea);
+          return;
+        case 'web_app_setup_back_button':
+          setMockBackButtonVisible(
+            typeof event.params === 'object' &&
+              event.params !== null &&
+              'is_visible' in event.params &&
+              event.params.is_visible === true,
+          );
           return;
         default:
           // Other methods (ready, expand, colours…) have no visible effect in the browser.

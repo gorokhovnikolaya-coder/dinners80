@@ -112,3 +112,46 @@ export function IconAlert(props: IconProps) {
     </Icon>
   );
 }
+
+/** Onboarding: «Я один». */
+export function IconPerson(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c0-4 4-6 8-6s8 2 8 6" />
+    </Icon>
+  );
+}
+
+/** Onboarding: «Мы вдвоём». */
+export function IconCouple(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="8" cy="8" r="3.5" />
+      <circle cx="16" cy="8" r="3.5" />
+      <path d="M2 20c0-3 3-5 6-5M22 20c0-3-3-5-6-5M8 15c1.2-.6 2.6-1 4-1s2.8.4 4 1" />
+    </Icon>
+  );
+}
+
+/** Onboarding: «Семья с детьми». */
+export function IconFamily(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="7" cy="7" r="3" />
+      <circle cx="17" cy="7" r="3" />
+      <circle cx="12" cy="14" r="2.5" />
+      <path d="M2 20c0-3 2-5 5-5M22 20c0-3-2-5-5-5M8.5 21c0-2 1.5-3.5 3.5-3.5s3.5 1.5 3.5 3.5" />
+    </Icon>
+  );
+}
+
+/** Onboarding: weekday dinner time. */
+export function IconClock(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </Icon>
+  );
+}

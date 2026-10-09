@@ -36,8 +36,16 @@ const variants: Record<ButtonVariant, string> = {
     'bg-amber font-extrabold text-ink enabled:hover:brightness-105 enabled:active:brightness-95',
 };
 
-// Disabled controls are exempt from WCAG contrast, but the pair still passes 4.5:1 (muted on track).
-const disabled = 'disabled:border-transparent disabled:bg-track disabled:text-muted';
+// Disabled controls are exempt from WCAG contrast, but the pairs still pass 4.5:1:
+// muted on track (light screens), on-dark-muted on navy-3 (4.9:1, the inverse button on navy).
+const disabledLight = 'disabled:border-transparent disabled:bg-track disabled:text-muted';
+const disabledStyles: Record<ButtonVariant, string> = {
+  primary: disabledLight,
+  accent: disabledLight,
+  secondary: disabledLight,
+  ghost: disabledLight,
+  inverse: 'disabled:bg-navy-3 disabled:text-on-dark-muted',
+};
 
 const sizes: Record<ButtonSize, string> = {
   md: 'min-h-12 px-5 text-lg',
@@ -61,7 +69,7 @@ export function Button({
       className={cx(
         base,
         variants[variant],
-        disabled,
+        disabledStyles[variant],
         sizes[size],
         fullWidth && 'w-full',
         className,

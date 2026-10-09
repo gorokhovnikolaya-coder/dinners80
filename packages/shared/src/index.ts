@@ -11,7 +11,22 @@ export {
 export { API_ERROR_CODES, apiErrorSchema, type ApiError, type ApiErrorCode } from './errors.ts';
 export { healthResponseSchema, type HealthResponse } from './health.ts';
 export {
+  meResponseSchema,
+  updateMeRequestSchema,
+  type MeResponse,
+  type UpdateMeRequest,
+} from './me.ts';
+export {
+  hasOnboardingAnswers,
+  IMPLIED_EXCLUSIONS,
+  isExclusionImplied,
+  normalizeExclusions,
+  type OnboardingAnswers,
+} from './preferences.ts';
+export {
+  reminderTimeSchema,
   subscriptionStatusSchema,
+  timezoneSchema,
   userProfileSchema,
   type SubscriptionStatus,
   type UserProfile,

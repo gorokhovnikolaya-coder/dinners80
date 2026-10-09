@@ -26,3 +26,6 @@ export function toHexColor(raw: string): HexColor | undefined {
 export function readColorToken(name: string, root: Element = document.documentElement) {
   return toHexColor(getComputedStyle(root).getPropertyValue(name));
 }
+
+/** Navy — the Telegram header and background on dark screens (onboarding, stamp, paywall). */
+export const DARK_CHROME_COLOR_TOKEN = '--color-ink';
