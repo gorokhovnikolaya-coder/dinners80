@@ -16,8 +16,8 @@ export default defineConfig(
     languageOptions: {
       parserOptions: {
         projectService: {
-          // Root-level tool configs are not part of any tsconfig project.
-          allowDefaultProject: ['*.js', '*.ts'],
+          // Root-level tool configs outside any tsconfig project (playwright.config.ts is in e2e/).
+          allowDefaultProject: ['*.js', 'vitest.config.ts'],
         },
         tsconfigRootDir: import.meta.dirname,
       },
@@ -32,7 +32,14 @@ export default defineConfig(
     extends: [tseslint.configs.disableTypeChecked],
   },
   {
-    files: ['*.js', '*.ts', 'apps/server/**/*.ts', 'apps/web/vite.config.ts', 'packages/**/*.ts'],
+    files: [
+      '*.js',
+      '*.ts',
+      'e2e/**/*.ts',
+      'apps/server/**/*.ts',
+      'apps/web/vite.config.ts',
+      'packages/**/*.ts',
+    ],
     languageOptions: { globals: globals.node },
   },
   {

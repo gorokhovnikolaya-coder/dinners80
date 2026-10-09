@@ -1,9 +1,20 @@
 {
   "files": [],
   "references": [
-    { "path": "./packages/shared" },
-    { "path": "./apps/server" },
-    { "path": "./apps/web/tsconfig.app.json" },
-    { "path": "./apps/web/tsconfig.node.json" }
+    {
+      "path": "./packages/shared"
+    },
+    {
+      "path": "./apps/server"
+    },
+    {
+      "path": "./apps/web/tsconfig.app.json"
+    },
+    {
+      "path": "./apps/web/tsconfig.node.json"
+    },
+    {
+      "path": "./e2e"
+    }
   ]
 }

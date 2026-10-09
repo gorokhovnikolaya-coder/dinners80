@@ -20,10 +20,12 @@
     "check": "npm run typecheck && npm run lint && npm run test && npm run size",
     "format": "prettier --write .",
     "db:up": "docker compose up -d --wait postgres",
-    "db:down": "docker compose down"
+    "db:down": "docker compose down",
+    "e2e": "playwright test"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.64.0",
     "@size-limit/file": "^14.2.0",
     "@types/node": "^24.19.1",
     "eslint": "^9.39.5",

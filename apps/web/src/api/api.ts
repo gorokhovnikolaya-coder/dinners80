@@ -1,0 +1,19 @@
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { AUTH_SCHEME } from '@tma80/shared';
+
+import { getRawInitData } from '../telegram/sdk.ts';
+import { API_URL } from './config.ts';
+
+/** RTK Query API slice; endpoints are injected per feature (`injectEndpoints`). */
+export const api = createApi({
+  reducerPath: 'api',
+  baseQuery: fetchBaseQuery({
+    baseUrl: API_URL,
+    prepareHeaders(headers) {
+      const initData = getRawInitData();
+      if (initData) headers.set('Authorization', `${AUTH_SCHEME} ${initData}`);
+      return headers;
+    },
+  }),
+  endpoints: () => ({}),
+});
