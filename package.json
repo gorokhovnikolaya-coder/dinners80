@@ -1,0 +1,41 @@
+{
+  "name": "tma80",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=24.12.0"
+  },
+  "scripts": {
+    "dev": "npm run dev -w @tma80/web",
+    "dev:server": "npm run dev -w @tma80/server",
+    "build": "tsc -b && npm run build -w @tma80/web",
+    "typecheck": "tsc -b",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "size": "npm run build -w @tma80/web && size-limit",
+    "check": "npm run typecheck && npm run lint && npm run test && npm run size",
+    "format": "prettier --write .",
+    "db:up": "docker compose up -d --wait postgres",
+    "db:down": "docker compose down"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@size-limit/file": "^14.2.0",
+    "@types/node": "^24.19.1",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.9",
+    "size-limit": "^14.2.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.1",
+    "vitest": "^5.0.3"
+  }
+}

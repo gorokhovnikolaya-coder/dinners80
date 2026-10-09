@@ -23,3 +23,4 @@ playwright-report/
 .claude/.state/
 
 .DS_Store
+.tsbuild/

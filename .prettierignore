@@ -1,0 +1,7 @@
+package-lock.json
+**/dist/
+**/.tsbuild/
+coverage/
+.data/
+docs/
+.claude/

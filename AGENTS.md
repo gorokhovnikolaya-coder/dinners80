@@ -24,21 +24,26 @@
 
 ## Команды
 
-Появляются по мере выполнения задач 1, 2 и 14; если команды ещё нет — задача, которая её вводит, ещё не сделана.
+Команды из колонки «Задача» с номером больше выполненных ещё не существуют. Окружение: Node ≥ 24.12, npm workspaces, Docker для локальной базы; переменные — в `.env` в корне (образец — `.env.example`).
 
-| Команда | Что делает |
-| --- | --- |
-| `npm install` | Установка зависимостей (npm из поставки Node 24, lock-файл `package-lock.json`) |
-| `npm run dev` | Мини-апп в браузере; по умолчанию `VITE_TG_MOCK=1 VITE_API=mock` |
-| `npm run typecheck` | TypeScript по всем пакетам (project references) |
-| `npm run lint` | ESLint |
-| `npm run test` | Vitest |
-| `npm run check` | typecheck + lint + test + size-limit |
-| `npm run e2e` | Playwright по основным сценариям в mock-режиме |
-| `npm run db:up` / `npm run db:down` | Локальный Postgres в Docker Compose |
-| `npm run db:migrate` | Применить миграции к локальной базе |
-| `npm run db:reset` | Пересоздать локальную базу: миграции + seed из `content/` |
-| `npm run dev:server` | Node-сервер и воркер локально (для `VITE_API=local`) |
+| Команда                             | Что делает                                                                                                    | Задача |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------ |
+| `npm install`                       | Установка зависимостей (npm из поставки Node 24, lock-файл `package-lock.json`)                               | 1      |
+| `npm run dev`                       | Мини-апп в браузере (Vite, `apps/web`); mock-режим по умолчанию (`VITE_TG_MOCK=1 VITE_API=mock`) — с задачи 2 | 1      |
+| `npm run build`                     | `tsc -b` + продакшен-сборка мини-аппа в `apps/web/dist`                                                       | 1      |
+| `npm run typecheck`                 | TypeScript по всем пакетам (`tsc -b`, project references)                                                     | 1      |
+| `npm run lint`                      | ESLint (flat config, typescript-eslint strict type-checked, React для `apps/web`)                             | 1      |
+| `npm run test`                      | Vitest по всем пакетам (`packages/*`, `apps/*` — отдельные projects)                                          | 1      |
+| `npm run size`                      | Сборка web + size-limit: стартовый JS ≤ 200 КБ gzip                                                           | 1      |
+| `npm run check`                     | typecheck + lint + test + size                                                                                | 1      |
+| `npm run format`                    | Prettier по всему репозиторию (кроме `docs/`, `.claude/`)                                                     | 1      |
+| `npm run db:up` / `npm run db:down` | Локальный Postgres 17 в Docker Compose (`127.0.0.1:5433`, том `postgres-data`)                                | 1      |
+| `npm run dev:server`                | Node-сервер локально (`node --watch`, порт 3080, `GET /api/health`); воркер — с задачи 14                     | 1      |
+| `npm run e2e`                       | Playwright по основным сценариям в mock-режиме                                                                | 2      |
+| `npm run db:migrate`                | Применить миграции к локальной базе                                                                           | 14     |
+| `npm run db:reset`                  | Пересоздать локальную базу: миграции + seed из `content/`                                                     | 14     |
+
+Скрипт отдельного пакета: `npm run <скрипт> -w @tma80/web` (`@tma80/server`, `@tma80/shared`).
 
 ## Структура
 
@@ -69,6 +74,8 @@ docs/                ТЗ, решения, прогресс, скриншоты
 
 - TypeScript strict, без `any` и `@ts-ignore`; если без них никак — комментарий с причиной.
 - Контракт API — только zod-схемы из `packages/shared`; клиент и сервер импортируют их, а не дублируют типы.
+- Схемы в `packages/shared` пишутся на `zod/mini` (`import { z } from 'zod/mini'`), чтобы клиентский бандл оставался маленьким; сервер использует те же схемы (решение 0002).
+- Относительные импорты — с расширением (`./foo.ts`, `./App.tsx`), только стираемый синтаксис TypeScript (без `enum`, `namespace`, parameter properties): сервер и `packages/shared` запускаются Node 24 без сборки (решение 0002).
 - Чистая бизнес-логика (алгоритм подбора, пересчёт порций, суммирование покупок, `overtook`) живёт в `packages/shared` и покрыта юнит-тестами.
 - Сервер не доверяет клиенту: доступ, штампы, подписка — только на сервере. Клиент не подключается к базе: всё через API.
 - Клиент обращается к бэкенду только через базовый URL из `VITE_API_URL`.

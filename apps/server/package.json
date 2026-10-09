@@ -1,0 +1,14 @@
+{
+  "name": "@tma80/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --env-file-if-exists=../../.env src/index.ts",
+    "start": "node src/index.ts"
+  },
+  "dependencies": {
+    "@tma80/shared": "*",
+    "fastify": "^5.12.5"
+  }
+}

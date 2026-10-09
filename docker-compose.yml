@@ -1,0 +1,23 @@
+# Local development only. Production compose lives in deploy/ (task 23).
+name: tma80
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: tma80
+      POSTGRES_PASSWORD: tma80
+      POSTGRES_DB: tma80
+    ports:
+      # 5433 on the host so it does not clash with a system Postgres; override via POSTGRES_PORT in .env.
+      - '127.0.0.1:${POSTGRES_PORT:-5433}:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U tma80 -d tma80']
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+volumes:
+  postgres-data:

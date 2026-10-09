@@ -16,6 +16,12 @@
 - Осталось / сомнения: …
 ```
 
+### Задача 01 — Монорепозиторий (2026-10-09, ветка task/01-monorepo)
+- Сделано: npm workspaces `apps/web` (Vite 8 + React 19, экран-заглушка, строки в `src/i18n/ru.ts`), `apps/server` (Fastify 5, `GET /api/health`, запуск `node src/index.ts` без сборки), `packages/shared` (схема `healthResponseSchema` на `zod/mini` + тест); TypeScript 6 strict с project references, ESLint 9 (typescript-eslint strict type-checked, react/react-hooks/react-refresh), Prettier, Vitest 5 (projects), size-limit по манифесту Vite; `docker-compose.yml` с Postgres 17 (`127.0.0.1:5433`), `.env.example`; таблица «Команды» в AGENTS.md.
+- Проверено: npm run check ✓ (стартовый JS 67.94 kB gzip из 200 kB), npm run build ✓, npm run dev отдаёт страницу, `GET /api/health` → `{"status":"ok"}`, npm run db:up/db:down ✓. UI — только заглушка, e2e и скриншоты появятся с задачи 2.
+- Решения: docs/decisions/0002-monorepo-ts-shared-zod-mini.md
+- Осталось / сомнения: TypeScript 7 и ESLint 10 не взяты из-за несовместимости typescript-eslint и eslint-plugin-react; дефолты mock-режима для `npm run dev` — в задаче 2; zod type provider для Fastify — выбрать в задаче 14.
+
 ### Смена стека (2026-10-09, ветка docs/stack-node-redux)
 - Сделано: ТЗ, AGENTS.md, субагент `spec-reviewer`, скилл `/task`, `guard-edit.sh`, `.gitignore` переведены на Redux Toolkit + RTK Query, Node.js-сервер с Postgres и nginx на VPS без Supabase; менеджер пакетов — npm вместо pnpm (плюс `CLAUDE.md`, `ui-verifier`, `stop-check.sh`).
 - Решения: docs/decisions/0001-stack-node-redux-nginx.md
