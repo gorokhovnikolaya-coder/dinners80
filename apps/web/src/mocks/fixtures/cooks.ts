@@ -53,16 +53,16 @@ export const cooks: Cook[] = [
     ['ar-choripan', 6],
     ['br-moqueca', 2],
   ]),
-  // Глеб — 10 countries, excludes spicy: no India and Thailand.
+  // Глеб — 10 countries, excludes pork: no India and Thailand.
   ...cooksOf(TEST_USER_IDS.tenCountriesSubscribed, [
-    ['it-carbonara', 90],
+    ['it-lasagna', 90],
     ['fr-omelette', 75],
     ['es-gazpacho', 64],
     ['gr-horiatiki', 50],
     ['jp-oyakodon', 41],
-    ['cn-sweet-sour-pork', 35],
+    ['cn-kung-pao', 35],
     ['pe-lomo-saltado', 27],
-    ['ar-choripan', 20],
+    ['ar-empanadas', 20],
     ['br-pao-de-queijo', 11],
     ['co-arepas', 4],
     ['jp-ramen', 2],
@@ -81,17 +81,17 @@ export const cooks: Cook[] = [
     ['th-pad-kra-pao', 6],
     ['pe-lomo-saltado', 1],
   ]),
-  // Жанна — 9 countries, excludes gluten.
+  // Жанна — 8 countries, excludes gluten (Italy, Greece, Japan, China have no gluten-free dish).
   ...cooksOf(FRIEND_IDS.zhanna, [
-    ['it-ossobuco', 70],
     ['fr-ratatouille', 60],
     ['es-tortilla', 50],
-    ['gr-moussaka', 40],
-    ['in-dal', 30],
-    ['th-green-curry', 20],
-    ['pe-ceviche', 10],
+    ['in-dal', 40],
+    ['th-green-curry', 30],
+    ['pe-ceviche', 20],
+    ['ar-asado', 10],
     ['br-moqueca', 3],
     ['co-arepas', 2],
+    ['es-paella', 1],
   ]),
   // Зоя — 11 countries, yearly subscription.
   ...cooksOf(FRIEND_IDS.zoya, [

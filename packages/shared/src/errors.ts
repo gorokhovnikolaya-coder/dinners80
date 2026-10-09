@@ -7,6 +7,8 @@ export const API_ERROR_CODES = [
   'rate_limited',
   'not_found',
   'validation',
+  /** Unexpected server error (HTTP 5xx). */
+  'internal',
 ] as const;
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number];
 

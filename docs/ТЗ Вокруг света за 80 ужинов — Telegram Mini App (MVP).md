@@ -145,7 +145,7 @@ Oct 8, 2026 · @Nikolay
 | --- | --- | --- |
 | `users` | `id` uuid, `tg_id` bigint unique, `first_name`, `username`, `photo_url`, `household` (solo / couple / family), `weekday_minutes` (20 / 30 / 45), `exclusions` text\[\], `timezone` (IANA, например `Europe/Moscow`), `reminder_enabled` bool, `reminder_time` time (по умолчанию 18:00), `bot_can_write` bool, `invite_code` unique, `invited_by` → users, `onboarded_at`, `created_at`, `last_seen_at` | Профиль, настройки онбординга и напоминаний |
 | `countries` | `id` (slug, например `pe`), `name_ru`, `continent`, `sort`, `is_published` | 30 стран |
-| `dishes` | `id`, `country_id` → countries, `slug`, `title`, `level` (weekday / weekend / challenge), `minutes`, `base_servings`, `description`, `fact`, `image_path`, `tags` text\[\] (pork, meat, spicy, gluten), `is_published` | 90 блюд |
+| `dishes` | `id`, `country_id` → countries, `slug`, `title`, `level` (weekday / weekend / challenge), `minutes`, `base_servings`, `description`, `fact`, `image_path`, `tags` text\[\] (pork, meat, spicy, gluten; блюдо со свининой всегда помечено и `pork`, и `meat` — свинина тоже мясо), `is_published` | 90 блюд |
 | `dish_ingredients` | `id`, `dish_id`, `key` (уникален в рамках блюда, например `onion`), `product` (общий ключ продукта для суммирования покупок, например `onion`), `name`, `amount` numeric, `unit`, `aisle` (meat / veg / dairy / grocery / other), `sort` | Ингредиенты на `base_servings` |
 | `dish_steps` | `id`, `dish_id`, `n`, `text` (с плейсхолдерами `{key}` ингредиентов этого блюда), `timer_seconds` | Шаги рецепта |
 | `cooks` | `id`, `user_id`, `dish_id`, `country_id`, `photo_path` (nullable — фото необязательно), `created_at` | Факт приготовления; повторы разрешены |
@@ -256,7 +256,7 @@ Telegram даёт нам вход без регистрации, приглаш�
 
 | Часть | Технологии |
 | --- | --- |
-| Мини-апп | React 19, TypeScript (strict), Vite, `@telegram-apps/sdk-react`, React Router, Redux Toolkit (состояние) и RTK Query (запросы и кеш), zod, Tailwind CSS с токенами из макета |
+| Мини-апп | React 19, TypeScript (strict), Vite, `@tma.js/sdk-react` (преемник `@telegram-apps/sdk-react`), React Router, Redux Toolkit (состояние) и RTK Query (запросы и кеш), zod, Tailwind CSS с токенами из макета |
 | Сервер | Node.js 24, TypeScript (strict), Fastify, Postgres 17, Drizzle ORM и SQL-миграции, файлы на диске |
 | Бот | grammY в Node-сервере, режим вебхука |
 | Инфраструктура | VPS, nginx (TLS, статика, реверс-прокси, `secure_link`), Docker Compose (Postgres, сервер, воркер, nginx) |
@@ -327,7 +327,7 @@ AGENTS.md            правила для агентов
 **Совместимость**
 
 - Telegram для iOS и Android последних двух мажорных версий; Telegram Desktop — базовая работоспособность.
-- Методы SDK, которых нет в старой версии клиента, проверяются через `isVersionAtLeast` и имеют запасной вариант.
+- Методы SDK, которых нет в старой версии клиента, проверяются средствами SDK (`isAvailable` / `ifAvailable` / `supports` — сверяют версию Mini Apps клиента) и имеют запасной вариант.
 
 **Язык**
 

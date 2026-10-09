@@ -44,6 +44,12 @@ describe('content fixtures', () => {
     }
   });
 
+  it('tag every pork dish as meat too (pork is meat)', () => {
+    for (const dish of dishes.filter((item) => item.tags.includes('pork'))) {
+      expect(dish.tags, dish.id).toContain('meat');
+    }
+  });
+
   it('keep weekday dishes within the longest weekday time', () => {
     for (const dish of dishes.filter((item) => item.level === 'weekday')) {
       expect(dish.minutes).toBeLessThanOrEqual(45);
@@ -82,8 +88,20 @@ describe('user fixtures', () => {
     expect(silent.profile.reminderEnabled).toBe(false);
   });
 
-  it('leave locked countries for the "10 countries" states', () => {
+  it('leave a locked country with an allowed dish for the "10 countries" states', () => {
     expect(countries.length).toBeGreaterThan(FREE_COUNTRIES_LIMIT);
+    for (const tgId of [TEST_USER_IDS.tenCountriesFree, TEST_USER_IDS.tenCountriesSubscribed]) {
+      const user = userByTgId(tgId);
+      const passed = new Set(
+        cooks.filter((cook) => cook.userId === user.profile.id).map((cook) => cook.countryId),
+      );
+      const available = dishes.filter(
+        (dish) =>
+          !passed.has(dish.countryId) &&
+          !dish.tags.some((tag) => user.profile.exclusions.includes(tag)),
+      );
+      expect(available.length, `user ${String(tgId)}`).toBeGreaterThanOrEqual(1);
+    }
   });
 
   it('have 3 friends, each a friend of the test users with progress', () => {

@@ -33,3 +33,19 @@ test.describe('dev mode', () => {
     );
   });
 });
+
+test.describe('dev mode: mock API errors', () => {
+  test('an error state retries with a loading state and then shows the user', async ({ page }) => {
+    await page.goto('/?user=1002&mock_error=auth&mock_delay=500');
+    await expect(page.getByRole('alert')).toHaveText('Не удалось загрузить данные.');
+
+    const retry = page.getByRole('button', { name: 'Повторить' });
+    const box = await retry.boundingBox();
+    expect(box?.width).toBeGreaterThanOrEqual(44);
+    expect(box?.height).toBeGreaterThanOrEqual(44);
+
+    await retry.click();
+    await expect(page.getByText('Загрузка…')).toBeVisible();
+    await expect(page.getByText('Привет, Борис!')).toBeVisible();
+  });
+});

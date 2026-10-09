@@ -127,7 +127,7 @@ export const users: UserFixture[] = [
     {
       household: 'solo',
       weekdayMinutes: 20,
-      exclusions: ['spicy'],
+      exclusions: ['pork'],
       reminderEnabled: true,
       botCanWrite: true,
     },
@@ -156,7 +156,7 @@ export const users: UserFixture[] = [
     },
   ),
   makeUser(
-    'друг, 9 стран',
+    'друг, 8 стран, без глютена',
     { id: FRIEND_IDS.zhanna, first_name: 'Жанна', username: 'zhanna', allows_write_to_pm: true },
     {
       household: 'family',

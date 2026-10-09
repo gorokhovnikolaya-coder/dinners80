@@ -4,6 +4,8 @@
 
 Проблемы и идеи, замеченные вне текущей задачи. Пункт удаляется, когда его взяли в работу.
 
+- Задача 3: заменить «Загрузка…» на скелетон и временный inline-стиль 44 × 44 у кнопки «Повторить» в `apps/web/src/app/App.tsx` на компоненты; цвет шапки и фона Telegram (`APP_BACKGROUND_COLOR` в `apps/web/src/telegram/sdk.ts`) брать из токенов.
+
 ## Журнал
 
 Новые записи — сверху. Шаблон:
@@ -17,10 +19,10 @@
 ```
 
 ### Задача 02 — Dev-режим (2026-10-09, ветка task/02-dev-mode)
-- Сделано: mock-окружение Telegram на `@tma.js/sdk-react` (`mockTelegramEnv`: тема, viewport, safe area; `?user=<id>` + sessionStorage); запуск SDK в `src/telegram/sdk.ts` (`ready`, `expand`, `setHeaderColor`/`setBgColor`, CSS-переменные safe area, всё через `isAvailable`/`ifAvailable`); схемы в `packages/shared` (страна, блюдо, готовка, профиль, подписка, ответ `POST /auth`, ошибки API, константы); фикстуры: 12 стран, 36 блюд, 5 тестовых пользователей + 3 друга; MSW `POST /api/auth` по `Authorization: tma <initData>`; RTK Query (`src/api/`) и store (`src/store/`); экран-заглушка с именем пользователя и состояниями загрузки/ошибки; `npm run e2e` (Playwright, 3 сценария).
+- Сделано: mock-окружение Telegram на `@tma.js/sdk-react` (`mockTelegramEnv`: тема, viewport, safe area; `?user=<id>` + sessionStorage); запуск SDK в `src/telegram/sdk.ts` (`ready`, `expand`, `setHeaderColor`/`setBgColor`, CSS-переменные safe area, всё через `isAvailable`/`ifAvailable`); схемы в `packages/shared` (страна, блюдо, готовка, профиль, подписка, ответ `POST /auth`, ошибки API, константы); фикстуры: 12 стран, 36 блюд, 5 тестовых пользователей + 3 друга; MSW `POST /api/auth` по `Authorization: tma <initData>`; RTK Query (`src/api/`) и store (`src/store/`); экран-заглушка с именем пользователя и состояниями загрузки/ошибки (повтор показывает загрузку, кнопка 44 × 44); управление моком `?mock_error=` / `?mock_delay=`; `npm run e2e` (Playwright, 4 сценария). Попутно: `<link rel="icon" href="data:,">` в `apps/web/index.html` (не было 404 на favicon в консоли); в `eslint.config.js` `allowDefaultProject` сужен до `*.js` и `vitest.config.ts` (`playwright.config.ts` входит в TS-проект `e2e/`), `e2e/**` добавлен к node globals. После ревью: ТЗ обновлено с согласия владельца — SDK `@tma.js/sdk-react`, проверка доступности методов вместо `isVersionAtLeast`, правило «свинина — тоже мясо» (`pork` ⇒ `meat`); фикстуры исправлены (теги, Глеб без свинины, Жанна без глютена — 8 стран), добавлены инварианты; код ошибки `internal` в shared.
 - Проверено: npm run check ✓ (стартовый JS 115.35 kB gzip из 200 kB, моков в `dist` нет), npm run e2e ✓, скриншоты docs/screens/task-02/
 - Решения: docs/decisions/0003-dev-mode-mocks.md
-- Осталось / сомнения: в ТЗ (стек) указан `@telegram-apps/sdk-react`, а используется его преемник `@tma.js/sdk-react`; подпись initData для `VITE_API=local` — задачи 15–16; цвет шапки/фона — константа до токенов задачи 3; бюджет стартового бандла после задачи 2 — ~85 kB.
+- Осталось / сомнения: подпись initData для `VITE_API=local` — задачи 15–16; цвет шапки/фона — константа до токенов задачи 3; бюджет стартового бандла после задачи 2 — ~85 kB.
 
 ### Задача 01 — Монорепозиторий (2026-10-09, ветка task/01-monorepo)
 - Сделано: npm workspaces `apps/web` (Vite 8 + React 19, экран-заглушка, строки в `src/i18n/ru.ts`), `apps/server` (Fastify 5, `GET /api/health`, запуск `node src/index.ts` без сборки), `packages/shared` (схема `healthResponseSchema` на `zod/mini` + тест); TypeScript 6 strict с project references, ESLint 9 (typescript-eslint strict type-checked, react/react-hooks/react-refresh), Prettier, Vitest 5 (projects), size-limit по манифесту Vite; `docker-compose.yml` с Postgres 17 (`127.0.0.1:5433`), `.env.example`; таблица «Команды» в AGENTS.md.

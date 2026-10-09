@@ -1,10 +1,14 @@
 import { useAuthQuery } from '../api/auth.ts';
 import { ru } from '../i18n/ru.ts';
 
-export function App() {
-  const { data, isLoading, isError, refetch } = useAuthQuery(undefined);
+/** Minimal touch target until the design components of task 3. */
+const TOUCH_TARGET = { minWidth: 44, minHeight: 44 } as const;
 
-  if (isLoading) {
+export function App() {
+  const { data, isFetching, isError, refetch } = useAuthQuery(undefined);
+
+  // `isFetching` (not only `isLoading`) so a retry after an error shows the loading state too.
+  if (isFetching && !data) {
     return (
       <main aria-busy="true">
         <p>{ru.common.loading}</p>
@@ -16,7 +20,7 @@ export function App() {
     return (
       <main>
         <p role="alert">{ru.common.error}</p>
-        <button type="button" onClick={() => void refetch()}>
+        <button type="button" style={TOUCH_TARGET} onClick={() => void refetch()}>
           {ru.common.retry}
         </button>
       </main>

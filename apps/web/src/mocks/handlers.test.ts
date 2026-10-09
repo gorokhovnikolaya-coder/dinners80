@@ -5,6 +5,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { API_URL } from '../api/config.ts';
 import { buildMockInitData, parseInitDataUserId } from '../telegram/mock/initData.ts';
 import { TEST_USER_IDS, findUserByTgId } from './fixtures/users.ts';
+import { parseMockControls } from './controls.ts';
 import { createHandlers } from './handlers.ts';
 
 const API_BASE = `http://localhost${API_URL}`;
@@ -63,5 +64,18 @@ describe('POST /auth (MSW)', () => {
 
     const unknown = await auth({ Authorization: 'tma user=%7B%22id%22%3A42%7D&hash=x' });
     expect(unknown.status).toBe(401);
+  });
+
+  it('fails once with 500 when mock_error=auth is set', async () => {
+    server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=auth')));
+    const headers = { Authorization: `tma ${initDataOf(TEST_USER_IDS.newbie)}` };
+
+    const failed = await auth(headers);
+    expect(failed.status).toBe(500);
+    expect(await failed.json()).toEqual({
+      error: { code: 'internal', message: expect.any(String) as string },
+    });
+
+    expect((await auth(headers)).status).toBe(200);
   });
 });
