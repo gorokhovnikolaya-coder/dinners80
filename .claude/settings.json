@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(pnpm install)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm check:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm e2e:*)",
+      "Bash(pnpm exec:*)",
+      "Bash(pnpm -s:*)",
+      "Bash(pnpm --filter:*)",
+      "Bash(pnpm -F:*)",
+      "Bash(pnpm supabase start:*)",
+      "Bash(pnpm supabase stop:*)",
+      "Bash(pnpm supabase status:*)",
+      "Bash(pnpm supabase db reset:*)",
+      "Bash(pnpm supabase migration new:*)",
+      "Bash(pnpm supabase functions serve:*)",
+      "Bash(pnpm supabase gen types:*)",
+      "Bash(npx playwright:*)",
+      "Bash(corepack enable:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git switch:*)",
+      "Bash(git checkout -b:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git stash:*)",
+      "Bash(docker ps:*)",
+      "WebFetch(domain:core.telegram.org)",
+      "WebFetch(domain:docs.telegram-mini-apps.com)",
+      "WebFetch(domain:supabase.com)",
+      "WebFetch(domain:grammy.dev)",
+      "WebFetch(domain:tanstack.com)",
+      "WebFetch(domain:zod.dev)",
+      "WebFetch(domain:vite.dev)",
+      "WebFetch(domain:playwright.dev)",
+      "WebFetch(domain:mswjs.io)",
+      "mcp__playwright"
+    ],
+    "ask": [
+      "Bash(git merge:*)",
+      "Bash(git rebase:*)",
+      "Bash(git reset:*)",
+      "Bash(git checkout main:*)",
+      "Bash(git switch main:*)",
+      "Bash(rm -rf:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.local)",
+      "Read(./.env.*.local)",
+      "Read(./.env.production)",
+      "Read(./supabase/.env)",
+      "Read(./supabase/functions/.env)",
+      "Bash(git push:*)",
+      "Bash(pnpm supabase link:*)",
+      "Bash(pnpm supabase db push:*)",
+      "Bash(pnpm supabase functions deploy:*)",
+      "Bash(pnpm supabase secrets:*)",
+      "Bash(supabase link:*)",
+      "Bash(supabase db push:*)",
+      "Bash(supabase functions deploy:*)",
+      "Bash(supabase secrets:*)",
+      "Bash(npx supabase link:*)",
+      "Bash(npx supabase db push:*)",
+      "Bash(npx supabase functions deploy:*)",
+      "Bash(npx supabase secrets:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [{ "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start.sh" }]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [{ "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-edit.sh" }]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [{ "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/format-file.sh", "timeout": 30 }]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [{ "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/stop-check.sh", "timeout": 300 }]
+      }
+    ]
+  }
+}

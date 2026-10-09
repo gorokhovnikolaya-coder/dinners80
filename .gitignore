@@ -1,0 +1,25 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.vite/
+
+# секреты
+.env
+.env.*
+!.env.example
+supabase/.env
+supabase/functions/.env
+supabase/.temp/
+supabase/.branches/
+
+# Playwright
+test-results/
+playwright-report/
+.playwright-mcp/
+
+# Claude Code: локальные настройки и состояние хуков
+.claude/settings.local.json
+.claude/.state/
+
+.DS_Store
