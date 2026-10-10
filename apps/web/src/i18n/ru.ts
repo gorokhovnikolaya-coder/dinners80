@@ -2,8 +2,37 @@
 export const ru = {
   app: {
     title: 'Вокруг света за 80 ужинов',
-    greeting: (name: string) => `Привет, ${name}!`,
-    placeholder: 'Скоро здесь будет ужин на сегодня.',
+  },
+  home: {
+    title: 'Что на ужин сегодня?',
+    profile: (name: string) => `Профиль: ${name}`,
+    countries: {
+      label: 'стран',
+      /** Accessible name of the counter tile that opens the map. */
+      link: (count: number, total: number) =>
+        `Пройдено стран: ${String(count)} из ${String(total)}. Открыть карту`,
+    },
+    modes: {
+      label: 'Подборка',
+      weekday: 'Будни',
+      weekdayWithMinutes: (minutes: number) => `Будни · до ${String(minutes)} мин`,
+      weekend: 'Выходные',
+    },
+    suggestions: 'Предложения на ужин',
+    minutes: (minutes: number) => `${String(minutes)} мин`,
+    levels: { weekday: 'Будний вечер', weekend: 'Выходные', challenge: 'Вызов' },
+    labels: {
+      newCountry: 'Новая страна',
+      newCountryShort: 'Новая',
+      nthDish: (n: number) => `${String(n)}-е блюдо`,
+      cookedBefore: 'Уже готовили',
+    },
+    locked: 'Откроется с подпиской',
+    showMore: 'Показать другие',
+    empty: {
+      title: 'Под ваши ограничения блюд не нашлось',
+      action: 'Изменить исключения',
+    },
   },
   common: {
     loading: 'Загрузка…',

@@ -3,24 +3,24 @@ import { expect, test } from './fixtures.ts';
 test.describe('dev mode', () => {
   test('?user= opens the app as the chosen test user', async ({ page }) => {
     await page.goto('/?user=1002');
-    await expect(page.getByText('Привет, Борис!')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Профиль: Борис' })).toBeVisible();
 
     await page.goto('/?user=1005');
-    await expect(page.getByText('Привет, Дина!')).toBeVisible();
-    await expect(page.getByText('Привет, Борис!')).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Профиль: Дина' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Профиль: Борис' })).toHaveCount(0);
   });
 
   test('the chosen user survives navigation without ?user=', async ({ page }) => {
     await page.goto('/?user=1003');
-    await expect(page.getByText('Привет, Вера!')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Профиль: Вера' })).toBeVisible();
 
     await page.goto('/');
-    await expect(page.getByText('Привет, Вера!')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Профиль: Вера' })).toBeVisible();
   });
 
   test('the app calls ready, expand and sets Telegram colours at startup', async ({ page }) => {
     await page.goto('/?user=1004');
-    await expect(page.getByText('Привет, Глеб!')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Профиль: Глеб' })).toBeVisible();
 
     const calls = await page.evaluate(() => window.__tgMockCalls ?? []);
     expect(calls).toEqual(
@@ -51,6 +51,6 @@ test.describe('dev mode: mock API errors', () => {
 
     await retry.click();
     await expect(page.getByRole('status')).toContainText('Загрузка…');
-    await expect(page.getByText('Привет, Борис!')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Профиль: Борис' })).toBeVisible();
   });
 });

@@ -88,15 +88,15 @@ test.describe('onboarding', () => {
       timezone: expect.any(String),
     });
 
-    await expect(page.getByText('Привет, Аня!')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Профиль: Аня' })).toBeVisible();
     await expect(page).toHaveURL(/\/$/);
     expect((await params()).web_app_set_header_color).toEqual({ color: '#f3f5f7' });
 
     // Reopening the mini app in the same tab: the mock backend remembers the answers.
     await page.goto('/?user=1001');
-    await expect(page.getByText('Привет, Аня!')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Профиль: Аня' })).toBeVisible();
     await page.goto('/onboarding');
-    await expect(page.getByText('Привет, Аня!')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Профиль: Аня' })).toBeVisible();
     await expect(page).toHaveURL(/\/$/);
   });
 
@@ -195,7 +195,7 @@ test.describe('onboarding', () => {
     );
     await next(page).click();
     expect((await request).postDataJSON()).toMatchObject({ customExclusions: ['кинза'] });
-    await expect(page.getByText('Привет, Аня!')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Профиль: Аня' })).toBeVisible();
   });
 
   test('a failed save shows an error, keeps the answers and succeeds on retry', async ({
@@ -212,14 +212,14 @@ test.describe('onboarding', () => {
     await expect(page.getByRole('checkbox', { name: /Глютен/ })).toBeChecked();
 
     await page.getByRole('button', { name: 'Повторить' }).click();
-    await expect(page.getByText('Привет, Аня!')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Профиль: Аня' })).toBeVisible();
   });
 
   test('an onboarded user goes straight to the main screen', async ({ page }) => {
     await page.goto('/?user=1002');
-    await expect(page.getByText('Привет, Борис!')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Профиль: Борис' })).toBeVisible();
     await page.goto('/onboarding');
     await expect(page).toHaveURL(/\/$/);
-    await expect(page.getByText('Привет, Борис!')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Профиль: Борис' })).toBeVisible();
   });
 });

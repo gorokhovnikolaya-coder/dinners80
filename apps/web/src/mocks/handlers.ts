@@ -1,16 +1,24 @@
 import {
   AUTH_SCHEME,
+  homeQuerySchema,
+  suggestDishes,
   updateMeRequestSchema,
   type ApiError,
   type ApiErrorCode,
   type AuthResponse,
+  type HomeResponse,
   type MeResponse,
+  type SuggestionCard,
 } from '@tma80/shared';
 import { HttpResponse, delay, http } from 'msw';
 
 import { parseInitDataUserId } from '../telegram/mock/initData.ts';
 import { NO_MOCK_CONTROLS, takeFailure, type MockControls } from './controls.ts';
 import { createMockDb, type MockDb, type MockUser } from './db.ts';
+import { cooks } from './fixtures/cooks.ts';
+import { countries } from './fixtures/countries.ts';
+import { dishes, withIngredients } from './fixtures/dishes.ts';
+import { mockDishImageUrl } from './fixtures/images.ts';
 
 const apiError = (status: number, code: ApiErrorCode, message: string) =>
   HttpResponse.json<ApiError>({ error: { code, message } }, { status });
@@ -26,6 +34,50 @@ const authenticate = (request: Request, db: MockDb): [number, MockUser] | undefi
 };
 
 const unauthorized = () => apiError(401, 'unauthorized', 'Invalid or missing initData');
+
+/** `GET /home` as the server does it: the shared suggestion algorithm over the fixtures. */
+export const homeResponse = (
+  user: MockUser,
+  query: { mode: HomeResponse['mode']; page: number },
+  now = new Date(),
+): HomeResponse => {
+  const userCooks = cooks.filter((cook) => cook.userId === user.profile.id);
+  const result = suggestDishes({
+    dishes: dishes.map(withIngredients),
+    cooks: userCooks,
+    user: { ...user.profile, subscribed: user.subscription.active },
+    mode: query.mode,
+    page: query.page,
+    now,
+  });
+  const suggestions = result.suggestions.flatMap((item): SuggestionCard[] => {
+    const dish = dishes.find((candidate) => candidate.id === item.dishId);
+    const country = countries.find((candidate) => candidate.id === dish?.countryId);
+    if (!dish || !country) return [];
+    return [
+      {
+        dishId: dish.id,
+        title: dish.title,
+        countryId: country.id,
+        countryName: country.nameRu,
+        level: dish.level,
+        minutes: dish.minutes,
+        imageUrl: mockDishImageUrl(dish),
+        label: item.label,
+        locked: item.locked,
+      },
+    ];
+  });
+  return {
+    mode: query.mode,
+    page: result.page,
+    pageCount: result.pageCount,
+    suggestions,
+    countriesCount: new Set(userCooks.map((cook) => cook.countryId)).size,
+    countriesTotal: countries.length,
+    dishesCount: userCooks.length,
+  };
+};
 
 const readJson = async (request: Request): Promise<unknown> => {
   try {
@@ -70,5 +122,20 @@ export const createHandlers = (
     const user = db.updateUser(auth[0], body.data);
     if (!user) return unauthorized();
     return HttpResponse.json<MeResponse>({ user: user.profile, needsOnboarding: !user.onboarded });
+  }),
+
+  http.get<never, never, HomeResponse | ApiError>(`${apiBase}/home`, async ({ request }) => {
+    if (controls.delayMs > 0) await delay(controls.delayMs);
+    if (takeFailure(controls, 'home'))
+      return apiError(500, 'internal', 'Mock error (mock_error=home)');
+    const auth = authenticate(request, db);
+    if (!auth) return unauthorized();
+    const params = new URL(request.url).searchParams;
+    const query = homeQuerySchema.safeParse({
+      mode: params.get('mode') ?? undefined,
+      page: params.get('page') ?? undefined,
+    });
+    if (!query.success) return apiError(400, 'validation', 'Invalid home query');
+    return HttpResponse.json<HomeResponse>(homeResponse(auth[1], query.data));
   }),
 ];

@@ -155,3 +155,13 @@ export function IconClock(props: IconProps) {
     </Icon>
   );
 }
+
+/** A locked dish (new country without a subscription). */
+export function IconLock(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="5" y="11" width="14" height="10" rx="2.5" />
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+    </Icon>
+  );
+}

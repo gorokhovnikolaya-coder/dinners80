@@ -1,9 +1,10 @@
-import { authResponseSchema, meResponseSchema } from '@tma80/shared';
+import { authResponseSchema, homeResponseSchema, meResponseSchema } from '@tma80/shared';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import { API_URL } from '../api/config.ts';
 import { buildMockInitData, parseInitDataUserId } from '../telegram/mock/initData.ts';
+import { dishIngredientNames } from './fixtures/dishes.ts';
 import { TEST_USER_IDS, findUserByTgId } from './fixtures/users.ts';
 import { NO_MOCK_CONTROLS, parseMockControls } from './controls.ts';
 import { createMockDb } from './db.ts';
@@ -193,5 +194,46 @@ describe('PATCH /me (MSW)', () => {
     const failed = await patchMe(answers, headers);
     expect(failed.status).toBe(500);
     expect((await patchMe(answers, headers)).status).toBe(200);
+  });
+});
+
+describe('GET /home (MSW)', () => {
+  const home = (tgId: number, query: string) =>
+    fetch(`${API_BASE}/home?${query}`, { headers: { Authorization: `tma ${initDataOf(tgId)}` } });
+  const parse = async (response: Response) => homeResponseSchema.parse(await response.json());
+
+  it('returns 3 suggestions and counters; own exclusions are applied on every page', async () => {
+    const first = await parse(await home(TEST_USER_IDS.eightCountries, 'mode=weekday&page=0'));
+    expect(first.suggestions).toHaveLength(3);
+    expect(first.countriesCount).toBe(8);
+    expect(first.countriesTotal).toBe(12);
+    expect(first.dishesCount).toBe(10);
+    expect(first.suggestions.every((card) => !card.locked && card.minutes <= 30)).toBe(true);
+    const seen = new Set<string>();
+    for (let page = 0; page < first.pageCount; page += 1) {
+      const body = await parse(
+        await home(TEST_USER_IDS.eightCountries, `mode=weekend&page=${String(page)}`),
+      );
+      for (const card of body.suggestions) seen.add(card.dishId);
+    }
+    for (const id of seen) {
+      expect((dishIngredientNames[id] ?? []).some((name) => /свин/i.test(name))).toBe(false);
+    }
+  });
+
+  it('a free user with 10 countries gets a locked card last; a subscriber does not', async () => {
+    const free = await parse(await home(TEST_USER_IDS.tenCountriesFree, 'mode=weekend'));
+    expect(free.suggestions.map((card) => card.locked)).toEqual([false, false, true]);
+    expect(free.suggestions[2]?.label).toEqual({ kind: 'newCountry' });
+    const paid = await parse(await home(TEST_USER_IDS.tenCountriesSubscribed, 'mode=weekend'));
+    expect(paid.suggestions.some((card) => card.locked)).toBe(false);
+  });
+
+  it('validates the query and the user; fails once with mock_error=home', async () => {
+    expect((await home(TEST_USER_IDS.eightCountries, 'mode=night')).status).toBe(400);
+    expect((await fetch(`${API_BASE}/home?mode=weekday`)).status).toBe(401);
+    server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=home')));
+    expect((await home(TEST_USER_IDS.eightCountries, 'mode=weekday')).status).toBe(500);
+    expect((await home(TEST_USER_IDS.eightCountries, 'mode=weekday')).status).toBe(200);
   });
 });

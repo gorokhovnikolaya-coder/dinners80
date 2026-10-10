@@ -1,6 +1,7 @@
 import { combineSlices, configureStore } from '@reduxjs/toolkit';
 
 import { api } from '../api/api.ts';
+import { homeSlice } from '../screens/home/homeSlice.ts';
 
 /**
  * Slices of lazily loaded screens. A screen adds its slice by module augmentation
@@ -10,7 +11,7 @@ import { api } from '../api/api.ts';
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- extended by lazy screens (RTK `combineSlices` pattern)
 export interface LazyLoadedSlices {}
 
-export const rootReducer = combineSlices(api).withLazyLoadedSlices<LazyLoadedSlices>();
+export const rootReducer = combineSlices(api, homeSlice).withLazyLoadedSlices<LazyLoadedSlices>();
 
 export const store = configureStore({
   reducer: rootReducer,

@@ -41,3 +41,31 @@ export {
   type SubscriptionStatus,
   type UserProfile,
 } from './user.ts';
+export {
+  homeQuerySchema,
+  homeResponseSchema,
+  suggestionCardSchema,
+  suggestionLabelSchema,
+  type HomeQuery,
+  type HomeResponse,
+  type SuggestionCard,
+} from './home.ts';
+export {
+  MODE_LEVELS,
+  RECENT_COOK_DAYS,
+  SUGGESTION_MODES,
+  SUGGESTIONS_PER_PAGE,
+  dailyRank,
+  defaultSuggestionMode,
+  isExcluded,
+  localDateKey,
+  suggestDishes,
+  type Suggestion,
+  type SuggestionCook,
+  type SuggestionDish,
+  type SuggestionInput,
+  type SuggestionLabel,
+  type SuggestionMode,
+  type SuggestionPage,
+  type SuggestionUser,
+} from './suggestions.ts';
