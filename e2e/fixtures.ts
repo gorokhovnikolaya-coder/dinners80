@@ -53,3 +53,18 @@ export const test = base.extend({
 });
 
 export { expect };
+
+/**
+ * Screenshot for `docs/screens/`: saved only when `SCREENS=task-NN` is set
+ * (`SCREENS=task-05 npm run e2e` → `docs/screens/task-05/<name>.png`), a no-op otherwise.
+ * The screenshots of a task come from its e2e scenarios, not from manual browser runs.
+ */
+export async function shot(page: Page, name: string, options: { fullPage?: boolean } = {}) {
+  const dir = process.env.SCREENS;
+  if (!dir) return;
+  await page.screenshot({
+    path: `docs/screens/${dir}/${name}.png`,
+    fullPage: options.fullPage ?? false,
+    animations: 'disabled',
+  });
+}
