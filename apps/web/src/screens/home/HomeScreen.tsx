@@ -53,8 +53,8 @@ function Avatar({ user }: { user: UserProfile }) {
 }
 
 /** «7/30 стран»: the passport counter, opens the map. */
-function CountriesTile({ data, failed }: { data: HomeResponse | undefined; failed: boolean }) {
-  if (!data && failed) return null;
+/** Without data (loading or error) a skeleton keeps the tile's place, so the header does not jump. */
+function CountriesTile({ data }: { data: HomeResponse | undefined }) {
   if (!data) return <Skeleton width={76} height={76} className="rounded-card" />;
   return (
     <Link
@@ -221,7 +221,7 @@ export function HomeScreen({ user }: { user: UserProfile }) {
           </div>
           <div className="flex shrink-0 items-start gap-2">
             <Avatar user={user} />
-            <CountriesTile data={data} failed={isError} />
+            <CountriesTile data={data} />
           </div>
         </header>
         <ModeSwitch

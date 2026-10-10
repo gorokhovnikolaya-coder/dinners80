@@ -81,6 +81,43 @@ test.describe('dinner today', () => {
     await expect(cards(page).nth(0)).toHaveAttribute('href', /^\/dishes\//);
     await expect(cards(page).nth(0)).not.toContainText('Новая страна');
     await shot(page, '04-locked');
+
+    // «Показать другие»: the next 2 open dishes and the next locked one, still last.
+    const firstPage = await cardTitles(page);
+    const firstLocked = await locked.getAttribute('href');
+    await page.getByRole('button', { name: 'Показать другие' }).click();
+    await expect.poll(async () => (await cardTitles(page)).join('|')).not.toBe(firstPage.join('|'));
+    await expect(cards(page)).toHaveCount(3);
+    await expect(locked).toContainText('Откроется с подпиской');
+    await expect(locked).toHaveAttribute('href', /^\/paywall\?dish=/);
+    expect(await locked.getAttribute('href')).not.toBe(firstLocked);
+    for (const index of [0, 1]) {
+      await expect(cards(page).nth(index)).toHaveAttribute('href', /^\/dishes\//);
+    }
+    await shot(page, '08-locked-show-more');
+
+    // Weekends: the locked card follows the mode.
+    await mode(page, /Выходные/).click();
+    await expect(mode(page, /Выходные/)).toHaveAttribute('aria-pressed', 'true');
+    await expect(cards(page)).toHaveCount(3);
+    await expect(locked).toContainText('Откроется с подпиской');
+    await expect(locked).toHaveAttribute('href', /^\/paywall\?dish=(th|co)-/);
+    for (const index of [0, 1]) {
+      await expect(cards(page).nth(index)).toContainText(/Выходные|Вызов/);
+    }
+    await shot(page, '09-locked-weekend');
+  });
+
+  test('a subscriber with 10 countries sees 3 open dishes without a lock', async ({ page }) => {
+    await page.goto('/?user=1004&mock_reset=1');
+    await expect(cards(page)).toHaveCount(3);
+    await expect(suggestions(page)).not.toContainText('Откроется с подпиской');
+    for (const href of await cards(page).evaluateAll((links) =>
+      links.map((link) => link.getAttribute('href')),
+    )) {
+      expect(href).toMatch(/^\/dishes\//);
+    }
+    await shot(page, '10-subscribed');
   });
 
   test('loading and error states, retry', async ({ page }) => {
@@ -90,6 +127,9 @@ test.describe('dinner today', () => {
     await shot(page, '05-loading');
 
     await expect(page.getByRole('alert')).toHaveText('Не удалось загрузить данные.');
+    // The counter tile keeps its place (a skeleton), so the header does not jump.
+    const title = await page.getByRole('heading', { level: 1 }).boundingBox();
+    expect(title?.width).toBeLessThan(260);
     await shot(page, '06-error');
     await page.getByRole('button', { name: 'Повторить' }).click();
     await expect(cards(page)).toHaveCount(3);

@@ -228,6 +228,17 @@ describe('suggestDishes: 14 days and relaxation', () => {
     expect(ids(result)).toEqual(['a-1']);
     expect(result.suggestions[0]?.label).toEqual({ kind: 'cookedBefore' });
   });
+  it('a cook exactly 14 days ago is not recent; a moment later than that it is', () => {
+    const dishes = [dish('a-1'), dish('a-2'), dish('b-1'), dish('c-1')];
+    const exactly = run({ dishes, cooks: [cook('a-1', 14)] });
+    expect(exactly.pageCount).toBe(2);
+    expect([...ids(exactly), ...ids(run({ dishes, cooks: [cook('a-1', 14)], page: 1 }))]).toContain(
+      'a-1',
+    );
+    const justInside = run({ dishes, cooks: [cook('a-1', 14 - 1 / DAY_MS)] });
+    expect(justInside.pageCount).toBe(1);
+    expect(ids(justInside)).not.toContain('a-1');
+  });
 });
 
 describe('suggestDishes: pages', () => {
@@ -304,6 +315,61 @@ describe('suggestDishes: free user with 10 countries', () => {
     const result = run({ dishes, cooks, user: { customExclusions: ['n1', 'n2'] } });
     expect(result.suggestions).toHaveLength(3);
     expect(result.suggestions.every((s) => !s.locked)).toBe(true);
+  });
+  it('relaxes up to 2 open dishes: recent cooks first (oldest first)', () => {
+    const recent = passed.map((country, index) => cook(`${country}-1`, 1 + index));
+    const result = run({
+      dishes: [...passed.map((country) => dish(`${country}-1`)), dish('n1-1')],
+      cooks: recent,
+    });
+    expect(result.pageCount).toBe(1);
+    expect(result.suggestions).toEqual([
+      { dishId: 'p9-1', label: { kind: 'cookedBefore' }, locked: false },
+      { dishId: 'p8-1', label: { kind: 'cookedBefore' }, locked: false },
+      { dishId: 'n1-1', label: { kind: 'newCountry' }, locked: true },
+    ]);
+  });
+
+  it('on weekdays adds a longer dish to fill the 2 open places, the closest time first', () => {
+    // Countries are passed with weekend dishes; weekday dishes: one fits 30 min, two are longer.
+    const weekendCooks = passed.map((country) => cook(`${country}-w`, 30));
+    const result = run({
+      dishes: [
+        dish('p0-1', { minutes: 20 }),
+        dish('p1-1', { minutes: 60 }),
+        dish('p2-1', { minutes: 35 }),
+        dish('n1-1', { minutes: 20 }),
+      ],
+      cooks: weekendCooks,
+    });
+    expect(result.pageCount).toBe(1);
+    expect(ids(result)).toEqual(['p0-1', 'p2-1', 'n1-1']);
+    expect(result.suggestions[0]?.label).toEqual({ kind: 'nthDish', n: 2 });
+    expect(result.suggestions[2]?.locked).toBe(true);
+  });
+
+  it('weekends: the locked card is a weekend or challenge dish and goes round with the pages', () => {
+    const weekdayCooks = passed.map((country) => cook(`${country}-d`, 30));
+    const weekendDishes = [
+      ...passed.map((country) => dish(`${country}-1`, { level: 'weekend' })),
+      dish('n1-1', { level: 'weekend', minutes: 90 }),
+      dish('n1-2', { level: 'challenge', minutes: 150 }),
+      dish('n2-1', { level: 'weekend', minutes: 60 }),
+      dish('n3-1', { level: 'weekday' }),
+    ];
+    const lockedOn = (page: number) => {
+      const result = run({ dishes: weekendDishes, cooks: weekdayCooks, mode: 'weekend', page });
+      expect(result.pageCount).toBe(5);
+      expect(result.suggestions).toHaveLength(3);
+      const last = result.suggestions[2];
+      expect(last?.locked).toBe(true);
+      return last?.dishId;
+    };
+    const firstThree = [lockedOn(0), lockedOn(1), lockedOn(2)];
+    expect(new Set(firstThree)).toEqual(new Set(['n1-1', 'n1-2', 'n2-1']));
+    expect(lockedOn(3)).toBe(firstThree[0]);
+    expect(lockedOn(4)).toBe(firstThree[1]);
+    expect(lockedOn(5)).toBe(firstThree[0]); // page 5 → page 0
   });
 });
 
