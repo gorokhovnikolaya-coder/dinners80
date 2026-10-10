@@ -17,13 +17,21 @@ export {
   type UpdateMeRequest,
 } from './me.ts';
 export {
+  addCustomExclusion,
+  cleanCustomExclusion,
+  customExclusionKey,
   hasOnboardingAnswers,
-  IMPLIED_EXCLUSIONS,
-  isExclusionImplied,
+  isValidCustomExclusion,
+  matchesCustomExclusion,
+  normalizeCustomExclusions,
   normalizeExclusions,
+  type CustomExclusionError,
+  type CustomExclusionTarget,
   type OnboardingAnswers,
 } from './preferences.ts';
 export {
+  customExclusionsSchema,
+  exclusionsSchema,
   isIanaTimeZone,
   reminderTimeSchema,
   subscriptionStatusSchema,

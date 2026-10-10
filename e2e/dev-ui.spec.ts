@@ -37,7 +37,7 @@ test.describe('/dev/ui component gallery', () => {
   test('components react to input', async ({ page }) => {
     await page.goto('/dev/ui');
 
-    const chip = page.getByRole('button', { name: 'Без свинины' });
+    const chip = page.getByRole('button', { name: 'Без рыбы' });
     await expect(chip).toHaveAttribute('aria-pressed', 'false');
     await chip.click();
     await expect(chip).toHaveAttribute('aria-pressed', 'true');

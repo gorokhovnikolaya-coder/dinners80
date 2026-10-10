@@ -85,7 +85,8 @@ describe('PATCH /me (MSW)', () => {
   const answers = {
     household: 'couple',
     weekdayMinutes: 30,
-    exclusions: ['pork', 'meat', 'spicy'],
+    exclusions: ['spicy', 'meat'],
+    customExclusions: ['  Кинза ', 'грибы'],
     timezone: 'Asia/Novosibirsk',
   };
 
@@ -108,8 +109,9 @@ describe('PATCH /me (MSW)', () => {
     expect(body.user).toMatchObject({
       household: 'couple',
       weekdayMinutes: 30,
-      // Pork is implied by meat and is not stored separately.
+      // Stored normalised: tags in canonical order, own words cleaned.
       exclusions: ['meat', 'spicy'],
+      customExclusions: ['кинза', 'грибы'],
       timezone: 'Asia/Novosibirsk',
     });
 
@@ -132,11 +134,19 @@ describe('PATCH /me (MSW)', () => {
       household: 'solo',
       weekdayMinutes: 20,
     });
-    createMockDb(storage).updateUser(TEST_USER_IDS.newbie, { exclusions: ['pork', 'meat'] });
+    createMockDb(storage).updateUser(TEST_USER_IDS.newbie, {
+      exclusions: ['gluten', 'meat'],
+      customExclusions: ['Грибы'],
+    });
     // Only the applied patch is stored, not the whole profile.
     expect(saved).toEqual({
       [TEST_USER_IDS.newbie]: {
-        patch: { household: 'solo', weekdayMinutes: 20, exclusions: ['pork', 'meat'] },
+        patch: {
+          household: 'solo',
+          weekdayMinutes: 20,
+          exclusions: ['gluten', 'meat'],
+          customExclusions: ['Грибы'],
+        },
         onboarded: true,
       },
     });
@@ -146,7 +156,8 @@ describe('PATCH /me (MSW)', () => {
       ...findUserByTgId(TEST_USER_IDS.newbie)?.profile,
       household: 'solo',
       weekdayMinutes: 20,
-      exclusions: ['meat'],
+      exclusions: ['meat', 'gluten'],
+      customExclusions: ['грибы'],
     });
 
     // Broken data is ignored.

@@ -31,9 +31,12 @@ test.describe('onboarding', () => {
     await expect(progress).toHaveAttribute('aria-valuenow', '1');
     await expect(page.getByText('Вопрос 1 из 3')).toBeVisible();
 
-    // Dark screen: the Telegram header and background are navy while the onboarding is shown.
+    // Light screen: the Telegram header keeps the app background, as on every screen.
     const params = () => page.evaluate(() => window.__tgMockParams ?? {});
-    expect((await params()).web_app_set_header_color).toEqual({ color: '#14213d' });
+    expect((await params()).web_app_set_header_color).toEqual({ color: '#f3f5f7' });
+    const background = () =>
+      page.locator('main').evaluate((element) => getComputedStyle(element).backgroundColor);
+    expect(await background()).toBe('rgb(243, 245, 247)');
 
     // Every answer is a 44 × 44+ touch target.
     const card = await page.getByText('Я один').locator('xpath=ancestor::label').boundingBox();
@@ -42,12 +45,33 @@ test.describe('onboarding', () => {
     await answerFirstTwo(page);
     await expect(progress).toHaveAttribute('aria-valuenow', '3');
 
-    // Nothing is required on step 3; meat implies pork.
+    // Nothing is required on step 3; pork is meat, there is no separate option.
     await expect(next(page)).toBeEnabled();
+    await expect(page.getByRole('checkbox')).toHaveCount(3);
+    await expect(page.getByRole('checkbox', { name: /Свинина/ })).toHaveCount(0);
     await page.getByText('Мясо', { exact: true }).click();
-    const pork = page.getByRole('checkbox', { name: /Свинина/ });
-    await expect(pork).toBeChecked();
-    await expect(pork).toBeDisabled();
+
+    // Own exclusions: added with the button or Enter, removed by the chip's «×».
+    const custom = page.getByRole('textbox', { name: 'Своё' });
+    await custom.fill('Кинза');
+    await page.getByRole('button', { name: 'Добавить' }).click();
+    await custom.fill('грибы');
+    await custom.press('Enter');
+    await custom.fill('сельдерей');
+    await custom.press('Enter');
+    const own = page.getByRole('list', { name: 'Ваши исключения' });
+    await expect(own.getByRole('listitem')).toHaveText(['кинза', 'грибы', 'сельдерей']);
+    const remove = page.getByRole('button', { name: 'Удалить «грибы»' });
+    const removeBox = await remove.boundingBox();
+    expect(removeBox?.width).toBeGreaterThanOrEqual(44);
+    expect(removeBox?.height).toBeGreaterThanOrEqual(44);
+    await remove.click();
+    await expect(custom).toBeFocused();
+    await custom.fill('КИНЗА');
+    await custom.press('Enter');
+    await expect(page.getByText('Это уже есть в списке.')).toBeVisible();
+    await expect(own.getByRole('listitem')).toHaveText(['кинза', 'сельдерей']);
+    expect(await background()).toBe('rgb(243, 245, 247)');
 
     const request = page.waitForRequest(
       (req) => req.url().endsWith('/api/me') && req.method() === 'PATCH',
@@ -58,6 +82,7 @@ test.describe('onboarding', () => {
       household: 'couple',
       weekdayMinutes: 30,
       exclusions: ['meat'],
+      customExclusions: ['кинза', 'сельдерей'],
       timezone: expect.any(String),
     });
 

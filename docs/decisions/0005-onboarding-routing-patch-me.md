@@ -2,6 +2,8 @@
 
 Дата: 2026-10-09 · Задача: 04
 
+> **Частично заменено решением [0006](0006-light-onboarding-custom-exclusions.md) (2026-10-10):** варианта «Свинина» и правила «мясо ⇒ свинина» больше нет, на шаге 3 появились свои исключения (`customExclusions`); онбординг светлый — без тёмной заглушки, navy-шапки Telegram (`useTelegramChromeColor`), тёмного тона `OptionCard`/`BackNavigation` и токенов `navy-selected`, `on-dark`.
+
 ## Контекст
 
 Задача 4 — первый экран с переходами: онбординг (3 вопроса) и выход на «Ужин сегодня». ТЗ и [макет](https://claude.ai/artifact/7CiZksb4DEdHmmUus8G2Mn) не определяют:

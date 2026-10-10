@@ -10,7 +10,10 @@ import { ROUTES } from './routes.ts';
 
 const screen = 'min-h-dvh bg-bg px-5 pt-14 pb-8';
 
-/** Light skeleton of a screen while `POST /auth` is in flight. */
+/**
+ * Light skeleton of a screen while `POST /auth` is in flight; also shown while a lazy screen's
+ * chunk loads, so the background stays the same from start to the screen.
+ */
 function ScreenSkeleton() {
   return (
     <main className={screen}>
@@ -23,24 +26,13 @@ function ScreenSkeleton() {
   );
 }
 
-/** Navy placeholder while the onboarding chunk loads, so the screen does not flash light. */
-function DarkScreenFallback() {
-  return (
-    <main className="min-h-dvh bg-ink" aria-busy="true">
-      <span className="sr-only" role="status">
-        {ru.common.loading}
-      </span>
-    </main>
-  );
-}
-
 /**
  * Screens other than the main one load lazily (ТЗ, НФТ «Производительность»), each behind an error
  * boundary: a chunk that fails to load shows «Повторить» instead of a blank page.
  */
 const OnboardingScreen = lazyScreen(
   () => import('../screens/onboarding/OnboardingScreen.tsx'),
-  <DarkScreenFallback />,
+  <ScreenSkeleton />,
 );
 
 /**

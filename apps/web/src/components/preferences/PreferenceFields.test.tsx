@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
-import type { DishTag, Household } from '@tma80/shared';
+import type { Household } from '@tma80/shared';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import type { ExclusionsValue } from './exclusions.ts';
 import { ExclusionsField, HouseholdField } from './PreferenceFields.tsx';
 
 function Question({ children }: { children: React.ReactNode }) {
@@ -50,38 +51,86 @@ describe('HouseholdField', () => {
 });
 
 describe('ExclusionsField', () => {
-  function Controlled({ initial = [] }: { initial?: DishTag[] }) {
-    const [value, setValue] = useState<DishTag[]>(initial);
+  const none: ExclusionsValue = { exclusions: [], customExclusions: [] };
+
+  function Controlled({ initial = none }: { initial?: ExclusionsValue }) {
+    const [value, setValue] = useState<ExclusionsValue>(initial);
     return (
       <Question>
         <ExclusionsField value={value} onChange={setValue} labelledBy="q" />
-        <output data-testid="value">{value.join(',')}</output>
+        <output data-testid="tags">{value.exclusions.join(',')}</output>
+        <output data-testid="custom">{value.customExclusions.join(',')}</output>
       </Question>
     );
   }
 
-  it('allows several answers or none', async () => {
+  it('offers meat, spicy and gluten; several answers or none; no pork option', async () => {
     render(<Controlled />);
-    expect(screen.getAllByRole('checkbox').every((box) => !(box as HTMLInputElement).checked)).toBe(
-      true,
-    );
+    const boxes = screen.getAllByRole('checkbox');
+    expect(boxes).toHaveLength(3);
+    expect(boxes.every((box) => !(box as HTMLInputElement).checked)).toBe(true);
+    expect(screen.queryByRole('checkbox', { name: /Свинина/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /Мясо/ })).toHaveAccessibleName(/свинину/);
+
     await userEvent.click(screen.getByRole('checkbox', { name: /Острое/ }));
     await userEvent.click(screen.getByRole('checkbox', { name: /Глютен/ }));
-    expect(screen.getByTestId('value')).toHaveTextContent('spicy,gluten');
+    expect(screen.getByTestId('tags')).toHaveTextContent('spicy,gluten');
     await userEvent.click(screen.getByRole('checkbox', { name: /Острое/ }));
-    expect(screen.getByTestId('value')).toHaveTextContent(/^gluten$/);
+    expect(screen.getByTestId('tags')).toHaveTextContent(/^gluten$/);
   });
 
-  it('meat checks and locks pork; unchecking meat unlocks it', async () => {
+  it('adds own words with the button or Enter and removes them by chip', async () => {
     render(<Controlled />);
-    const pork = () => screen.getByRole('checkbox', { name: /Свинина/ });
-    await userEvent.click(screen.getByRole('checkbox', { name: /Мясо/ }));
-    expect(pork()).toBeChecked();
-    expect(pork()).toBeDisabled();
-    expect(pork()).toHaveAccessibleName(/Уже исключена вместе с мясом/);
+    const input = screen.getByRole('textbox', { name: 'Своё' });
+    await userEvent.type(input, '  Кинза ');
+    await userEvent.click(screen.getByRole('button', { name: 'Добавить' }));
+    expect(screen.getByTestId('custom')).toHaveTextContent('кинза');
+    expect(input).toHaveValue('');
 
-    await userEvent.click(screen.getByRole('checkbox', { name: /Мясо/ }));
-    expect(pork()).not.toBeChecked();
-    expect(pork()).toBeEnabled();
+    await userEvent.type(input, 'Грибы{Enter}');
+    expect(screen.getByTestId('custom')).toHaveTextContent('кинза,грибы');
+    const list = screen.getByRole('list', { name: 'Ваши исключения' });
+    expect(list.querySelectorAll('li')).toHaveLength(2);
+
+    const remove = screen.getByRole('button', { name: 'Удалить «кинза»' });
+    expect(remove).toHaveClass('size-11');
+    await userEvent.click(remove);
+    expect(screen.getByTestId('custom')).toHaveTextContent(/^грибы$/);
+    expect(input).toHaveFocus();
+  });
+
+  it('explains why a word is not added', async () => {
+    render(<Controlled initial={{ exclusions: [], customExclusions: ['свёкла'] }} />);
+    const input = screen.getByRole('textbox', { name: 'Своё' });
+
+    await userEvent.type(input, 'к{Enter}');
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    expect(input).toHaveAccessibleDescription(/Слишком коротко/);
+
+    await userEvent.clear(input);
+    expect(input).toHaveAttribute('aria-invalid', 'false');
+    await userEvent.type(input, 'СВЕКЛА{Enter}');
+    expect(input).toHaveAccessibleDescription(/уже есть в списке/);
+    expect(screen.getByTestId('custom')).toHaveTextContent(/^свёкла$/);
+
+    // An empty field adds nothing and shows no error.
+    await userEvent.clear(input);
+    await userEvent.keyboard('{Enter}');
+    expect(input).toHaveAttribute('aria-invalid', 'false');
+  });
+
+  it('is disabled together with the group', () => {
+    render(
+      <Question>
+        <ExclusionsField
+          value={{ exclusions: [], customExclusions: ['кинза'] }}
+          onChange={() => undefined}
+          labelledBy="q"
+          disabled
+        />
+      </Question>,
+    );
+    expect(screen.getByRole('textbox', { name: 'Своё' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Удалить «кинза»' })).toBeDisabled();
   });
 });

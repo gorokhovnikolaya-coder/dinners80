@@ -1,5 +1,6 @@
 import {
   hasOnboardingAnswers,
+  normalizeCustomExclusions,
   normalizeExclusions,
   updateMeRequestSchema,
   type SubscriptionStatus,
@@ -53,6 +54,9 @@ const applyPatch = (profile: UserProfile, patch: UpdateMeRequest): UserProfile =
   household: patch.household ?? profile.household,
   weekdayMinutes: patch.weekdayMinutes ?? profile.weekdayMinutes,
   exclusions: patch.exclusions ? normalizeExclusions(patch.exclusions) : profile.exclusions,
+  customExclusions: patch.customExclusions
+    ? normalizeCustomExclusions(patch.customExclusions)
+    : profile.customExclusions,
   timezone: patch.timezone ?? profile.timezone,
   reminderEnabled: patch.reminderEnabled ?? profile.reminderEnabled,
   reminderTime: patch.reminderTime ?? profile.reminderTime,

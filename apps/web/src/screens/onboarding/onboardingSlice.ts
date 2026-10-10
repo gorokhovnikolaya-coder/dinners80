@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction, type WithSlice } from '@reduxjs/toolkit';
-import type { DishTag, Household, WeekdayMinutes } from '@tma80/shared';
+import type { Household, WeekdayMinutes } from '@tma80/shared';
 
+import type { ExclusionsValue } from '../../components/preferences/exclusions.ts';
 import { rootReducer } from '../../store/store.ts';
 import { ONBOARDING_STEPS, type OnboardingDraft } from './onboarding.ts';
 
@@ -9,12 +10,12 @@ const initialState: OnboardingDraft = {
   household: null,
   weekdayMinutes: null,
   exclusions: [],
+  customExclusions: [],
 };
 
 /**
  * Draft answers of the onboarding. Kept in Redux (client state, decision 0001) so they survive
  * a failed save and re-renders; reset when the screen unmounts after a successful save.
- * `exclusions` is the raw selection: pork stays remembered while meat implies it.
  */
 export const onboardingSlice = createSlice({
   name: 'onboarding',
@@ -26,8 +27,9 @@ export const onboardingSlice = createSlice({
     weekdayMinutesSelected(state, action: PayloadAction<WeekdayMinutes>) {
       state.weekdayMinutes = action.payload;
     },
-    exclusionsChanged(state, action: PayloadAction<DishTag[]>) {
-      state.exclusions = action.payload;
+    exclusionsChanged(state, action: PayloadAction<ExclusionsValue>) {
+      state.exclusions = action.payload.exclusions;
+      state.customExclusions = action.payload.customExclusions;
     },
     stepForward(state) {
       state.step = Math.min(state.step + 1, ONBOARDING_STEPS.length - 1);

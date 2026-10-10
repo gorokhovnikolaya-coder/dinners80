@@ -19,7 +19,13 @@ import {
   weekdayMinutesSelected,
 } from './onboardingSlice.ts';
 
-const empty: OnboardingDraft = { step: 0, household: null, weekdayMinutes: null, exclusions: [] };
+const empty: OnboardingDraft = {
+  step: 0,
+  household: null,
+  weekdayMinutes: null,
+  exclusions: [],
+  customExclusions: [],
+};
 
 describe('canProceed', () => {
   it('step 1 needs who eats', () => {
@@ -51,7 +57,8 @@ describe('buildOnboardingRequest', () => {
     step: 2,
     household: 'couple',
     weekdayMinutes: 30,
-    exclusions: ['gluten', 'pork', 'meat'],
+    exclusions: ['gluten', 'meat'],
+    customExclusions: [' Кинза ', 'грибы'],
   };
 
   it('sends normalised answers and the time zone', () => {
@@ -60,16 +67,20 @@ describe('buildOnboardingRequest', () => {
       household: 'couple',
       weekdayMinutes: 30,
       exclusions: ['meat', 'gluten'],
+      customExclusions: ['кинза', 'грибы'],
       timezone: 'Europe/Kaliningrad',
     });
     expect(updateMeRequestSchema.safeParse(body).success).toBe(true);
   });
 
-  it('sends an empty exclusion list and omits an unknown time zone', () => {
-    expect(buildOnboardingRequest({ ...answered, exclusions: [] }, undefined)).toEqual({
+  it('sends empty exclusion lists and omits an unknown time zone', () => {
+    expect(
+      buildOnboardingRequest({ ...answered, exclusions: [], customExclusions: [] }, undefined),
+    ).toEqual({
       household: 'couple',
       weekdayMinutes: 30,
       exclusions: [],
+      customExclusions: [],
     });
   });
 
@@ -119,13 +130,14 @@ describe('onboardingSlice', () => {
     state = reducer(state, stepForward());
     state = reducer(state, weekdayMinutesSelected(20));
     state = reducer(state, stepForward());
-    state = reducer(state, exclusionsChanged(['spicy']));
+    state = reducer(state, exclusionsChanged({ exclusions: ['spicy'], customExclusions: ['кинза'] }));
     state = reducer(state, stepForward());
     expect(state).toEqual({
       step: 2,
       household: 'family',
       weekdayMinutes: 20,
       exclusions: ['spicy'],
+      customExclusions: ['кинза'],
     });
 
     state = reducer(state, stepBack());

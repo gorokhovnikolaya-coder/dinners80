@@ -1,6 +1,6 @@
 import './dev-ui.css';
 
-import type { DishTag, Household } from '@tma80/shared';
+import type { Household } from '@tma80/shared';
 import { useState, type ReactNode } from 'react';
 
 import { Button, IconButton } from '../components/Button.tsx';
@@ -19,6 +19,7 @@ import {
   IconRefresh,
 } from '../components/icons.tsx';
 import { ProgressBar } from '../components/ProgressBar.tsx';
+import type { ExclusionsValue } from '../components/preferences/exclusions.ts';
 import { ExclusionsField, HouseholdField } from '../components/preferences/PreferenceFields.tsx';
 import { Skeleton, SkeletonGroup } from '../components/Skeleton.tsx';
 import { Spinner } from '../components/Spinner.tsx';
@@ -43,8 +44,6 @@ const SWATCHES = [
   'accent-soft',
   'navy-2',
   'navy-3',
-  'navy-selected',
-  'on-dark',
   'on-dark-muted',
   'amber',
 ] as const;
@@ -68,7 +67,7 @@ function Section({ id, title, children }: { id: string; title: string; children:
 
 /** Dev-only gallery of the design tokens and base components (`/dev/ui`). */
 export function DevUiPage() {
-  const [chips, setChips] = useState<Record<string, boolean>>({ noMeat: true, noPork: false });
+  const [chips, setChips] = useState<Record<string, boolean>>({ noMeat: true, noFish: false });
   const [checks, setChecks] = useState<Record<string, boolean>>({
     beef: false,
     potato: true,
@@ -78,7 +77,11 @@ export function DevUiPage() {
   const [tab, setTab] = useState('dinner');
   const [retries, setRetries] = useState(0);
   const [household, setHousehold] = useState<Household | null>('couple');
-  const [exclusions, setExclusions] = useState<DishTag[]>(['meat']);
+  const [exclusions, setExclusions] = useState<ExclusionsValue>({
+    exclusions: ['meat'],
+    customExclusions: ['кинза'],
+  });
+  const [removable, setRemovable] = useState<string[]>([t.chips.removable]);
 
   const toggleCheck = (key: string) => (checked: boolean) => {
     setChecks((prev) => ({ ...prev, [key]: checked }));
@@ -194,7 +197,7 @@ export function DevUiPage() {
           <Chip tone="badge">{t.card.newCountry}</Chip>
         </div>
         <div className="flex flex-wrap gap-2">
-          {(['noMeat', 'noPork'] as const).map((key) => (
+          {(['noMeat', 'noFish'] as const).map((key) => (
             <Chip
               key={key}
               selected={chips[key] ?? false}
@@ -208,6 +211,17 @@ export function DevUiPage() {
           <Chip selected={false} onToggle={() => undefined} disabled>
             {t.chips.disabled}
           </Chip>
+          {removable.map((word) => (
+            <Chip
+              key={word}
+              onRemove={() => {
+                setRemovable([]);
+              }}
+              removeLabel={ru.preferences.customExclusions.remove(word)}
+            >
+              {word}
+            </Chip>
+          ))}
         </div>
       </Section>
 
@@ -305,7 +319,7 @@ export function DevUiPage() {
       </Section>
 
       <Section id="ui-option-card" title={t.sections.optionCard}>
-        <Card tone="inverse" className="flex flex-col gap-3">
+        <Card className="flex flex-col gap-3">
           <p id="ui-option-question" className="text-lg font-bold">
             {t.optionCard.question}
           </p>
@@ -319,7 +333,6 @@ export function DevUiPage() {
           {t.optionCard.exclusionsQuestion}
         </p>
         <ExclusionsField
-          tone="light"
           value={exclusions}
           onChange={setExclusions}
           labelledBy="ui-option-exclusions"

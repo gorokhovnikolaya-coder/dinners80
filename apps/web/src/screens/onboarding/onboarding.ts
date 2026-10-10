@@ -1,5 +1,6 @@
 import {
   isIanaTimeZone,
+  normalizeCustomExclusions,
   normalizeExclusions,
   type DishTag,
   type Household,
@@ -16,8 +17,9 @@ export interface OnboardingDraft {
   step: number;
   household: Household | null;
   weekdayMinutes: WeekdayMinutes | null;
-  /** Raw selection (may hold pork together with meat; normalised only when saving). */
   exclusions: DishTag[];
+  /** Own exclusions («Своё»), as added in the field. */
+  customExclusions: string[];
 }
 
 export const stepAt = (index: number): OnboardingStep =>
@@ -39,8 +41,7 @@ export function canProceed(draft: OnboardingDraft): boolean {
 
 /**
  * Body of `PATCH /me` for the finished onboarding, or `null` while a required answer is missing.
- * Exclusions are normalised (pork is dropped when meat is excluded); the time zone is sent if the
- * browser knows it.
+ * Both kinds of exclusions are sent normalised; the time zone is sent if the browser knows it.
  */
 export function buildOnboardingRequest(
   draft: OnboardingDraft,
@@ -51,6 +52,7 @@ export function buildOnboardingRequest(
     household: draft.household,
     weekdayMinutes: draft.weekdayMinutes,
     exclusions: normalizeExclusions(draft.exclusions),
+    customExclusions: normalizeCustomExclusions(draft.customExclusions),
     ...(timezone ? { timezone } : {}),
   };
 }

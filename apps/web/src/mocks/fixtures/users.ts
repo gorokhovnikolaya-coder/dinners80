@@ -28,7 +28,12 @@ const uuid = (tgId: number) => `00000000-0000-4000-8000-${String(tgId).padStart(
 
 type ProfileSettings = Pick<
   UserProfile,
-  'household' | 'weekdayMinutes' | 'exclusions' | 'reminderEnabled' | 'botCanWrite'
+    | 'household'
+  | 'weekdayMinutes'
+  | 'exclusions'
+  | 'customExclusions'
+  | 'reminderEnabled'
+  | 'botCanWrite'
 >;
 
 const makeUser = (
@@ -83,6 +88,7 @@ export const users: UserFixture[] = [
       household: null,
       weekdayMinutes: null,
       exclusions: [],
+      customExclusions: [],
       reminderEnabled: false,
       botCanWrite: true,
     },
@@ -100,7 +106,8 @@ export const users: UserFixture[] = [
     {
       household: 'couple',
       weekdayMinutes: 30,
-      exclusions: ['pork'],
+      exclusions: [],
+      customExclusions: ['свинина'],
       reminderEnabled: true,
       botCanWrite: true,
     },
@@ -112,6 +119,7 @@ export const users: UserFixture[] = [
       household: 'family',
       weekdayMinutes: 45,
       exclusions: [],
+      customExclusions: [],
       reminderEnabled: true,
       botCanWrite: true,
     },
@@ -127,7 +135,8 @@ export const users: UserFixture[] = [
     {
       household: 'solo',
       weekdayMinutes: 20,
-      exclusions: ['pork'],
+      exclusions: [],
+      customExclusions: ['свинина'],
       reminderEnabled: true,
       botCanWrite: true,
     },
@@ -140,6 +149,7 @@ export const users: UserFixture[] = [
       household: 'couple',
       weekdayMinutes: 30,
       exclusions: ['meat'],
+      customExclusions: [],
       reminderEnabled: false,
       botCanWrite: false,
     },
@@ -151,6 +161,7 @@ export const users: UserFixture[] = [
       household: 'solo',
       weekdayMinutes: 30,
       exclusions: [],
+      customExclusions: [],
       reminderEnabled: true,
       botCanWrite: true,
     },
@@ -162,6 +173,7 @@ export const users: UserFixture[] = [
       household: 'family',
       weekdayMinutes: 45,
       exclusions: ['gluten'],
+      customExclusions: [],
       reminderEnabled: false,
       botCanWrite: true,
     },
@@ -173,6 +185,7 @@ export const users: UserFixture[] = [
       household: 'couple',
       weekdayMinutes: 45,
       exclusions: [],
+      customExclusions: [],
       reminderEnabled: true,
       botCanWrite: true,
     },

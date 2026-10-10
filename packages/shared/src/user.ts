@@ -1,6 +1,17 @@
 import { z } from 'zod/mini';
 
-import { DISH_TAGS, HOUSEHOLDS, SUBSCRIPTION_PLANS, WEEKDAY_MINUTES } from './constants.ts';
+import {
+  CUSTOM_EXCLUSIONS_MAX,
+  DISH_TAGS,
+  HOUSEHOLDS,
+  SUBSCRIPTION_PLANS,
+  WEEKDAY_MINUTES,
+} from './constants.ts';
+import {
+  cleanCustomExclusion,
+  customExclusionKey,
+  isValidCustomExclusion,
+} from './preferences.ts';
 
 /**
  * Shape of an IANA time zone name (`Europe/Moscow`, `America/Argentina/Buenos_Aires`, `UTC`):
@@ -44,6 +55,35 @@ export const timezoneSchema = timezoneNameSchema.check(
 /** Dinner reminder time `HH:MM`, step 30 minutes (`users.reminder_time`). */
 export const reminderTimeSchema = z.string().check(z.regex(/^([01]\d|2[0-3]):(00|30)$/));
 
+/** Tag exclusions without repeats (`users.exclusions`). */
+export const exclusionsSchema = z
+  .array(z.enum(DISH_TAGS))
+  .check(z.refine((tags) => new Set(tags).size === tags.length, 'Duplicate exclusions'));
+
+/**
+ * The user's own exclusions (`users.custom_exclusions`): free-text words matched against dish
+ * titles and ingredient names (`matchesCustomExclusion`). At most `CUSTOM_EXCLUSIONS_MAX` words,
+ * each 2–40 characters with a letter after `cleanCustomExclusion` (the raw value is capped at 100
+ * characters), no repeats by `customExclusionKey`. The server stores them normalised
+ * (`normalizeCustomExclusions`).
+ */
+export const customExclusionsSchema = z
+  .array(
+    z
+      .string()
+      .check(
+        z.maxLength(100),
+        z.refine((word) => isValidCustomExclusion(cleanCustomExclusion(word)), 'Invalid exclusion'),
+      ),
+  )
+  .check(
+    z.maxLength(CUSTOM_EXCLUSIONS_MAX),
+    z.refine(
+      (words) => new Set(words.map(customExclusionKey)).size === words.length,
+      'Duplicate exclusions',
+    ),
+  );
+
 /** The current user's profile and settings, as the client sees it (`users`). */
 export const userProfileSchema = z.object({
   id: z.string().check(z.minLength(1)),
@@ -54,7 +94,9 @@ export const userProfileSchema = z.object({
   /** Onboarding answers; `null` until the onboarding is done. */
   household: z.nullable(z.enum(HOUSEHOLDS)),
   weekdayMinutes: z.nullable(z.literal(WEEKDAY_MINUTES)),
-  exclusions: z.array(z.enum(DISH_TAGS)),
+  exclusions: exclusionsSchema,
+  /** Own exclusions typed by the user, e.g. `['кинза']`. */
+  customExclusions: customExclusionsSchema,
   /** IANA time zone, e.g. `Europe/Moscow` (format only, see `timezoneNameSchema`). */
   timezone: timezoneNameSchema,
   reminderEnabled: z.boolean(),

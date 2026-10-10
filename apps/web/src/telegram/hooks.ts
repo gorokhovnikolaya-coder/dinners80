@@ -1,8 +1,6 @@
 import { backButton } from '@tma.js/sdk-react';
 import { useEffect, useState } from 'react';
 
-import { CHROME_COLOR_TOKEN } from '../theme/tokens.ts';
-import { setChromeColors } from './sdk.ts';
 
 /** True if this client can show the Telegram BackButton and report presses (Mini Apps 6.1+). */
 export function isTelegramBackButtonAvailable(): boolean {
@@ -33,17 +31,4 @@ export function useTelegramBackButton(onBack: (() => void) | undefined): boolean
     };
   }, [onBack, available]);
   return available;
-}
-
-/**
- * Paints the Telegram header and background with a colour token while the screen is shown
- * (e.g. `--color-ink` on dark screens), and restores the default `--color-bg` afterwards.
- */
-export function useTelegramChromeColor(token: string): void {
-  useEffect(() => {
-    setChromeColors(token);
-    return () => {
-      setChromeColors(CHROME_COLOR_TOKEN);
-    };
-  }, [token]);
 }

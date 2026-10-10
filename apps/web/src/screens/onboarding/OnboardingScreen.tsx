@@ -12,8 +12,6 @@ import {
 import { ProgressBar } from '../../components/ProgressBar.tsx';
 import { ru } from '../../i18n/ru.ts';
 import { useAppDispatch, useAppSelector } from '../../store/hooks.ts';
-import { useTelegramChromeColor } from '../../telegram/hooks.ts';
-import { DARK_CHROME_COLOR_TOKEN } from '../../theme/tokens.ts';
 import {
   buildOnboardingRequest,
   canProceed,
@@ -53,8 +51,6 @@ export default function OnboardingScreen() {
   const last = isLastStep(draft.step);
   const texts = t.steps[step];
 
-  useTelegramChromeColor(DARK_CHROME_COLOR_TOKEN);
-
   const goBack = useCallback(() => {
     resetSave();
     dispatch(stepBack());
@@ -89,13 +85,12 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <main className="surface-dark flex min-h-dvh flex-col gap-7 bg-ink px-5 pt-14 pb-safe-8 text-white">
+    <main className="flex min-h-dvh flex-col gap-7 bg-bg px-5 pt-14 pb-safe-8 text-ink">
       <div className="flex items-center gap-3">
         {/* Telegram BackButton on steps 2–3; an in-page button only if the client lacks it. */}
-        <BackNavigation onBack={onBack} tone="dark" />
+        <BackNavigation onBack={onBack} />
         <ProgressBar
           variant="steps"
-          tone="dark"
           size="xs"
           value={draft.step + 1}
           max={ONBOARDING_STEPS.length}
@@ -106,7 +101,7 @@ export default function OnboardingScreen() {
       </div>
 
       <div className="flex flex-col gap-3">
-        <p className="text-sm font-bold tracking-caps-lg text-amber uppercase">
+        <p className="text-sm font-bold tracking-caps-lg text-primary uppercase">
           {t.counter(draft.step + 1, ONBOARDING_STEPS.length)}
         </p>
         <h1
@@ -117,7 +112,7 @@ export default function OnboardingScreen() {
         >
           {texts.title}
         </h1>
-        <p className="text-base text-on-dark">{texts.description}</p>
+        <p className="text-base text-ink-2">{texts.description}</p>
       </div>
 
       {step === 'household' && (
@@ -136,7 +131,7 @@ export default function OnboardingScreen() {
       )}
       {step === 'exclusions' && (
         <ExclusionsField
-          value={draft.exclusions}
+          value={{ exclusions: draft.exclusions, customExclusions: draft.customExclusions }}
           onChange={(value) => {
             resetSave();
             dispatch(exclusionsChanged(value));
@@ -150,17 +145,17 @@ export default function OnboardingScreen() {
         {saveFailed ? (
           <p
             role="alert"
-            className="flex items-center justify-center gap-2 text-md font-semibold text-amber"
+            className="flex items-center justify-center gap-2 text-md font-semibold text-accent-strong"
           >
             <IconAlert size={20} />
             {t.saveError} {ru.common.errorHint}
           </p>
         ) : (
-          <p className="text-center text-sm text-on-dark-muted">{texts.hint}</p>
+          <p className="text-center text-sm text-muted">{texts.hint}</p>
         )}
         {/* While saving the button stays focusable (aria-disabled) and shows progress. */}
         <Button
-          variant="inverse"
+          variant="accent"
           size="lg"
           fullWidth
           disabled={!canProceed(draft)}

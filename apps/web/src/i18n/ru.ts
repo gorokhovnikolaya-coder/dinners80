@@ -21,13 +21,26 @@ export const ru = {
     },
     weekdayMinutes: (minutes: number) => `${String(minutes)} минут`,
     exclusions: {
-      pork: { title: 'Свинина' },
       meat: { title: 'Мясо', description: 'Включая свинину' },
       spicy: { title: 'Острое' },
       gluten: { title: 'Глютен', description: 'Мука, паста, хлеб, соевый соус' },
     },
-    /** Shown on pork while meat is excluded. */
-    impliedByMeat: 'Уже исключена вместе с мясом',
+    /** The user's own exclusions: free text matched against dish titles and ingredients. */
+    customExclusions: {
+      label: 'Своё',
+      hint: 'Например, кинза или грибы: уберём блюда, где это есть в названии или в ингредиентах.',
+      placeholder: 'Продукт или блюдо',
+      add: 'Добавить',
+      list: 'Ваши исключения',
+      remove: (word: string) => `Удалить «${word}»`,
+      errors: {
+        tooShort: (min: number) => `Слишком коротко: нужно хотя бы ${String(min)} символа.`,
+        tooLong: (max: number) => `Слишком длинно: не больше ${String(max)} символов.`,
+        noLetter: 'Нужна хотя бы одна буква.',
+        duplicate: 'Это уже есть в списке.',
+        limit: (max: number) => `Можно добавить не больше ${String(max)}.`,
+      },
+    },
   },
   onboarding: {
     progress: 'Вопросы онбординга',
@@ -114,8 +127,8 @@ export const ruDevUi = {
   },
   chips: {
     noMeat: 'Без мяса',
-    noPork: 'Без свинины',
     noFish: 'Без рыбы',
+    removable: 'кинза',
     disabled: 'Без глютена',
   },
   progress: {

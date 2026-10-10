@@ -30,11 +30,9 @@
   --color-accent-strong: #9a3412; /* pressed accent, text on accent-soft */
   --color-accent-soft: #fbe3d6;
 
-  /* Dark screens (onboarding, stamp, paywall) */
+  /* Dark screens and cards (stamp, paywall, passport, timer) */
   --color-navy-2: #1e2d4f; /* raised surface on navy */
   --color-navy-3: #33415c; /* borders and progress track on navy */
-  --color-navy-selected: #2a2f45; /* selected option on navy (with an amber border) */
-  --color-on-dark: #c9d1dd; /* secondary text and icons on navy */
   --color-on-dark-muted: #a9b4c6; /* captions on navy */
   --color-amber: #f2a65a; /* CTA and progress on navy */
 

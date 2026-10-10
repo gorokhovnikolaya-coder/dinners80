@@ -4,6 +4,7 @@ import {
   cookSchema,
   countrySchema,
   dishSchema,
+  matchesCustomExclusion,
   userProfileSchema,
   subscriptionStatusSchema,
 } from '@tma80/shared';
@@ -41,12 +42,6 @@ describe('content fixtures', () => {
         .filter((dish) => dish.countryId === country.id)
         .map((dish) => dish.level);
       expect(levels.toSorted()).toEqual([...DISH_LEVELS].toSorted());
-    }
-  });
-
-  it('tag every pork dish as meat too (pork is meat)', () => {
-    for (const dish of dishes.filter((item) => item.tags.includes('pork'))) {
-      expect(dish.tags, dish.id).toContain('meat');
     }
   });
 
@@ -123,6 +118,12 @@ describe('user fixtures', () => {
       expect(user && dish).toBeTruthy();
       const excluded = dish?.tags.filter((tag) => user?.profile.exclusions.includes(tag));
       expect(excluded, `${cook.dishId} for ${String(user?.tg.id)}`).toEqual([]);
+      // Mock dishes have no ingredients: own exclusions are checked against the title.
+      const custom =
+        dish && user
+          ? matchesCustomExclusion({ ...dish, ingredients: [] }, user.profile.customExclusions)
+          : false;
+      expect(custom, `${cook.dishId} for ${String(user?.tg.id)}`).toBe(false);
     }
   });
 });

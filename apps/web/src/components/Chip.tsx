@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { cx } from './cx.ts';
-import { IconCheck } from './icons.tsx';
+import { IconCheck, IconClose } from './icons.tsx';
 
 export type ChipTone = 'neutral' | 'primary' | 'accent' | 'badge';
 
@@ -17,6 +17,8 @@ interface StaticChipProps {
   selected?: never;
   onToggle?: never;
   disabled?: never;
+  onRemove?: never;
+  removeLabel?: never;
 }
 
 interface ToggleChipProps {
@@ -28,9 +30,25 @@ interface ToggleChipProps {
   icon?: ReactNode;
   className?: string;
   tone?: never;
+  onRemove?: never;
+  removeLabel?: never;
 }
 
-export type ChipProps = StaticChipProps | ToggleChipProps;
+interface RemovableChipProps {
+  children: ReactNode;
+  /** Removes the item (e.g. an own exclusion «кинза»). */
+  onRemove: () => void;
+  /** Accessible name of the remove button, e.g. «Удалить «кинза»». */
+  removeLabel: string;
+  disabled?: boolean;
+  className?: string;
+  tone?: never;
+  selected?: never;
+  onToggle?: never;
+  icon?: never;
+}
+
+export type ChipProps = StaticChipProps | ToggleChipProps | RemovableChipProps;
 
 const tones: Record<ChipTone, string> = {
   neutral: 'rounded-chip bg-bg px-2.5 py-1.5 text-sm font-semibold text-ink-2',
@@ -40,10 +58,35 @@ const tones: Record<ChipTone, string> = {
 };
 
 /**
- * A tag (static, without `onToggle`) or a toggle chip (`selected` + `onToggle`) — a real
- * `button` with `aria-pressed` and a 44 px touch target.
+ * A tag (static), a toggle chip (`selected` + `onToggle`) — a real `button` with `aria-pressed`
+ * and a 44 px touch target — or a removable item (`onRemove` + `removeLabel`): the text with a
+ * 44 × 44 «×» button named by `removeLabel`.
  */
 export function Chip(props: ChipProps) {
+  if (props.onRemove !== undefined) {
+    const { children, onRemove, removeLabel, disabled, className } = props;
+    return (
+      <span
+        className={cx(
+          'inline-flex min-h-11 max-w-full items-center rounded-tile border-[1.5px] border-border bg-surface pl-4',
+          'text-base font-semibold text-ink',
+          className,
+        )}
+      >
+        <span className="min-w-0 break-words">{children}</span>
+        <button
+          type="button"
+          aria-label={removeLabel}
+          disabled={disabled}
+          onClick={onRemove}
+          className="inline-flex size-11 shrink-0 items-center justify-center rounded-tile text-muted transition-colors enabled:hover:text-ink disabled:cursor-not-allowed"
+        >
+          <IconClose size={18} />
+        </button>
+      </span>
+    );
+  }
+
   if (props.onToggle === undefined) {
     const { children, tone = 'neutral', icon, className } = props;
     return (

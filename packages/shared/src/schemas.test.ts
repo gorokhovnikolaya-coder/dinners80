@@ -13,6 +13,7 @@ const profile = {
   household: null,
   weekdayMinutes: null,
   exclusions: [],
+  customExclusions: [],
   timezone: 'Europe/Moscow',
   reminderEnabled: false,
   reminderTime: '18:00',

@@ -62,13 +62,13 @@ describe('BackNavigation', () => {
   it('draws its own 44 × 44 «Назад» button in clients without BackButton', async () => {
     sdk.state.available = false;
     const onBack = vi.fn();
-    const { rerender } = render(<BackNavigation onBack={onBack} tone="dark" />);
+    const { rerender } = render(<BackNavigation onBack={onBack} />);
     const button = screen.getByRole('button', { name: 'Назад' });
     expect(button).toHaveClass('size-11');
     await userEvent.click(button);
     expect(onBack).toHaveBeenCalledOnce();
 
-    rerender(<BackNavigation onBack={undefined} tone="dark" />);
+    rerender(<BackNavigation onBack={undefined} />);
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });

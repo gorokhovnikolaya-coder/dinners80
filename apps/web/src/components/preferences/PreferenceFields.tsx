@@ -1,20 +1,28 @@
 import {
+  addCustomExclusion,
+  CUSTOM_EXCLUSION_MAX_LENGTH,
+  CUSTOM_EXCLUSION_MIN_LENGTH,
+  CUSTOM_EXCLUSIONS_MAX,
+  DISH_TAGS,
   HOUSEHOLDS,
   WEEKDAY_MINUTES,
-  type DishTag,
+  type CustomExclusionError,
   type Household,
   type WeekdayMinutes,
 } from '@tma80/shared';
-import type { ReactNode } from 'react';
+import { useId, useRef, useState, type ReactNode } from 'react';
 
 import { ru } from '../../i18n/ru.ts';
-import { IconClock, IconCouple, IconFamily, IconPerson } from '../icons.tsx';
-import { OptionCard, type OptionCardTone } from '../OptionCard.tsx';
-import { exclusionOptions, toggleExclusion } from './exclusions.ts';
+import { Button } from '../Button.tsx';
+import { Chip } from '../Chip.tsx';
+import { cx } from '../cx.ts';
+import { IconClock, IconCouple, IconFamily, IconPerson, IconPlus } from '../icons.tsx';
+import { OptionCard } from '../OptionCard.tsx';
+import { toggleExclusion, type ExclusionsValue } from './exclusions.ts';
 
 /**
- * Controls of the onboarding answers. The onboarding (dark) and the profile settings (light,
- * task 13) use the same components, as the ТЗ requires.
+ * Controls of the onboarding answers. The onboarding and the profile settings (task 13) use the
+ * same components, as the ТЗ requires; both screens are light.
  */
 interface FieldProps<Value, Selected = Value> {
   value: Value;
@@ -22,7 +30,6 @@ interface FieldProps<Value, Selected = Value> {
   /** Id of the visible question that names the group. */
   labelledBy: string;
   disabled?: boolean | undefined;
-  tone?: OptionCardTone | undefined;
 }
 
 function Group({
@@ -57,7 +64,6 @@ export function HouseholdField({
   onChange,
   labelledBy,
   disabled,
-  tone,
 }: FieldProps<Household | null, Household>) {
   return (
     <Group labelledBy={labelledBy} disabled={disabled}>
@@ -74,7 +80,6 @@ export function HouseholdField({
           title={ru.preferences.household[household].title}
           description={ru.preferences.household[household].description}
           icon={HOUSEHOLD_ICONS[household]}
-          tone={tone}
         />
       ))}
     </Group>
@@ -87,7 +92,6 @@ export function WeekdayMinutesField({
   onChange,
   labelledBy,
   disabled,
-  tone,
 }: FieldProps<WeekdayMinutes | null, WeekdayMinutes>) {
   return (
     <Group labelledBy={labelledBy} disabled={disabled}>
@@ -103,27 +107,144 @@ export function WeekdayMinutesField({
           }}
           title={ru.preferences.weekdayMinutes(minutes)}
           icon={<IconClock size={28} />}
-          tone={tone}
         />
       ))}
     </Group>
   );
 }
 
+const customTexts = ru.preferences.customExclusions;
+
+const customErrorText = (error: Exclude<CustomExclusionError, 'empty'>): string => {
+  const { errors } = customTexts;
+  switch (error) {
+    case 'tooShort':
+      return errors.tooShort(CUSTOM_EXCLUSION_MIN_LENGTH);
+    case 'tooLong':
+      return errors.tooLong(CUSTOM_EXCLUSION_MAX_LENGTH);
+    case 'limit':
+      return errors.limit(CUSTOM_EXCLUSIONS_MAX);
+    case 'noLetter':
+    case 'duplicate':
+      return errors[error];
+  }
+};
+
 /**
- * Step 3 «Что не ест»: any of pork / meat / spicy / gluten, or nothing. `value` is the raw
- * selection; pork is shown checked and locked while meat is selected (pork is meat too).
+ * «Своё»: the user's own exclusions as free text. A word is added with «Добавить» or Enter and
+ * shown as a chip with a «×» button; invalid input explains why it was not added. Disabled
+ * together with the surrounding `fieldset`.
+ */
+function CustomExclusionsInput({
+  words,
+  onChange,
+}: {
+  words: string[];
+  onChange: (words: string[]) => void;
+}) {
+  const inputId = useId();
+  const hintId = useId();
+  const errorId = useId();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [text, setText] = useState('');
+  const [error, setError] = useState<Exclude<CustomExclusionError, 'empty'> | null>(null);
+
+  const add = () => {
+    const result = addCustomExclusion(words, text);
+    if ('error' in result) {
+      setError(result.error === 'empty' ? null : result.error);
+      return;
+    }
+    onChange(result.list);
+    setText('');
+    setError(null);
+  };
+
+  const remove = (word: string) => {
+    onChange(words.filter((item) => item !== word));
+    setError(null);
+    // The removed chip's button disappears: keep the focus in the field.
+    inputRef.current?.focus();
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <label htmlFor={inputId} className="flex min-h-11 items-end text-xl font-extrabold">
+        {customTexts.label}
+      </label>
+      <p id={hintId} className="text-sm text-muted">
+        {customTexts.hint}
+      </p>
+      <div className="flex gap-2">
+        <input
+          ref={inputRef}
+          id={inputId}
+          type="text"
+          value={text}
+          maxLength={CUSTOM_EXCLUSION_MAX_LENGTH}
+          autoComplete="off"
+          placeholder={customTexts.placeholder}
+          aria-describedby={`${hintId} ${errorId}`}
+          aria-invalid={error !== null}
+          onChange={(event) => {
+            setText(event.target.value);
+            setError(null);
+          }}
+          onKeyDown={(event) => {
+            if (event.key !== 'Enter' || event.nativeEvent.isComposing) return;
+            event.preventDefault();
+            add();
+          }}
+          className={cx(
+            'min-h-12 min-w-0 flex-1 rounded-button border-[1.5px] bg-surface px-4 text-lg text-ink',
+            'placeholder:text-muted disabled:cursor-not-allowed disabled:bg-track',
+            error === null ? 'border-muted' : 'border-accent-strong',
+          )}
+        />
+        <Button variant="secondary" icon={<IconPlus size={20} />} onClick={add}>
+          {customTexts.add}
+        </Button>
+      </div>
+      <p
+        id={errorId}
+        aria-live="polite"
+        className="text-sm font-semibold text-accent-strong empty:hidden"
+      >
+        {error === null ? '' : customErrorText(error)}
+      </p>
+      {words.length > 0 && (
+        <ul aria-label={customTexts.list} className="flex flex-wrap gap-2">
+          {words.map((word) => (
+            <li key={word} className="max-w-full">
+              <Chip
+                onRemove={() => {
+                  remove(word);
+                }}
+                removeLabel={customTexts.remove(word)}
+              >
+                {word}
+              </Chip>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Step 3 «Что не ест»: any of meat / spicy / gluten, or nothing, plus own words («Своё»), e.g.
+ * «кинза». Pork is meat: there is no separate option.
  */
 export function ExclusionsField({
   value,
   onChange,
   labelledBy,
   disabled,
-  tone,
-}: FieldProps<DishTag[]>) {
+}: FieldProps<ExclusionsValue>) {
   return (
     <Group labelledBy={labelledBy} disabled={disabled}>
-      {exclusionOptions(value).map(({ tag, checked, implied }) => {
+      {DISH_TAGS.map((tag) => {
         const text = ru.preferences.exclusions[tag];
         return (
           <OptionCard
@@ -131,23 +252,21 @@ export function ExclusionsField({
             type="checkbox"
             name="exclusions"
             value={tag}
-            checked={checked}
-            disabled={implied}
+            checked={value.exclusions.includes(tag)}
             onChange={(next) => {
-              onChange(toggleExclusion(value, tag, next));
+              onChange({ ...value, exclusions: toggleExclusion(value.exclusions, tag, next) });
             }}
             title={text.title}
-            description={
-              implied
-                ? ru.preferences.impliedByMeat
-                : 'description' in text
-                  ? text.description
-                  : undefined
-            }
-            tone={tone}
+            description={'description' in text ? text.description : undefined}
           />
         );
       })}
+      <CustomExclusionsInput
+        words={value.customExclusions}
+        onChange={(customExclusions) => {
+          onChange({ ...value, customExclusions });
+        }}
+      />
     </Group>
   );
 }

@@ -8,10 +8,18 @@ export type WeekdayMinutes = (typeof WEEKDAY_MINUTES)[number];
 
 /**
  * Dish tags that a user can exclude (onboarding step 3, `users.exclusions`, `dishes.tags`):
- * pork, meat, spicy, gluten.
+ * meat (pork included — a pork dish is just `meat`), spicy, gluten.
  */
-export const DISH_TAGS = ['pork', 'meat', 'spicy', 'gluten'] as const;
+export const DISH_TAGS = ['meat', 'spicy', 'gluten'] as const;
 export type DishTag = (typeof DISH_TAGS)[number];
+
+/**
+ * Limits of the user's own exclusions (onboarding step 3 «Своё», `users.custom_exclusions`):
+ * at most 10 words, each 2–40 characters after trimming, with at least one letter.
+ */
+export const CUSTOM_EXCLUSIONS_MAX = 10;
+export const CUSTOM_EXCLUSION_MIN_LENGTH = 2;
+export const CUSTOM_EXCLUSION_MAX_LENGTH = 40;
 
 /** Dish levels: weekday evening, weekend, challenge (`dishes.level`). */
 export const DISH_LEVELS = ['weekday', 'weekend', 'challenge'] as const;
