@@ -10,8 +10,8 @@ export const countries: Country[] = [
   { id: 'cn', nameRu: 'Китай', continent: 'asia', sort: 6 },
   { id: 'in', nameRu: 'Индия', continent: 'asia', sort: 7 },
   { id: 'th', nameRu: 'Таиланд', continent: 'asia', sort: 8 },
-  { id: 'pe', nameRu: 'Перу', continent: 'south_america', sort: 9 },
-  { id: 'ar', nameRu: 'Аргентина', continent: 'south_america', sort: 10 },
-  { id: 'br', nameRu: 'Бразилия', continent: 'south_america', sort: 11 },
-  { id: 'co', nameRu: 'Колумбия', continent: 'south_america', sort: 12 },
+  { id: 'pe', nameRu: 'Перу', continent: 'americas', sort: 9 },
+  { id: 'ar', nameRu: 'Аргентина', continent: 'americas', sort: 10 },
+  { id: 'br', nameRu: 'Бразилия', continent: 'americas', sort: 11 },
+  { id: 'co', nameRu: 'Колумбия', continent: 'americas', sort: 12 },
 ];

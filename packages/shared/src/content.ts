@@ -1,13 +1,13 @@
 import { z } from 'zod/mini';
 
-import { DISH_LEVELS, DISH_TAGS } from './constants.ts';
+import { CONTINENTS, DISH_LEVELS, DISH_TAGS } from './constants.ts';
 
 /** A country of the content (`countries`). `id` is a slug, e.g. `pe`. */
 export const countrySchema = z.object({
   id: z.string().check(z.regex(/^[a-z]{2,3}$/)),
   nameRu: z.string().check(z.minLength(1)),
-  /** Continent slug used to group countries on the map, e.g. `europe`. */
-  continent: z.string().check(z.regex(/^[a-z_]+$/)),
+  /** Continent group of the map (`CONTINENTS`), e.g. `europe`. */
+  continent: z.enum(CONTINENTS),
   sort: z.int(),
 });
 export type Country = z.infer<typeof countrySchema>;

@@ -12,6 +12,8 @@ export const ROUTES = {
   shopping: '/shopping',
   /** Map and passport (task 9). */
   map: '/map',
+  /** A country of the passport: its dishes (task 9). */
+  country: '/map/countries/:id',
   /** Friends (task 10). */
   friends: '/friends',
   /** Paywall (task 12); `?dish=<id>` — the dish to return to after the payment. */
@@ -26,6 +28,8 @@ export const dishPath = (id: string) => `/dishes/${encodeURIComponent(id)}`;
 export const cookingPath = (id: string) => `${dishPath(id)}/cook`;
 
 export const cookedPath = (id: string) => `${dishPath(id)}/done`;
+
+export const countryPath = (id: string) => `/map/countries/${encodeURIComponent(id)}`;
 
 export const paywallPath = (dishId?: string) =>
   dishId === undefined

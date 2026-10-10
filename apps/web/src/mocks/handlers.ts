@@ -5,6 +5,7 @@ import {
   COOK_PHOTO_TYPE,
   COOKS_PER_DAY_LIMIT,
   addShoppingRequestSchema,
+  buildPassport,
   createCookRequestSchema,
   findOvertakenFriend,
   clampServings,
@@ -25,6 +26,7 @@ import {
   type DishPreview,
   type DishResponse,
   type HomeResponse,
+  type MapResponse,
   type PaywallError,
   type MeResponse,
   type SuggestionCard,
@@ -98,6 +100,15 @@ export const homeResponse = (
     dishesCount: userCooks.length,
   };
 };
+
+/** `GET /map` as the server does it: the shared `buildPassport` over the fixtures. */
+export const mapResponse = (user: MockUser): MapResponse =>
+  buildPassport({
+    countries: countries.map((country) => ({ ...country, name: country.nameRu })),
+    dishes: dishes.map((dish) => ({ ...dish, imageUrl: mockDishImageUrl(dish) })),
+    cooks: user.cooks,
+    subscribed: user.subscription.active,
+  });
 
 /** Result of `GET /dishes/:id` as the server decides it. */
 export type DishResult =
@@ -292,6 +303,15 @@ export const createHandlers = (
     });
     if (!query.success) return apiError(400, 'validation', 'Invalid home query');
     return HttpResponse.json<HomeResponse>(homeResponse(auth[1], query.data));
+  }),
+
+  http.get<never, never, MapResponse | ApiError>(`${apiBase}/map`, async ({ request }) => {
+    if (controls.delayMs > 0) await delay(controls.delayMs);
+    if (takeFailure(controls, 'map'))
+      return apiError(500, 'internal', 'Mock error (mock_error=map)');
+    const auth = authenticate(request, db);
+    if (!auth) return unauthorized();
+    return HttpResponse.json<MapResponse>(mapResponse(auth[1]));
   }),
 
   http.get<{ id: string }, never, DishResponse | PaywallError | ApiError>(

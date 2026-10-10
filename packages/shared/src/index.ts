@@ -124,3 +124,18 @@ export {
   type RankedFriend,
   type UploadCookPhotoResponse,
 } from './cooks.ts';
+export {
+  buildPassport,
+  mapContinentSchema,
+  mapCountrySchema,
+  mapDishSchema,
+  mapResponseSchema,
+  type MapContinent,
+  type MapCountry,
+  type MapDish,
+  type MapResponse,
+  type PassportCook,
+  type PassportCountry,
+  type PassportDish,
+  type PassportInput,
+} from './map.ts';

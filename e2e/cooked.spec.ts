@@ -125,16 +125,37 @@ test.describe('photo and stamp', () => {
     await shot(page, '03-repeat-dish');
   });
 
+  test('«Открыть карту» after a new country: the country is passed on the map', async ({
+    page,
+  }) => {
+    await cookToEnd(page, 'in-dal', 'user=1002&mock_reset=1');
+    await page.getByRole('button', { name: 'Без фото' }).click();
+    await expect(page.getByText('Новая страна!')).toBeVisible();
+    await page.getByRole('button', { name: 'Открыть карту' }).click();
+
+    await expect(page).toHaveURL('/map');
+    await expect(page.getByRole('progressbar', { name: 'Пройдено стран' })).toHaveAttribute(
+      'aria-valuetext',
+      '9 из 12 стран',
+    );
+    await expect(page.getByRole('link', { name: 'Индия: пройдена' })).toBeVisible();
+    await expect(page.getByText('11 блюд')).toBeVisible();
+  });
+
   test('a failed upload is retried', async ({ page }) => {
     await cookToEnd(page, 'in-dal', 'user=1002&mock_reset=1&mock_error=upload');
     await photoInput(page).setInputFiles(await cameraPhoto(page));
     await expect(page.getByRole('status')).toHaveText('Не удалось загрузить фото');
-    await expect(page.getByRole('img', { name: 'Ваше фото: Дал из красной чечевицы' })).toBeVisible();
+    await expect(
+      page.getByRole('img', { name: 'Ваше фото: Дал из красной чечевицы' }),
+    ).toBeVisible();
     await shot(page, '04-upload-error');
 
     await page.getByRole('button', { name: 'Повторить' }).click();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Индия в паспорте');
-    await expect(page.getByRole('img', { name: 'Ваше фото: Дал из красной чечевицы' })).toBeVisible();
+    await expect(
+      page.getByRole('img', { name: 'Ваше фото: Дал из красной чечевицы' }),
+    ).toBeVisible();
   });
 
   test('after a failed upload the cook is recorded without a photo', async ({ page }) => {

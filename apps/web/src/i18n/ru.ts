@@ -1,3 +1,12 @@
+/** Russian plural form for a count: `plural(n, 'блюдо', 'блюда', 'блюд')`. */
+const plural = (count: number, one: string, few: string, many: string) => {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+  return many;
+};
+
 /** All user-facing strings of the mini app. */
 export const ru = {
   app: {
@@ -132,6 +141,40 @@ export const ru = {
     yourPhoto: (title: string) => `Ваше фото: ${title}`,
     dishPhoto: (title: string) => `Фото: ${title}`,
     openMap: 'Открыть карту',
+  },
+  map: {
+    title: 'Мой паспорт',
+    /** «13 блюд»: all cooks of the user, repeats included. */
+    dishes: (count: number) => `${String(count)} ${plural(count, 'блюдо', 'блюда', 'блюд')}`,
+    countriesCaption: 'стран пройдено',
+    progressLabel: 'Пройдено стран',
+    progressValue: (count: number, total: number) =>
+      `${String(count)} из ${String(total)} стран`,
+    continents: {
+      europe: 'Европа',
+      asia: 'Азия',
+      americas: 'Америка',
+      africa_oceania: 'Африка и Океания',
+    },
+    continentProgress: (passed: number, total: number) => `${String(passed)} из ${String(total)}`,
+    /** Hidden before «3 из 8» for screen readers. */
+    continentProgressPrefix: 'пройдено',
+    tile: {
+      passed: (name: string) => `${name}: пройдена`,
+      open: (name: string) => `${name}: не пройдена`,
+      locked: (name: string) => `${name}: откроется с подпиской`,
+    },
+  },
+  country: {
+    since: (date: string) => `В паспорте с ${date}`,
+    notPassed: 'Ещё не пройдена',
+    locked: 'Откроется с подпиской',
+    dishes: 'Блюда страны',
+    cooked: 'Приготовлено',
+    notFound: {
+      title: 'Страна не найдена',
+      action: 'К карте',
+    },
   },
   paywallStub: {
     title: 'Откроется с подпиской',

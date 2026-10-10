@@ -1,45 +1,14 @@
 import type { SuggestionCard } from '@tma80/shared';
-import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
 
 import { dishPath, paywallPath } from '../../app/routes.ts';
 import { Chip } from '../../components/Chip.tsx';
+import { DishPhoto } from '../../components/DishPhoto.tsx';
 import { cx } from '../../components/cx.ts';
 import { IconLock } from '../../components/icons.tsx';
 import { ru } from '../../i18n/ru.ts';
 
 const t = ru.home;
-
-/** The dish photo; a failed image leaves the neutral background instead of a broken icon. */
-function Photo({
-  url,
-  className,
-  children,
-}: {
-  url: string;
-  className?: string;
-  /** Overlays (badge, lock), positioned over the photo. */
-  children?: ReactNode;
-}) {
-  const [failed, setFailed] = useState(false);
-  return (
-    <span className={cx('relative block shrink-0 bg-track', className)}>
-      {!failed && (
-        <img
-          src={url}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 size-full object-cover"
-          onError={() => {
-            setFailed(true);
-          }}
-        />
-      )}
-      {children}
-    </span>
-  );
-}
 
 const linkClass =
   'flex flex-col overflow-hidden bg-surface text-ink no-underline shadow-card transition-transform active:scale-[0.99]';
@@ -76,11 +45,11 @@ function smallLabel(label: SuggestionCard['label']): { text: string; tone: strin
 export function BigSuggestionCard({ card }: { card: SuggestionCard }) {
   return (
     <Link to={dishPath(card.dishId)} className={cx(linkClass, 'rounded-card-lg')}>
-      <Photo url={card.imageUrl} className="h-37.5">
+      <DishPhoto url={card.imageUrl} className="h-37.5">
         <span className="absolute top-3 left-3">
           <LabelBadge label={card.label} />
         </span>
-      </Photo>
+      </DishPhoto>
       <span className="flex flex-col gap-2 px-4 pt-3.5 pb-4">
         <span className="text-sm font-bold tracking-caps text-muted uppercase">
           {card.countryName}
@@ -100,7 +69,7 @@ export function SmallSuggestionCard({ card }: { card: SuggestionCard }) {
   const label = smallLabel(card.label);
   return (
     <Link to={dishPath(card.dishId)} className={cx(linkClass, 'rounded-card')}>
-      <Photo url={card.imageUrl} className="h-23" />
+      <DishPhoto url={card.imageUrl} className="h-23" />
       <span className="flex flex-1 flex-col gap-1 px-3 pt-2.5 pb-3">
         <span className={cx('text-2xs font-bold tracking-caps uppercase', label.tone)}>
           {card.countryName} · {label.text}
@@ -121,13 +90,13 @@ export function SmallSuggestionCard({ card }: { card: SuggestionCard }) {
 export function LockedSuggestionCard({ card }: { card: SuggestionCard }) {
   return (
     <Link to={paywallPath(card.dishId)} className={cx(linkClass, 'rounded-card')}>
-      <Photo url={card.imageUrl} className="h-23">
+      <DishPhoto url={card.imageUrl} className="h-23">
         <span className="absolute inset-0 flex items-center justify-center bg-ink/40">
           <span className="flex size-10 items-center justify-center rounded-full bg-ink text-white">
             <IconLock size={20} />
           </span>
         </span>
-      </Photo>
+      </DishPhoto>
       <span className="flex flex-1 flex-col gap-1 px-3 pt-2.5 pb-3">
         <span className="text-2xs font-bold tracking-caps text-muted uppercase">
           {card.countryName}

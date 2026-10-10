@@ -5,6 +5,7 @@ import {
   createCookResponseSchema,
   dishResponseSchema,
   homeResponseSchema,
+  mapResponseSchema,
   meResponseSchema,
   paywallErrorSchema,
   uploadCookPhotoResponseSchema,
@@ -248,6 +249,47 @@ describe('GET /home (MSW)', () => {
     server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=home')));
     expect((await home(TEST_USER_IDS.eightCountries, 'mode=weekday')).status).toBe(500);
     expect((await home(TEST_USER_IDS.eightCountries, 'mode=weekday')).status).toBe(200);
+  });
+});
+
+describe('GET /map (MSW)', () => {
+  const map = (tgId: number) =>
+    fetch(`${API_BASE}/map`, { headers: { Authorization: `tma ${initDataOf(tgId)}` } });
+  const parse = async (response: Response) => mapResponseSchema.parse(await response.json());
+  const countriesOf = (body: Awaited<ReturnType<typeof parse>>) =>
+    body.continents.flatMap((group) => group.countries);
+
+  it('returns the passport by continent with counters, stamps and cooked dishes', async () => {
+    const body = await parse(await map(TEST_USER_IDS.eightCountries));
+    expect(body).toMatchObject({ countriesCount: 8, countriesTotal: 12, dishesCount: 10 });
+    expect(body.continents.map((group) => group.id)).toEqual(['europe', 'asia', 'americas']);
+    const all = countriesOf(body);
+    expect(all).toHaveLength(12);
+    expect(all.filter((country) => country.passed)).toHaveLength(8);
+    expect(all.every((country) => country.dishes.length === 3 && !country.locked)).toBe(true);
+    const japan = all.find((country) => country.id === 'jp');
+    expect(japan?.passed).toBe(true);
+    expect(japan?.firstStampAt).not.toBeNull();
+    expect(japan?.dishes.filter((dish) => dish.cooked).map((dish) => dish.dishId)).toEqual([
+      'jp-oyakodon',
+    ]);
+  });
+
+  it('locks the new countries of a free user with 10 countries, not of a subscriber', async () => {
+    const free = countriesOf(await parse(await map(TEST_USER_IDS.tenCountriesFree)));
+    expect(free.filter((country) => country.locked).map((country) => country.id)).toEqual([
+      'th',
+      'co',
+    ]);
+    const paid = countriesOf(await parse(await map(TEST_USER_IDS.tenCountriesSubscribed)));
+    expect(paid.some((country) => country.locked)).toBe(false);
+  });
+
+  it('needs the user; fails once with mock_error=map', async () => {
+    expect((await fetch(`${API_BASE}/map`)).status).toBe(401);
+    server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=map')));
+    expect((await map(TEST_USER_IDS.eightCountries)).status).toBe(500);
+    expect((await map(TEST_USER_IDS.eightCountries)).status).toBe(200);
   });
 });
 

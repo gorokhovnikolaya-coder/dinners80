@@ -47,6 +47,13 @@ const CookedScreen = lazyScreen(
   <ScreenSkeleton />,
 );
 
+const MapScreen = lazyScreen(() => import('../screens/map/MapScreen.tsx'), <ScreenSkeleton />);
+
+const CountryScreen = lazyScreen(
+  () => import('../screens/map/CountryScreen.tsx'),
+  <ScreenSkeleton />,
+);
+
 /** Temporary paywall (task 6) until the real one (task 12). */
 const PaywallScreen = lazyScreen(
   () => import('../screens/paywall/PaywallStubScreen.tsx'),
@@ -106,6 +113,14 @@ function AuthenticatedApp() {
       <Route
         path={ROUTES.cooked}
         element={needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <CookedScreen />}
+      />
+      <Route
+        path={ROUTES.map}
+        element={needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <MapScreen />}
+      />
+      <Route
+        path={ROUTES.country}
+        element={needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <CountryScreen />}
       />
       <Route
         path={ROUTES.paywall}

@@ -51,3 +51,10 @@ export type IngredientUnit = (typeof INGREDIENT_UNITS)[number];
 /** Store aisles of the shopping list (`dish_ingredients.aisle`). */
 export const AISLES = ['meat', 'veg', 'dairy', 'grocery', 'other'] as const;
 export type Aisle = (typeof AISLES)[number];
+
+/**
+ * Continents of the map in their display order (`countries.continent`). The mockup groups the
+ * Americas together, and Africa with Oceania, so 30 countries fit four groups.
+ */
+export const CONTINENTS = ['europe', 'asia', 'americas', 'africa_oceania'] as const;
+export type Continent = (typeof CONTINENTS)[number];

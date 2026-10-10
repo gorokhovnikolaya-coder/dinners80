@@ -3,7 +3,7 @@
  * - `?mock_error=auth` — the first request to the `auth` endpoint fails with HTTP 500
  *   (`{error: {code: 'internal'}}`), the retry succeeds; `auth:always` fails every time.
  *   Several endpoints: `?mock_error=auth,me`. Keys: `auth` (`POST /auth`), `me` (`PATCH /me`), `home` (`GET /home`),
- *   `dish` (`GET /dishes/:id`), `shopping` (`POST /shopping`), `upload`
+ *   `map` (`GET /map`), `dish` (`GET /dishes/:id`), `shopping` (`POST /shopping`), `upload`
  *   (`POST /uploads/cook-photo`), `cooks` (`POST /cooks`),
  *   `cooks_limit` (`POST /cooks` answers `429 rate_limited` — the daily cook limit),
  *   `chunk` (the first lazy screen chunk, browser only).
