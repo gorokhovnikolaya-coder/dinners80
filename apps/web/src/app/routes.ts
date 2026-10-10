@@ -6,6 +6,8 @@ export const ROUTES = {
   dish: '/dishes/:id',
   /** Cooking mode of a dish (task 7). */
   cooking: '/dishes/:id/cook',
+  /** Photo and stamp after cooking (task 8). */
+  cooked: '/dishes/:id/done',
   /** Shopping list (task 11). */
   shopping: '/shopping',
   /** Map and passport (task 9). */
@@ -22,6 +24,8 @@ export const ROUTES = {
 export const dishPath = (id: string) => `/dishes/${encodeURIComponent(id)}`;
 
 export const cookingPath = (id: string) => `${dishPath(id)}/cook`;
+
+export const cookedPath = (id: string) => `${dishPath(id)}/done`;
 
 export const paywallPath = (dishId?: string) =>
   dishId === undefined

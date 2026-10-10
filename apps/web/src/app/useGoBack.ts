@@ -11,13 +11,13 @@ const historyIndex = (): number => {
 };
 
 /**
- * «Back» of a nested screen: the previous screen of the app, or the main screen if the app was
- * opened right on this one (a link, a reload) — never out of the mini app.
+ * «Back» of a nested screen: the previous screen of the app, or `fallback` (the main screen by
+ * default) if the app was opened right on this one (a link, a reload) — never out of the mini app.
  */
-export function useGoBack(): () => void {
+export function useGoBack(fallback: string = ROUTES.home): () => void {
   const navigate = useNavigate();
   return useCallback(() => {
     if (historyIndex() > 0) void navigate(-1);
-    else void navigate(ROUTES.home, { replace: true });
-  }, [navigate]);
+    else void navigate(fallback, { replace: true });
+  }, [navigate, fallback]);
 }

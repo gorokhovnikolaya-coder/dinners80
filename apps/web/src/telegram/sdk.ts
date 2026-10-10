@@ -1,4 +1,11 @@
-import { backButton, init, miniApp, retrieveRawInitData, viewport } from '@tma.js/sdk-react';
+import {
+  backButton,
+  init,
+  miniApp,
+  retrieveRawInitData,
+  swipeBehavior,
+  viewport,
+} from '@tma.js/sdk-react';
 
 import { CHROME_COLOR_TOKEN, readColorToken } from '../theme/tokens.ts';
 
@@ -36,6 +43,8 @@ export async function initTelegram(): Promise<boolean> {
 
   miniApp.mount.ifAvailable();
   backButton.mount.ifAvailable();
+  // Vertical swipes are turned off only in the cooking mode (`useVerticalSwipesDisabled`).
+  swipeBehavior.mount.ifAvailable();
   setChromeColors();
   miniApp.ready.ifAvailable();
 

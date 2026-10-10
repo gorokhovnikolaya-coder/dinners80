@@ -6,6 +6,7 @@ import {
   dishSchema,
   dishIngredientSchema,
   dishStepSchema,
+  findStepPlaceholderProblems,
   matchesCustomExclusion,
   userProfileSchema,
   subscriptionStatusSchema,
@@ -71,7 +72,7 @@ describe('content fixtures', () => {
     }
   });
 
-  it('have a recipe for every dish: valid ingredients, unique keys, known placeholders', () => {
+  it('have a recipe for every dish: valid ingredients, unique keys, valid placeholders', () => {
     expect(Object.keys(recipes).toSorted()).toEqual(dishes.map((dish) => dish.id).toSorted());
     for (const [id, recipe] of Object.entries(recipes)) {
       const keys = recipe.ingredients.map((ingredient) => ingredient.key);
@@ -86,10 +87,9 @@ describe('content fixtures', () => {
       expect(recipe.steps.length, id).toBeGreaterThanOrEqual(3);
       recipe.steps.forEach((step, index) => {
         expect(dishStepSchema.safeParse({ n: index + 1, ...step }).success, id).toBe(true);
-        for (const [, key] of step.text.matchAll(/\{([^}]+)\}/g)) {
-          expect(keys, `${id}, step ${String(index + 1)}`).toContain(key);
-        }
       });
+      // Known keys only, never «по вкусу» (placeholders are replaced with the amount).
+      expect(findStepPlaceholderProblems(recipe.ingredients, recipe.steps), id).toEqual([]);
     }
   });
 

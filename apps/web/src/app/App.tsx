@@ -37,6 +37,11 @@ const OnboardingScreen = lazyScreen(
 
 const DishScreen = lazyScreen(() => import('../screens/dish/DishScreen.tsx'), <ScreenSkeleton />);
 
+const CookingScreen = lazyScreen(
+  () => import('../screens/cooking/CookingScreen.tsx'),
+  <ScreenSkeleton />,
+);
+
 /** Temporary paywall (task 6) until the real one (task 12). */
 const PaywallScreen = lazyScreen(
   () => import('../screens/paywall/PaywallStubScreen.tsx'),
@@ -88,6 +93,10 @@ function AuthenticatedApp() {
       <Route
         path={ROUTES.dish}
         element={needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <DishScreen />}
+      />
+      <Route
+        path={ROUTES.cooking}
+        element={needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <CookingScreen />}
       />
       <Route
         path={ROUTES.paywall}

@@ -100,3 +100,10 @@ export {
   type AddShoppingRequest,
   type AddShoppingResponse,
 } from './shopping.ts';
+export {
+  findStepPlaceholderProblems,
+  splitStepText,
+  stepPlaceholderKeys,
+  type StepPart,
+  type StepPlaceholderProblem,
+} from './steps.ts';

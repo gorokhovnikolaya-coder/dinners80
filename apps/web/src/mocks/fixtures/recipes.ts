@@ -64,9 +64,9 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       pepper,
     ],
     steps: [
-      step('Отварите {spaghetti} в подсоленной воде до состояния аль денте.', 9),
-      step('Нарежьте {guanciale} брусочками и обжарьте до хруста.', 5),
-      step('Взбейте {yolks} с тёртым {parmesan} и перцем.'),
+      step('Отварите {spaghetti} спагетти в подсоленной воде до состояния аль денте.', 9),
+      step('Нарежьте {guanciale} гуанчале брусочками и обжарьте до хруста.', 5),
+      step('Взбейте {yolks} желтков с {parmesan} тёртого пармезана и перцем.'),
       step('Смешайте пасту с гуанчале, снимите с огня и быстро вмешайте яичную смесь.'),
     ],
   },
@@ -80,9 +80,9 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       salt,
     ],
     steps: [
-      step('Обжарьте {onion} и {beef_mince} до румяности.', 10),
-      step('Добавьте {tomatoes} и томите рагу под крышкой.', 40),
-      step('Соберите слоями: {sheets}, рагу, {bechamel}.'),
+      step('Обжарьте {onion} лука и {beef_mince} говяжьего фарша до румяности.', 10),
+      step('Добавьте {tomatoes} томатов и томите рагу под крышкой.', 40),
+      step('Соберите слоями {sheets} листов лазаньи, рагу и {bechamel} соуса бешамель.'),
       step('Запекайте при 180 °C до золотистой корочки.', 40),
     ],
   },
@@ -96,10 +96,10 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       salt,
     ],
     steps: [
-      step('Обваляйте {veal_shank} в {flour} и обжарьте со всех сторон.', 10),
-      step('Добавьте нарезанные {carrot} и {celery}, влейте стакан воды.'),
+      step('Обваляйте {veal_shank} телячьей голяшки в {flour} муки и обжарьте со всех сторон.', 10),
+      step('Добавьте нарезанные {carrot} моркови и {celery} сельдерея, влейте стакан воды.'),
       step('Тушите под крышкой на слабом огне.', 120),
-      step('Перед подачей посыпьте {lemon_zest}.'),
+      step('Перед подачей посыпьте {lemon_zest} лимонной цедры.'),
     ],
   },
 
@@ -112,9 +112,12 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       salt,
     ],
     steps: [
-      step('Взбейте {eggs} с солью до однородности.'),
-      step('Растопите {butter} на сковороде и вылейте яйца, постоянно помешивая.', 3),
-      step('Посыпьте {gruyere} и {chives}, сверните омлет рулетом.'),
+      step('Взбейте {eggs} яиц с солью до однородности.'),
+      step(
+        'Растопите {butter} сливочного масла на сковороде и вылейте яйца, постоянно помешивая.',
+        3,
+      ),
+      step('Посыпьте {gruyere} грюйера и {chives} шнитт-лука, сверните омлет рулетом.'),
     ],
   },
   'fr-ratatouille': {
@@ -128,9 +131,11 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       salt,
     ],
     steps: [
-      step('Нарежьте {zucchini}, {eggplant} и {tomatoes} тонкими кружками.'),
-      step('Выложите овощи в форму внахлёст, добавьте {garlic}.'),
-      step('Сбрызните {olive_oil}, посыпьте {herbs} и солью.'),
+      step(
+        'Нарежьте {zucchini} кабачков, {eggplant} баклажанов и {tomatoes} томатов тонкими кружками.',
+      ),
+      step('Выложите овощи в форму внахлёст, добавьте {garlic} чеснока.'),
+      step('Сбрызните {olive_oil} оливкового масла, посыпьте {herbs} прованских трав и солью.'),
       step('Запекайте при 180 °C под фольгой.', 60),
     ],
   },
@@ -145,10 +150,10 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       salt,
     ],
     steps: [
-      step('Обжарьте {bacon}, затем крупно нарезанную {beef}.', 10),
-      step('Добавьте {onion} и {carrot}, влейте {red_wine}.'),
+      step('Обжарьте {bacon} бекона, затем {beef} крупно нарезанной говядины.', 10),
+      step('Добавьте {onion} лука и {carrot} моркови, влейте {red_wine} красного вина.'),
       step('Тушите под крышкой на слабом огне.', 150),
-      step('Обжарьте {mushrooms} и добавьте в рагу за 10 минут до конца.'),
+      step('Обжарьте {mushrooms} шампиньонов и добавьте в рагу за 10 минут до конца.'),
     ],
   },
 
@@ -163,9 +168,11 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       salt,
     ],
     steps: [
-      step('Замочите {bread} в воде на пару минут.'),
-      step('Нарежьте {tomatoes}, {cucumber}, {bell_pepper} и {garlic}.'),
-      step('Взбейте всё блендером с {olive_oil} и солью.'),
+      step('Замочите {bread} белого хлеба в воде на пару минут.'),
+      step(
+        'Нарежьте {tomatoes} томатов, {cucumber} огурца, {bell_pepper} сладкого перца и {garlic} чеснока.',
+      ),
+      step('Взбейте всё блендером с {olive_oil} оливкового масла и солью.'),
       step('Охладите суп в холодильнике.', 15),
     ],
   },
@@ -178,9 +185,9 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       salt,
     ],
     steps: [
-      step('Нарежьте {potatoes} и {onion} тонкими ломтиками.'),
-      step('Томите их в {olive_oil} до мягкости.', 15),
-      step('Смешайте с взбитыми {eggs} и посолите.'),
+      step('Нарежьте {potatoes} картофеля и {onion} лука тонкими ломтиками.'),
+      step('Томите их в {olive_oil} оливкового масла до мягкости.', 15),
+      step('Смешайте с {eggs} взбитых яиц и посолите.'),
       step('Жарьте на сковороде, переверните с помощью тарелки.', 8),
     ],
   },
@@ -194,8 +201,10 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       salt,
     ],
     steps: [
-      step('Обжарьте {chicken} в {olive_oil} в широкой сковороде.', 10),
-      step('Добавьте {green_beans}, затем {rice} и залейте водой с {saffron}.'),
+      step('Обжарьте {chicken} курицы в {olive_oil} оливкового масла в широкой сковороде.', 10),
+      step(
+        'Добавьте {green_beans} стручковой фасоли, затем {rice} риса и залейте водой с {saffron} шафрана.',
+      ),
       step('Готовьте не помешивая, пока рис не впитает воду.', 20),
       step('Накройте полотенцем и дайте постоять.', 5),
     ],
@@ -211,9 +220,9 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('olive_oil', 'Оливковое масло', 2, 'tbsp', 'grocery'),
     ],
     steps: [
-      step('Крупно нарежьте {tomatoes} и {cucumbers}.'),
-      step('Добавьте {olives} и положите сверху кусок {feta}.'),
-      step('Полейте {olive_oil} и подайте с {pita}.'),
+      step('Крупно нарежьте {tomatoes} томатов и {cucumbers} огурцов.'),
+      step('Добавьте {olives} маслин и положите сверху {feta} феты одним куском.'),
+      step('Полейте {olive_oil} оливкового масла и подайте с {pita} питы.'),
     ],
   },
   'gr-moussaka': {
@@ -226,9 +235,9 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       salt,
     ],
     steps: [
-      step('Нарежьте {eggplant} пластинами и обжарьте.', 10),
-      step('Потушите {beef_mince} с {tomatoes} и {cinnamon}.', 20),
-      step('Выложите слоями баклажаны и фарш, залейте {bechamel}.'),
+      step('Нарежьте {eggplant} баклажанов пластинами и обжарьте.', 10),
+      step('Потушите {beef_mince} говяжьего фарша с {tomatoes} томатов и {cinnamon} корицы.', 20),
+      step('Выложите слоями баклажаны и фарш, залейте {bechamel} соуса бешамель.'),
       step('Запекайте при 180 °C.', 45),
     ],
   },
@@ -241,9 +250,11 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('butter', 'Сливочное масло', 50, 'g', 'dairy'),
     ],
     steps: [
-      step('Припустите {spinach} и отожмите лишнюю воду.', 5),
-      step('Смешайте шпинат с раскрошенной {feta} и {eggs}.'),
-      step('Выложите в форму слои {filo}, смазывая каждый растопленным {butter}.'),
+      step('Припустите {spinach} шпината и отожмите лишнюю воду.', 5),
+      step('Смешайте шпинат с {feta} раскрошенной феты и {eggs} яиц.'),
+      step(
+        'Выложите в форму {filo} теста фило слоями, смазывая каждый {butter} растопленного сливочного масла.',
+      ),
       step('Положите начинку, накройте листами и запекайте при 180 °C.', 45),
     ],
   },
@@ -257,9 +268,12 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('onion', 'Репчатый лук', 1, 'pcs', 'veg'),
     ],
     steps: [
-      step('Отварите {rice}.', 15),
-      step('Потушите {chicken_thigh} с {onion} в {soy_sauce} с водой.', 7),
-      step('Влейте слегка взбитые {eggs} и держите под крышкой минуту.', 1),
+      step('Отварите {rice} риса.', 15),
+      step(
+        'Потушите {chicken_thigh} куриного бедра с {onion} лука в {soy_sauce} соевого соуса с водой.',
+        7,
+      ),
+      step('Влейте {eggs} слегка взбитых яиц и держите под крышкой минуту.', 1),
       step('Выложите курицу с яйцом на рис.'),
     ],
   },
@@ -273,10 +287,12 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('green_onion', 'Зелёный лук', 20, 'g', 'veg'),
     ],
     steps: [
-      step('Сварите бульон из {chicken} с {ginger}.', 90),
-      step('Сварите {eggs} всмятку и замаринуйте в {soy_sauce}.', 7),
-      step('Отварите {noodles}.', 4),
-      step('Разложите лапшу по мискам, залейте бульоном, добавьте яйцо и {green_onion}.'),
+      step('Сварите бульон из {chicken} курицы с {ginger} имбиря.', 90),
+      step('Сварите {eggs} яиц всмятку и замаринуйте в {soy_sauce} соевого соуса.', 7),
+      step('Отварите {noodles} пшеничной лапши.', 4),
+      step(
+        'Разложите лапшу по мискам, залейте бульоном, добавьте яйцо и {green_onion} зелёного лука.',
+      ),
     ],
   },
   'jp-gyoza': {
@@ -289,9 +305,11 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('ginger', 'Имбирь', 10, 'g', 'veg'),
     ],
     steps: [
-      step('Мелко нарубите {napa_cabbage}, отожмите и смешайте с {pork_mince}.'),
-      step('Добавьте натёртые {garlic} и {ginger}, немного {soy_sauce}.'),
-      step('Разложите начинку по {wrappers} и защипните края.'),
+      step(
+        'Мелко нарубите {napa_cabbage} пекинской капусты, отожмите и смешайте с {pork_mince} свиного фарша.',
+      ),
+      step('Добавьте {garlic} натёртого чеснока, {ginger} имбиря и {soy_sauce} соевого соуса.'),
+      step('Разложите начинку по {wrappers} теста для гёдза и защипните края.'),
       step('Обжарьте, влейте немного воды и готовьте под крышкой.', 8),
     ],
   },
@@ -306,10 +324,15 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('garlic', 'Чеснок', 2, 'clove', 'veg'),
     ],
     steps: [
-      step('Нарежьте {chicken_fillet} кубиками и замаринуйте в {soy_sauce}.'),
-      step('Обжарьте {chili}, {sichuan_pepper} и {garlic} на сильном огне.', 1),
+      step(
+        'Нарежьте {chicken_fillet} куриного филе кубиками и замаринуйте в {soy_sauce} соевого соуса.',
+      ),
+      step(
+        'Обжарьте {chili} чили, {sichuan_pepper} сычуаньского перца и {garlic} чеснока на сильном огне.',
+        1,
+      ),
       step('Добавьте курицу и жарьте, помешивая.', 5),
-      step('Всыпьте {peanuts} и сразу снимите с огня.'),
+      step('Всыпьте {peanuts} арахиса и сразу снимите с огня.'),
     ],
   },
   'cn-sweet-sour-pork': {
@@ -322,9 +345,14 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('vinegar', 'Рисовый уксус', 2, 'tbsp', 'grocery', 'rice_vinegar'),
     ],
     steps: [
-      step('Нарежьте {pork_loin}, обваляйте в {flour} и обжарьте до корочки.', 8),
-      step('Обжарьте {bell_pepper} и {pineapple}.', 3),
-      step('Смешайте {ketchup} с {vinegar} и ложкой сахара, влейте в сковороду.'),
+      step(
+        'Нарежьте {pork_loin} свиной вырезки, обваляйте в {flour} муки и обжарьте до корочки.',
+        8,
+      ),
+      step('Обжарьте {bell_pepper} сладкого перца и {pineapple} ананаса.', 3),
+      step(
+        'Смешайте {ketchup} кетчупа с {vinegar} рисового уксуса и ложкой сахара, влейте в сковороду.',
+      ),
       step('Верните мясо и прогрейте в соусе.', 2),
     ],
   },
@@ -337,8 +365,10 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('soy_sauce', 'Соевый соус', 2, 'tbsp', 'grocery'),
     ],
     steps: [
-      step('Замесите тесто из {flour} и холодной воды, дайте отдохнуть.', 30),
-      step('Смешайте {pork_mince} с рубленой {chinese_cabbage}, {ginger} и {soy_sauce}.'),
+      step('Замесите тесто из {flour} муки и холодной воды, дайте отдохнуть.', 30),
+      step(
+        'Смешайте {pork_mince} свиного фарша с {chinese_cabbage} рубленой китайской капусты, {ginger} имбиря и {soy_sauce} соевого соуса.',
+      ),
       step('Раскатайте кружки, разложите начинку и слепите пельмени.'),
       step('Варите в кипящей воде после всплытия.', 4),
     ],
@@ -355,9 +385,9 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       salt,
     ],
     steps: [
-      step('Промойте {lentils} и варите с {turmeric}.', 15),
-      step('Обжарьте {onion}, {garlic} и {chili}.', 5),
-      step('Добавьте нарезанные {tomatoes} и прогрейте.', 3),
+      step('Промойте {lentils} красной чечевицы и варите с {turmeric} куркумы.', 15),
+      step('Обжарьте {onion} лука, {garlic} чеснока и {chili} чили.', 5),
+      step('Добавьте {tomatoes} нарезанных томатов и прогрейте.', 3),
       step('Смешайте зажарку с чечевицей и посолите.'),
     ],
   },
@@ -371,10 +401,13 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('garlic', 'Чеснок', 3, 'clove', 'veg'),
     ],
     steps: [
-      step('Замаринуйте {chicken_fillet} в {yogurt} с половиной {garam_masala}.', 30),
+      step(
+        'Замаринуйте {chicken_fillet} куриного филе в {yogurt} йогурта с половиной {garam_masala} гарам масалы.',
+        30,
+      ),
       step('Обжарьте курицу до корочки.', 8),
-      step('Потушите {tomatoes} с {garlic} и остальными специями.', 10),
-      step('Влейте {cream}, верните курицу и прогрейте.', 5),
+      step('Потушите {tomatoes} томатов с {garlic} чеснока и остальными специями.', 10),
+      step('Влейте {cream} сливок, верните курицу и прогрейте.', 5),
     ],
   },
   'in-biryani': {
@@ -387,10 +420,10 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('garam_masala', 'Гарам масала', 2, 'tsp', 'grocery'),
     ],
     steps: [
-      step('Замаринуйте {chicken} в {yogurt} с {garam_masala}.', 60),
-      step('Обжарьте {onion} до тёмно-золотистого цвета.', 15),
-      step('Отварите {basmati} до полуготовности.', 6),
-      step('Выложите слоями курицу, лук и рис, полейте водой с {saffron} и томите.', 40),
+      step('Замаринуйте {chicken} курицы в {yogurt} йогурта с {garam_masala} гарам масалы.', 60),
+      step('Обжарьте {onion} лука до тёмно-золотистого цвета.', 15),
+      step('Отварите {basmati} риса басмати до полуготовности.', 6),
+      step('Выложите слоями курицу, лук и рис, полейте водой с {saffron} шафрана и томите.', 40),
     ],
   },
 
@@ -404,10 +437,13 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('garlic', 'Чеснок', 3, 'clove', 'veg'),
     ],
     steps: [
-      step('Обжарьте {garlic} и {chili} на сильном огне.', 1),
-      step('Добавьте {chicken_mince} и {soy_sauce}, жарьте, помешивая.', 5),
-      step('Снимите с огня и вмешайте {thai_basil}.'),
-      step('Пожарьте {eggs} глазуньей и подайте сверху.', 3),
+      step('Обжарьте {garlic} чеснока и {chili} чили на сильном огне.', 1),
+      step(
+        'Добавьте {chicken_mince} куриного фарша и {soy_sauce} соевого соуса, жарьте, помешивая.',
+        5,
+      ),
+      step('Снимите с огня и вмешайте {thai_basil} тайского базилика.'),
+      step('Пожарьте глазунью из {eggs} яиц и подайте сверху.', 3),
     ],
   },
   'th-green-curry': {
@@ -419,10 +455,13 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('thai_basil', 'Тайский базилик', 15, 'g', 'veg'),
     ],
     steps: [
-      step('Обжарьте {curry_paste} в части {coconut_milk}.', 2),
-      step('Добавьте нарезанное {chicken_fillet} и {eggplant}.'),
+      step(
+        'Обжарьте {curry_paste} зелёной пасты карри в части из {coconut_milk} кокосового молока.',
+        2,
+      ),
+      step('Добавьте {chicken_fillet} нарезанного куриного филе и {eggplant} баклажанов.'),
       step('Влейте остальное молоко и тушите.', 15),
-      step('Перед подачей добавьте {thai_basil}.'),
+      step('Перед подачей добавьте {thai_basil} тайского базилика.'),
     ],
   },
   'th-massaman': {
@@ -434,10 +473,13 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('coconut_milk', 'Кокосовое молоко', 400, 'ml', 'grocery'),
     ],
     steps: [
-      step('Обжарьте {massaman_paste} в части {coconut_milk}.', 2),
-      step('Добавьте нарезанную {beef} и остальное молоко, тушите.', 90),
-      step('Положите {potatoes} и готовьте до мягкости.', 25),
-      step('Посыпьте {peanuts} перед подачей.'),
+      step(
+        'Обжарьте {massaman_paste} пасты массаман в части из {coconut_milk} кокосового молока.',
+        2,
+      ),
+      step('Добавьте {beef} нарезанной говядины и остальное молоко, тушите.', 90),
+      step('Положите {potatoes} картофеля и готовьте до мягкости.', 25),
+      step('Посыпьте {peanuts} арахиса перед подачей.'),
     ],
   },
 
@@ -452,10 +494,13 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       salt,
     ],
     steps: [
-      step('Нарежьте {potatoes} брусками и обжарьте до золотистого цвета.', 12),
-      step('Отварите {rice}.', 15),
-      step('Обжарьте {beef_tenderloin} полосками на очень сильном огне.', 3),
-      step('Добавьте {red_onion}, {tomatoes} и {soy_sauce}, через минуту — картофель.', 1),
+      step('Нарежьте {potatoes} картофеля брусками и обжарьте до золотистого цвета.', 12),
+      step('Отварите {rice} риса.', 15),
+      step('Обжарьте {beef_tenderloin} говяжьей вырезки полосками на очень сильном огне.', 3),
+      step(
+        'Добавьте {red_onion} красного лука, {tomatoes} томатов и {soy_sauce} соевого соуса, через минуту — картофель.',
+        1,
+      ),
     ],
   },
   'pe-aji-de-gallina': {
@@ -468,10 +513,10 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('parmesan', 'Пармезан', 30, 'g', 'dairy'),
     ],
     steps: [
-      step('Отварите {chicken} и разберите на волокна.', 30),
-      step('Обжарьте {onion} с {aji_amarillo}.', 5),
-      step('Добавьте размоченный в {cream} {bread} и взбейте соус.'),
-      step('Смешайте курицу с соусом и посыпьте {parmesan}.', 5),
+      step('Отварите {chicken} курицы и разберите на волокна.', 30),
+      step('Обжарьте {onion} лука с {aji_amarillo} пасты ахи амарильо.', 5),
+      step('Добавьте {bread} белого хлеба, размоченного в {cream} сливок, и взбейте соус.'),
+      step('Смешайте курицу с соусом и посыпьте {parmesan} пармезана.', 5),
     ],
   },
   'pe-ceviche': {
@@ -484,10 +529,13 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       salt,
     ],
     steps: [
-      step('Нарежьте {white_fish} кубиками по 2 см и посолите.'),
-      step('Выжмите сок из {lime} и залейте рыбу.'),
-      step('Добавьте тонко нарезанные {red_onion} и {chili}, оставьте мариноваться.', 10),
-      step('Посыпьте {cilantro} и сразу подавайте.'),
+      step('Нарежьте {white_fish} филе белой рыбы кубиками по 2 см и посолите.'),
+      step('Выжмите сок из {lime} лайма и залейте рыбу.'),
+      step(
+        'Добавьте {red_onion} тонко нарезанного красного лука и {chili} чили, оставьте мариноваться.',
+        10,
+      ),
+      step('Посыпьте {cilantro} кинзы и сразу подавайте.'),
     ],
   },
 
@@ -500,9 +548,11 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('olive_oil', 'Оливковое масло', 3, 'tbsp', 'grocery'),
     ],
     steps: [
-      step('Обжарьте {chorizo} на гриле или сковороде.', 10),
-      step('Смешайте рубленую {parsley}, {garlic} и {olive_oil} — это чимичурри.'),
-      step('Разрежьте {baguette}, положите колбаски и полейте соусом.'),
+      step('Обжарьте {chorizo} чоризо на гриле или сковороде.', 10),
+      step(
+        'Смешайте {parsley} рубленой петрушки, {garlic} чеснока и {olive_oil} оливкового масла — это чимичурри.',
+      ),
+      step('Разрежьте {baguette} багета, положите колбаски и полейте соусом.'),
     ],
   },
   'ar-empanadas': {
@@ -514,9 +564,9 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('onion', 'Репчатый лук', 1, 'pcs', 'veg'),
     ],
     steps: [
-      step('Обжарьте {onion} с {beef_mince}.', 10),
-      step('Сварите вкрутую {eggs}, нарежьте их и {olives}.', 10),
-      step('Разложите начинку по кругам {dough} и защипните края.'),
+      step('Обжарьте {onion} лука с {beef_mince} говяжьего фарша.', 10),
+      step('Сварите вкрутую {eggs} яиц, нарежьте их и {olives} оливок.', 10),
+      step('Разложите начинку по {dough} кругов теста и защипните края.'),
       step('Запекайте при 200 °C до золотистого цвета.', 20),
     ],
   },
@@ -529,9 +579,11 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       salt,
     ],
     steps: [
-      step('Посолите {beef_ribs} крупной солью.'),
+      step('Посолите {beef_ribs} говяжьих рёбер крупной солью.'),
       step('Жарьте на углях на слабом жаре, переворачивая один раз.', 150),
-      step('Смешайте {parsley}, {garlic} и {vinegar} для чимичурри.'),
+      step(
+        'Смешайте {parsley} петрушки, {garlic} чеснока и {vinegar} винного уксуса для чимичурри.',
+      ),
       step('Дайте мясу отдохнуть и подайте с соусом.', 10),
     ],
   },
@@ -546,10 +598,10 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('cilantro', 'Кинза', 15, 'g', 'veg'),
     ],
     steps: [
-      step('Замаринуйте {white_fish} в соке {lime}.', 15),
-      step('Выложите слоями {bell_pepper}, {tomatoes} и рыбу.'),
-      step('Залейте {coconut_milk} и тушите на слабом огне.', 20),
-      step('Посыпьте {cilantro}.'),
+      step('Замаринуйте {white_fish} филе белой рыбы в соке из {lime} лайма.', 15),
+      step('Выложите слоями {bell_pepper} сладкого перца, {tomatoes} томатов и рыбу.'),
+      step('Залейте {coconut_milk} кокосового молока и тушите на слабом огне.', 20),
+      step('Посыпьте {cilantro} кинзы.'),
     ],
   },
   'br-pao-de-queijo': {
@@ -561,8 +613,10 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('butter', 'Сливочное масло', 50, 'g', 'dairy'),
     ],
     steps: [
-      step('Доведите {milk} с {butter} до кипения и заварите {tapioca}.'),
-      step('Остудите тесто, вмешайте {eggs} и тёртый {cheese}.', 10),
+      step(
+        'Доведите {milk} молока с {butter} сливочного масла до кипения и заварите {tapioca} тапиоковой муки.',
+      ),
+      step('Остудите тесто, вмешайте {eggs} яиц и {cheese} тёртого сыра.', 10),
       step('Скатайте шарики и выпекайте при 200 °C.', 20),
     ],
   },
@@ -576,10 +630,13 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('garlic', 'Чеснок', 3, 'clove', 'veg'),
     ],
     steps: [
-      step('Замочите {black_beans} на ночь и отварите.', 60),
-      step('Обжарьте {pork_ribs} и {smoked_sausage} с {onion} и {garlic}.', 10),
+      step('Замочите {black_beans} чёрной фасоли на ночь и отварите.', 60),
+      step(
+        'Обжарьте {pork_ribs} свиных рёбрышек и {smoked_sausage} копчёной колбасы с {onion} лука и {garlic} чеснока.',
+        10,
+      ),
       step('Соедините мясо с фасолью и тушите.', 90),
-      step('Подайте с отварным {rice}.'),
+      step('Подайте с {rice} отварного риса.'),
     ],
   },
 
@@ -591,9 +648,9 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       salt,
     ],
     steps: [
-      step('Замесите {corn_flour} с тёплой водой и солью.', 5),
+      step('Замесите {corn_flour} кукурузной муки с тёплой водой и солью.', 5),
       step('Слепите лепёшки и обжарьте на сухой сковороде.', 10),
-      step('Разрежьте, смажьте {butter} и положите {cheese}.'),
+      step('Разрежьте, смажьте {butter} сливочного масла и положите {cheese} сыра.'),
     ],
   },
   'co-sancocho': {
@@ -606,10 +663,10 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       salt,
     ],
     steps: [
-      step('Залейте {chicken} водой и варите.', 40),
-      step('Добавьте {cassava}, {potatoes} и куски {corn}.'),
+      step('Залейте {chicken} курицы водой и варите.', 40),
+      step('Добавьте {cassava} маниоки, {potatoes} картофеля и {corn} кукурузы кусками.'),
       step('Варите до мягкости овощей.', 30),
-      step('Посыпьте {cilantro} перед подачей.'),
+      step('Посыпьте {cilantro} кинзы перед подачей.'),
     ],
   },
   'co-bandeja-paisa': {
@@ -622,10 +679,10 @@ export const recipes: Readonly<Record<string, Recipe>> = {
       ing('avocado', 'Авокадо', 1, 'pcs', 'veg'),
     ],
     steps: [
-      step('Отварите {red_beans} до мягкости.', 60),
-      step('Обжарьте {chicharron} до хруста.', 25),
-      step('Обжарьте {beef_mince} и отварите {rice}.', 15),
-      step('Пожарьте {eggs} и разложите всё на большой тарелке с {avocado}.', 3),
+      step('Отварите {red_beans} красной фасоли до мягкости.', 60),
+      step('Обжарьте {chicharron} чичаррона до хруста.', 25),
+      step('Обжарьте {beef_mince} говяжьего фарша и отварите {rice} риса.', 15),
+      step('Пожарьте {eggs} яиц и разложите всё на большой тарелке с {avocado} авокадо.', 3),
     ],
   },
 };

@@ -1,4 +1,4 @@
-import { backButton } from '@tma.js/sdk-react';
+import { backButton, swipeBehavior } from '@tma.js/sdk-react';
 import { useEffect, useState } from 'react';
 
 /** True if this client can show the Telegram BackButton and report presses (Mini Apps 6.1+). */
@@ -30,4 +30,26 @@ export function useTelegramBackButton(onBack: (() => void) | undefined): boolean
     };
   }, [onBack, available]);
   return available;
+}
+
+/**
+ * Turns off the vertical swipes that close or minimise the mini app while the component is
+ * mounted (the cooking mode: wet hands must not close the app) and turns them back on after.
+ * Clients without the method (Mini Apps < 7.7) keep the swipes: there is nothing to turn off.
+ */
+export function useVerticalSwipesDisabled(): void {
+  useEffect(() => {
+    try {
+      swipeBehavior.disableVertical.ifAvailable();
+    } catch {
+      return;
+    }
+    return () => {
+      try {
+        swipeBehavior.enableVertical.ifAvailable();
+      } catch {
+        // The SDK is gone (e.g. tests): nothing to restore.
+      }
+    };
+  }, []);
 }

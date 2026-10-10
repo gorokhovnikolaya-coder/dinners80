@@ -1,4 +1,4 @@
-import type { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { QueryStatus, type FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import {
   addShoppingResponseSchema,
   dishResponseSchema,
@@ -9,6 +9,7 @@ import {
   type DishResponse,
 } from '@tma80/shared';
 
+import type { RootState } from '../store/store.ts';
 import { api } from './api.ts';
 
 export interface DishArgs {
@@ -49,4 +50,18 @@ export function paywallPreview(error: unknown): DishPreview | undefined {
 /** True if the error is a `404` of the API. */
 export function isNotFound(error: unknown): boolean {
   return typeof error === 'object' && error !== null && 'status' in error && error.status === 404;
+}
+
+/**
+ * Arguments of a loaded `GET /dishes/:id` of this dish in the cache (e.g. the card just opened),
+ * so the cooking mode subscribes to the same entry: no new request, and the steps stay on screen
+ * if the connection drops.
+ */
+export function selectLoadedDishArgs(state: RootState, id: string): DishArgs | undefined {
+  for (const query of Object.values(state.api.queries)) {
+    if (query?.endpointName !== 'dish' || query.status !== QueryStatus.fulfilled) continue;
+    const args = query.originalArgs as DishArgs;
+    if (args.id === id) return args;
+  }
+  return undefined;
 }
