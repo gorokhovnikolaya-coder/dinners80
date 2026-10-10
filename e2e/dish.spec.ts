@@ -38,6 +38,17 @@ test.describe('dish card', () => {
     await expect(row(page, 'Соль')).toContainText('по вкусу');
     await shot(page, '01-card');
 
+    // − / + keep a 44 × 44 touch target on 390 and 375 px wide screens.
+    for (const width of [390, 375]) {
+      await page.setViewportSize({ width, height: 844 });
+      for (const name of ['Меньше порций', 'Больше порций']) {
+        const box = await servings(page).getByRole('button', { name }).boundingBox();
+        expect(box?.width, `${name} at ${String(width)} px`).toBeGreaterThanOrEqual(44);
+        expect(box?.height, `${name} at ${String(width)} px`).toBeGreaterThanOrEqual(44);
+      }
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+
     // + / − recalculate the amounts at once; «по вкусу» stays.
     await servings(page).getByRole('button', { name: 'Больше порций' }).click();
     await expect(servings(page)).toContainText('3порции');

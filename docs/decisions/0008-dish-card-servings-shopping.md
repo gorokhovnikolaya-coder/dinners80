@@ -23,7 +23,7 @@
 
 - Логика в `packages/shared`: `defaultServings`, `clampServings`, `roundAmount`, `scaleAmount` (`servings.ts`), `hasCountryAccess` (правило `has_access`), `dishLabel` (метка вынесена из `suggestDishes`). Единицы — `INGREDIENT_UNITS` (`g`, `ml`, `pcs`, `tbsp`, `tsp`, `clove`, `pinch`), отделы — `AISLES`.
 - `GET /dishes/:id?servings=` → `dishResponseSchema`: поля карточки, `label`, `baseServings`, `servings` (запрошенные или по «кто ест»; неверное значение отбрасывается), ингредиенты с `baseAmount` (на базовые порции) и `amount` (на `servings`), шаги с плейсхолдерами `{key}` и `timerSeconds`. `403` — `paywallErrorSchema` (`error.preview`: `dishId`, `title`, `countryId`, `countryName`, `imageUrl`).
-- Клиент запрашивает блюдо один раз — с порциями, с которыми открывается карточка, — а − / + пересчитывает локально тем же `scaleAmount` из `baseAmount`: без запроса на каждое нажатие, а числа совпадают с серверными.
+- Клиент запрашивает блюдо один раз: с уже выбранными для этого блюда порциями, а если их нет — без `servings`, и сервер берёт порции по актуальному «кто ест» (клиент дефолт не вычисляет и не замораживает); − / + пересчитывает локально тем же `scaleAmount` из `baseAmount`: без запроса на каждое нажатие, а числа совпадают с серверными.
 - `POST /shopping` `{dishId, servings, ingredientKeys}` → `201 {added}`; сервер проверяет доступ к блюду и ключи ингредиентов.
 - Слайс `dish` (ленивый, в чанке экрана): `servings` и `atHome` по id блюда; режим готовки (задача 7) читает `selectServings`.
 - «Назад» вложенных экранов (`useGoBack`): предыдущий экран приложения или главный, если приложение открыто сразу на этом экране (по `history.state.idx` React Router), — чтобы не выйти из мини-аппа.

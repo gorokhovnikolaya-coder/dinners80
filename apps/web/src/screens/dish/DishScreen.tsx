@@ -1,8 +1,7 @@
-import { defaultServings, SERVINGS_MAX, SERVINGS_MIN, type DishResponse } from '@tma80/shared';
+import { SERVINGS_MAX, SERVINGS_MIN, type DishResponse } from '@tma80/shared';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
-import { useAuthQuery } from '../../api/auth.ts';
 import {
   isNotFound,
   paywallPreview,
@@ -63,7 +62,7 @@ function DishSkeleton() {
 
 function Stat({ label, value, tone }: { label: string; value: string; tone?: 'primary' }) {
   return (
-    <div className="flex flex-col gap-0.5 rounded-tile bg-surface p-2.5 shadow-card">
+    <div className="flex min-w-0 flex-1 flex-col gap-0.5 rounded-tile bg-surface p-2.5 shadow-card">
       <span className="text-xs font-semibold text-muted">{label}</span>
       <span
         className={
@@ -88,7 +87,7 @@ function ServingsStepper({
     <div
       role="group"
       aria-label={t.servings.label}
-      className="flex items-center justify-between rounded-tile bg-surface shadow-card"
+      className="flex shrink-0 items-center gap-1 rounded-tile bg-surface px-1 shadow-card"
     >
       <button
         type="button"
@@ -97,11 +96,11 @@ function ServingsStepper({
         onClick={() => {
           onChange(servings - 1);
         }}
-        className="flex size-11 items-center justify-center rounded-tile text-4xl font-bold text-ink disabled:text-border"
+        className="flex size-11 shrink-0 items-center justify-center rounded-tile text-4xl font-bold text-ink disabled:text-border"
       >
-        −
+        <span aria-hidden="true">{t.servings.minusSign}</span>
       </button>
-      <span aria-live="polite" className="flex flex-col items-center">
+      <span aria-live="polite" className="flex min-w-10 flex-col items-center">
         <span className="text-lg font-extrabold">{servings}</span>
         <span className="text-2xs font-semibold text-muted">{t.servings.word(servings)}</span>
       </span>
@@ -112,9 +111,9 @@ function ServingsStepper({
         onClick={() => {
           onChange(servings + 1);
         }}
-        className="flex size-11 items-center justify-center rounded-tile text-4xl font-bold text-ink disabled:text-border"
+        className="flex size-11 shrink-0 items-center justify-center rounded-tile text-4xl font-bold text-ink disabled:text-border"
       >
-        +
+        <span aria-hidden="true">{t.servings.plusSign}</span>
       </button>
     </div>
   );
@@ -171,7 +170,7 @@ function DishCard({ dish, servings }: { dish: DishResponse; servings: number }) 
             </aside>
           )}
 
-          <div className="grid grid-cols-3 gap-2">
+          <div className="flex gap-2">
             <Stat label={t.time} value={ru.home.minutes(dish.minutes)} />
             <Stat label={t.level} value={ru.home.levels[dish.level]} tone="primary" />
             <ServingsStepper
@@ -265,12 +264,13 @@ export default function DishScreen() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
   const onBack = useGoBack();
-  const { data: auth } = useAuthQuery(undefined);
   const chosen = useAppSelector((state) => selectServings(state, id));
-  const fallback = defaultServings(auth?.user.household ?? null);
-  // The request takes the servings the card opens with; − / + recalculate on the client.
-  const [requested] = useState(() => chosen ?? fallback);
-  const { data, error, isError, refetch } = useDishQuery({ id, servings: requested });
+  // The request takes the servings already chosen for this dish, if any; otherwise the server
+  // picks the default by the user's current «who eats». − / + then recalculate on the client.
+  const [requested] = useState(chosen);
+  const { data, error, isError, refetch } = useDishQuery(
+    requested === undefined ? { id } : { id, servings: requested },
+  );
   const preview = paywallPreview(error);
   const closedDishId = preview?.dishId;
 

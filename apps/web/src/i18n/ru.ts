@@ -49,6 +49,8 @@ export const ru = {
         if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'порции';
         return 'порций';
       },
+      minusSign: '−',
+      plusSign: '+',
       fewer: 'Меньше порций',
       more: 'Больше порций',
     },
