@@ -1,12 +1,23 @@
 import {
   AUTH_SCHEME,
+  addShoppingRequestSchema,
+  clampServings,
+  defaultServings,
+  dishLabel,
+  dishQuerySchema,
+  hasCountryAccess,
   homeQuerySchema,
+  scaleAmount,
   suggestDishes,
   updateMeRequestSchema,
+  type AddShoppingResponse,
   type ApiError,
   type ApiErrorCode,
   type AuthResponse,
+  type DishPreview,
+  type DishResponse,
   type HomeResponse,
+  type PaywallError,
   type MeResponse,
   type SuggestionCard,
 } from '@tma80/shared';
@@ -19,6 +30,7 @@ import { cooks } from './fixtures/cooks.ts';
 import { countries } from './fixtures/countries.ts';
 import { dishes, withIngredients } from './fixtures/dishes.ts';
 import { mockDishImageUrl } from './fixtures/images.ts';
+import { recipes } from './fixtures/recipes.ts';
 
 const apiError = (status: number, code: ApiErrorCode, message: string) =>
   HttpResponse.json<ApiError>({ error: { code, message } }, { status });
@@ -76,6 +88,71 @@ export const homeResponse = (
     countriesCount: new Set(userCooks.map((cook) => cook.countryId)).size,
     countriesTotal: countries.length,
     dishesCount: userCooks.length,
+  };
+};
+
+/** Result of `GET /dishes/:id` as the server decides it. */
+export type DishResult =
+  | { kind: 'ok'; dish: DishResponse }
+  | { kind: 'paywall'; preview: DishPreview }
+  | { kind: 'notFound' };
+
+/**
+ * `GET /dishes/:id` as the server does it: access by `has_access`, the dish with ingredients
+ * recalculated for `servings` (default — by «who eats»), the label as on the main screen; a closed
+ * dish gets only the preview.
+ */
+export const dishResult = (
+  user: MockUser,
+  dishId: string,
+  servings: number | undefined,
+): DishResult => {
+  const dish = dishes.find((candidate) => candidate.id === dishId);
+  const country = countries.find((candidate) => candidate.id === dish?.countryId);
+  const recipe = recipes[dishId];
+  if (!dish || !country || !recipe) return { kind: 'notFound' };
+  const userCooks = cooks.filter((cook) => cook.userId === user.profile.id);
+  const passed = new Set(userCooks.map((cook) => cook.countryId));
+  const imageUrl = mockDishImageUrl(dish);
+  if (!hasCountryAccess(country.id, passed, user.subscription.active)) {
+    return {
+      kind: 'paywall',
+      preview: {
+        dishId: dish.id,
+        title: dish.title,
+        countryId: country.id,
+        countryName: country.nameRu,
+        imageUrl,
+      },
+    };
+  }
+  const target = clampServings(servings ?? defaultServings(user.profile.household));
+  return {
+    kind: 'ok',
+    dish: {
+      id: dish.id,
+      title: dish.title,
+      countryId: country.id,
+      countryName: country.nameRu,
+      level: dish.level,
+      minutes: dish.minutes,
+      description: dish.description,
+      fact: dish.fact,
+      imageUrl,
+      label: dishLabel(dish, userCooks),
+      baseServings: dish.baseServings,
+      servings: target,
+      ingredients: recipe.ingredients.map((ingredient) => ({
+        key: ingredient.key,
+        product: ingredient.product,
+        name: ingredient.name,
+        baseAmount: ingredient.amount,
+        amount: scaleAmount(ingredient, dish.baseServings, target),
+        unit: ingredient.unit,
+        aisle: ingredient.aisle,
+      })),
+      steps: recipe.steps.map((step, index) => ({ n: index + 1, ...step })),
+    },
   };
 };
 
@@ -138,4 +215,58 @@ export const createHandlers = (
     if (!query.success) return apiError(400, 'validation', 'Invalid home query');
     return HttpResponse.json<HomeResponse>(homeResponse(auth[1], query.data));
   }),
+
+  http.get<{ id: string }, never, DishResponse | PaywallError | ApiError>(
+    `${apiBase}/dishes/:id`,
+    async ({ request, params }) => {
+      if (controls.delayMs > 0) await delay(controls.delayMs);
+      if (takeFailure(controls, 'dish'))
+        return apiError(500, 'internal', 'Mock error (mock_error=dish)');
+      const auth = authenticate(request, db);
+      if (!auth) return unauthorized();
+      const query = dishQuerySchema.parse({
+        servings: new URL(request.url).searchParams.get('servings') ?? undefined,
+      });
+      const result = dishResult(auth[1], params.id, query.servings);
+      switch (result.kind) {
+        case 'notFound':
+          return apiError(404, 'not_found', 'Dish not found');
+        case 'paywall':
+          return HttpResponse.json<PaywallError>(
+            {
+              error: {
+                code: 'paywall',
+                message: 'Subscription required',
+                preview: result.preview,
+              },
+            },
+            { status: 403 },
+          );
+        case 'ok':
+          return HttpResponse.json<DishResponse>(result.dish);
+      }
+    },
+  ),
+
+  http.post<never, never, AddShoppingResponse | ApiError>(
+    `${apiBase}/shopping`,
+    async ({ request }) => {
+      if (controls.delayMs > 0) await delay(controls.delayMs);
+      if (takeFailure(controls, 'shopping'))
+        return apiError(500, 'internal', 'Mock error (mock_error=shopping)');
+      const auth = authenticate(request, db);
+      if (!auth) return unauthorized();
+      const body = addShoppingRequestSchema.safeParse(await readJson(request));
+      if (!body.success) return apiError(400, 'validation', 'Invalid shopping items');
+      const dish = dishResult(auth[1], body.data.dishId, body.data.servings);
+      if (dish.kind === 'notFound') return apiError(404, 'not_found', 'Dish not found');
+      if (dish.kind === 'paywall') return apiError(403, 'paywall', 'Subscription required');
+      const known = new Set(dish.dish.ingredients.map((ingredient) => ingredient.key));
+      if (!body.data.ingredientKeys.every((key) => known.has(key)))
+        return apiError(400, 'validation', 'Unknown ingredient');
+      const added = db.addShopping(auth[0], body.data);
+      if (added === undefined) return unauthorized();
+      return HttpResponse.json<AddShoppingResponse>({ added }, { status: 201 });
+    },
+  ),
 ];

@@ -3,6 +3,7 @@ import {
   normalizeCustomExclusions,
   normalizeExclusions,
   updateMeRequestSchema,
+  type AddShoppingRequest,
   type SubscriptionStatus,
   type UpdateMeRequest,
   type UserProfile,
@@ -18,14 +19,38 @@ export interface MockUser {
   subscription: SubscriptionStatus;
 }
 
+/** An item of the user's shopping list (`shopping_items`): an ingredient of a dish to buy. */
+export interface MockShoppingItem {
+  id: string;
+  dishId: string;
+  /** `dish_ingredients.key` within the dish. */
+  ingredientKey: string;
+  servings: number;
+  checked: boolean;
+}
+
 /**
- * A changed user as stored: only the applied `PATCH /me` fields and the onboarding flag. The
- * profile is rebuilt from the current fixture, so later fixture edits are not masked.
+ * A changed user as stored: only the applied `PATCH /me` fields, the onboarding flag and the
+ * shopping list. The profile is rebuilt from the current fixture, so later fixture edits are not
+ * masked.
  */
 interface StoredUser {
   patch: UpdateMeRequest;
   onboarded: boolean;
+  shopping: MockShoppingItem[];
 }
+
+const isShoppingItem = (value: unknown): value is MockShoppingItem => {
+  if (typeof value !== 'object' || value === null) return false;
+  const item = value as Partial<MockShoppingItem>;
+  return (
+    typeof item.id === 'string' &&
+    typeof item.dishId === 'string' &&
+    typeof item.ingredientKey === 'string' &&
+    typeof item.servings === 'number' &&
+    typeof item.checked === 'boolean'
+  );
+};
 
 /** Where changed users are kept between page loads (sessionStorage in the browser). */
 export interface MockDbStorage {
@@ -39,10 +64,15 @@ const restore = (data: unknown): Map<number, StoredUser> => {
   if (typeof data !== 'object' || data === null) return users;
   for (const [key, value] of Object.entries(data)) {
     if (typeof value !== 'object' || value === null) continue;
-    const { patch, onboarded } = value as Partial<StoredUser>;
+    const { patch, onboarded, shopping } = value as Partial<StoredUser>;
     const parsed = updateMeRequestSchema.safeParse(patch);
     if (parsed.success && typeof onboarded === 'boolean') {
-      users.set(Number(key), { patch: parsed.data, onboarded });
+      const items: unknown[] = Array.isArray(shopping) ? shopping : [];
+      users.set(Number(key), {
+        patch: parsed.data,
+        onboarded,
+        shopping: items.filter(isShoppingItem),
+      });
     }
   }
   return users;
@@ -98,12 +128,45 @@ export function createMockDb(storage?: MockDbStorage) {
     const previous = changed.get(tgId)?.patch ?? {};
     const profile = applyPatch(user.profile, patch);
     const onboarded = user.onboarded || hasOnboardingAnswers(profile);
-    changed.set(tgId, { patch: mergePatches(previous, patch), onboarded });
+    const shopping = changed.get(tgId)?.shopping ?? [];
+    changed.set(tgId, { patch: mergePatches(previous, patch), onboarded, shopping });
     persist();
     return { ...user, profile, onboarded };
   };
 
-  return { getUser, updateUser };
+  /** The user's shopping list (empty in the fixtures). */
+  const getShopping = (tgId: number): readonly MockShoppingItem[] =>
+    changed.get(tgId)?.shopping ?? [];
+
+  /**
+   * `POST /shopping` as the server does it: the dish's unchecked items are replaced with the sent
+   * ingredients (no duplicates when a dish is added again); bought items stay.
+   * @returns the number of the dish's items added, or `undefined` for an unknown user.
+   */
+  const addShopping = (tgId: number, request: AddShoppingRequest): number | undefined => {
+    const user = getUser(tgId);
+    if (!user) return undefined;
+    const stored = changed.get(tgId);
+    const kept = (stored?.shopping ?? []).filter(
+      (item) => item.dishId !== request.dishId || item.checked,
+    );
+    const added = request.ingredientKeys.map((ingredientKey) => ({
+      id: crypto.randomUUID(),
+      dishId: request.dishId,
+      ingredientKey,
+      servings: request.servings,
+      checked: false,
+    }));
+    changed.set(tgId, {
+      patch: stored?.patch ?? {},
+      onboarded: stored?.onboarded ?? user.onboarded,
+      shopping: [...kept, ...added],
+    });
+    persist();
+    return added.length;
+  };
+
+  return { getUser, updateUser, getShopping, addShopping };
 }
 
 export type MockDb = ReturnType<typeof createMockDb>;

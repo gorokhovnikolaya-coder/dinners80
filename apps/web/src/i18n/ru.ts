@@ -34,6 +34,54 @@ export const ru = {
       action: 'Изменить исключения',
     },
   },
+  dish: {
+    photo: (title: string) => `Фото: ${title}`,
+    fact: 'Интересный факт',
+    time: 'Время',
+    level: 'Уровень',
+    servings: {
+      label: 'Порции',
+      /** «порция» / «порции» / «порций» for the count. */
+      word: (count: number) => {
+        const mod10 = count % 10;
+        const mod100 = count % 100;
+        if (mod10 === 1 && mod100 !== 11) return 'порция';
+        if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'порции';
+        return 'порций';
+      },
+      fewer: 'Меньше порций',
+      more: 'Больше порций',
+    },
+    ingredients: {
+      title: 'Ингредиенты',
+      hint: 'отметьте, что есть дома',
+    },
+    toTaste: 'по вкусу',
+    units: {
+      g: 'г',
+      ml: 'мл',
+      pcs: 'шт',
+      tbsp: 'ст. л.',
+      tsp: 'ч. л.',
+      clove: 'зубч.',
+      pinch: 'щеп.',
+    },
+    cart: 'В список покупок',
+    cartAllAtHome: 'Всё есть дома — покупать нечего',
+    added: (count: number) => `Добавлено в список покупок: ${String(count)}`,
+    openShopping: 'Открыть список',
+    addError: 'Не удалось добавить в список покупок. Попробуйте ещё раз.',
+    startCooking: 'Начать готовить',
+    notFound: {
+      title: 'Блюдо не найдено',
+      action: 'На главную',
+    },
+  },
+  paywallStub: {
+    title: 'Откроется с подпиской',
+    description: 'Рецепт этого блюда откроется после оформления подписки.',
+    notNow: 'Не сейчас',
+  },
   common: {
     loading: 'Загрузка…',
     error: 'Не удалось загрузить данные.',

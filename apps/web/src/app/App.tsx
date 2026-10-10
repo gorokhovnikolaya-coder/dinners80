@@ -35,6 +35,14 @@ const OnboardingScreen = lazyScreen(
   <ScreenSkeleton />,
 );
 
+const DishScreen = lazyScreen(() => import('../screens/dish/DishScreen.tsx'), <ScreenSkeleton />);
+
+/** Temporary paywall (task 6) until the real one (task 12). */
+const PaywallScreen = lazyScreen(
+  () => import('../screens/paywall/PaywallStubScreen.tsx'),
+  <ScreenSkeleton />,
+);
+
 /**
  * The dev-only component gallery. `import.meta.env.DEV` is false in `vite build`, so the route and
  * its chunk are dropped from production.
@@ -76,6 +84,14 @@ function AuthenticatedApp() {
         element={
           needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <HomeScreen user={user} />
         }
+      />
+      <Route
+        path={ROUTES.dish}
+        element={needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <DishScreen />}
+      />
+      <Route
+        path={ROUTES.paywall}
+        element={needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <PaywallScreen />}
       />
       <Route path="*" element={<Navigate to={ROUTES.home} replace />} />
     </Routes>

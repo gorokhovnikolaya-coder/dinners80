@@ -4,6 +4,10 @@ export const ROUTES = {
   onboarding: '/onboarding',
   /** Dish card (task 6). */
   dish: '/dishes/:id',
+  /** Cooking mode of a dish (task 7). */
+  cooking: '/dishes/:id/cook',
+  /** Shopping list (task 11). */
+  shopping: '/shopping',
   /** Map and passport (task 9). */
   map: '/map',
   /** Friends (task 10). */
@@ -16,6 +20,8 @@ export const ROUTES = {
 } as const;
 
 export const dishPath = (id: string) => `/dishes/${encodeURIComponent(id)}`;
+
+export const cookingPath = (id: string) => `${dishPath(id)}/cook`;
 
 export const paywallPath = (dishId?: string) =>
   dishId === undefined

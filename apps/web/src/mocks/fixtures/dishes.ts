@@ -1,5 +1,7 @@
 import type { Dish, DishLevel, DishTag } from '@tma80/shared';
 
+import { recipes } from './recipes.ts';
+
 const dish = (
   countryId: string,
   slug: string,
@@ -399,56 +401,15 @@ export const dishes: Dish[] = [
 ];
 
 /**
- * Main ingredient names of each mock dish (`dish_ingredients.name` in the ТЗ), for own exclusions
- * (`matchesCustomExclusion` looks at the title and these names). Only names: amounts, units and
- * the shape of `GET /dishes/:id` come with the dish card (task 6). Pork is named explicitly
- * («свиной фарш», «бекон из свинины»), so the own word «свин» excludes every pork dish.
+ * Ingredient names of each mock dish (`dish_ingredients.name` in the ТЗ), for own exclusions
+ * (`matchesCustomExclusion` looks at the title and these names); taken from the recipes.
  */
-export const dishIngredientNames: Readonly<Record<string, readonly string[]>> = {
-  'it-carbonara': ['Спагетти', 'Гуанчале (свиные щёчки)', 'Яичные желтки', 'Пармезан'],
-  'it-lasagna': ['Листы лазаньи', 'Говяжий фарш', 'Томаты', 'Соус бешамель'],
-  'it-ossobuco': ['Телячья голяшка', 'Морковь', 'Сельдерей', 'Лимонная цедра'],
-  'fr-omelette': ['Яйца', 'Сливочное масло', 'Сыр грюйер', 'Шнитт-лук'],
-  'fr-ratatouille': ['Кабачки', 'Баклажаны', 'Томаты', 'Прованские травы'],
-  'fr-bourguignon': ['Говядина', 'Бекон из свинины', 'Красное вино', 'Шампиньоны'],
-  'es-gazpacho': ['Томаты', 'Огурец', 'Сладкий перец', 'Белый хлеб'],
-  'es-tortilla': ['Яйца', 'Картофель', 'Репчатый лук', 'Оливковое масло'],
-  'es-paella': ['Рис', 'Курица', 'Стручковая фасоль', 'Шафран'],
-  'gr-horiatiki': ['Томаты', 'Огурцы', 'Маслины', 'Фета', 'Пита'],
-  'gr-moussaka': ['Баклажаны', 'Говяжий фарш', 'Томаты', 'Соус бешамель'],
-  'gr-spanakopita': ['Тесто фило', 'Шпинат', 'Фета', 'Яйца'],
-  'jp-oyakodon': ['Рис', 'Куриное бедро', 'Яйца', 'Соевый соус'],
-  'jp-ramen': ['Пшеничная лапша', 'Курица', 'Яйца', 'Соевый соус'],
-  'jp-gyoza': ['Свиной фарш', 'Пекинская капуста', 'Тесто для гёдза', 'Соевый соус'],
-  'cn-kung-pao': ['Куриное филе', 'Арахис', 'Сычуаньский перец', 'Соевый соус'],
-  'cn-sweet-sour-pork': ['Свиная вырезка', 'Ананас', 'Сладкий перец', 'Мука'],
-  'cn-jiaozi': ['Свиной фарш', 'Китайская капуста', 'Мука', 'Имбирь'],
-  'in-dal': ['Красная чечевица', 'Томаты', 'Куркума', 'Чили'],
-  'in-tikka-masala': ['Куриное филе', 'Йогурт', 'Томаты', 'Сливки', 'Гарам масала'],
-  'in-biryani': ['Рис басмати', 'Курица', 'Шафран', 'Репчатый лук'],
-  'th-pad-kra-pao': ['Куриный фарш', 'Тайский базилик', 'Чили', 'Соевый соус', 'Яйца'],
-  'th-green-curry': ['Куриное филе', 'Кокосовое молоко', 'Зелёная паста карри', 'Баклажаны'],
-  'th-massaman': ['Говядина', 'Картофель', 'Арахис', 'Паста массаман'],
-  'pe-lomo-saltado': ['Говяжья вырезка', 'Репчатый лук', 'Томаты', 'Картофель', 'Соевый соус'],
-  'pe-aji-de-gallina': ['Курица', 'Перец ахи амарильо', 'Сливки', 'Белый хлеб'],
-  'pe-ceviche': ['Филе белой рыбы', 'Лайм', 'Красный лук', 'Чили'],
-  'ar-choripan': ['Чоризо (свиная колбаска)', 'Багет', 'Петрушка', 'Чеснок'],
-  'ar-empanadas': ['Тесто для эмпанадас', 'Говяжий фарш', 'Яйца', 'Оливки'],
-  'ar-asado': ['Говяжьи рёбра', 'Петрушка', 'Чеснок', 'Винный уксус'],
-  'br-moqueca': ['Филе белой рыбы', 'Кокосовое молоко', 'Сладкий перец', 'Томаты'],
-  'br-pao-de-queijo': ['Тапиоковая мука', 'Сыр', 'Яйца', 'Молоко'],
-  'br-feijoada': ['Чёрная фасоль', 'Свиные рёбрышки', 'Копчёная свиная колбаса', 'Рис'],
-  'co-arepas': ['Кукурузная мука', 'Сыр', 'Сливочное масло'],
-  'co-sancocho': ['Курица', 'Кукуруза', 'Маниока', 'Кинза'],
-  'co-bandeja-paisa': [
-    'Красная фасоль',
-    'Рис',
-    'Говяжий фарш',
-    'Чичаррон (свиная грудинка)',
-    'Яйца',
-    'Авокадо',
-  ],
-};
+export const dishIngredientNames: Readonly<Record<string, readonly string[]>> = Object.fromEntries(
+  Object.entries(recipes).map(([id, recipe]) => [
+    id,
+    recipe.ingredients.map((ingredient) => ingredient.name),
+  ]),
+);
 
 /** A mock dish with its ingredient names, as `matchesCustomExclusion` expects. */
 export const withIngredients = (item: Dish) => ({

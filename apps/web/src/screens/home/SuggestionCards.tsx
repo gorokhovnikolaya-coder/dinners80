@@ -44,8 +44,8 @@ function Photo({
 const linkClass =
   'flex flex-col overflow-hidden bg-surface text-ink no-underline shadow-card transition-transform active:scale-[0.99]';
 
-/** Badge over the photo of the big card. */
-function Badge({ label }: { label: SuggestionCard['label'] }) {
+/** The mark of a dish («Новая страна» / «N-е блюдо» / «Уже готовили»): big card, dish card. */
+export function LabelBadge({ label }: { label: SuggestionCard['label'] }) {
   switch (label.kind) {
     case 'newCountry':
       return <Chip tone="badge">{t.labels.newCountry}</Chip>;
@@ -78,7 +78,7 @@ export function BigSuggestionCard({ card }: { card: SuggestionCard }) {
     <Link to={dishPath(card.dishId)} className={cx(linkClass, 'rounded-card-lg')}>
       <Photo url={card.imageUrl} className="h-37.5">
         <span className="absolute top-3 left-3">
-          <Badge label={card.label} />
+          <LabelBadge label={card.label} />
         </span>
       </Photo>
       <span className="flex flex-col gap-2 px-4 pt-3.5 pb-4">

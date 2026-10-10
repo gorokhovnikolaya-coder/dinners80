@@ -94,6 +94,21 @@ export interface SuggestionPage {
   suggestions: Suggestion[];
 }
 
+/**
+ * The mark of a dish for the user (main screen cards and the dish card): `newCountry` if the
+ * country has no cooks, `cookedBefore` if this dish has, else `nthDish` with n = the number of
+ * different cooked dishes of the country + 1.
+ */
+export function dishLabel(
+  dish: { id: string; countryId: string },
+  cooks: readonly SuggestionCook[],
+): SuggestionLabel {
+  const ofCountry = cooks.filter((cook) => cook.countryId === dish.countryId);
+  if (ofCountry.length === 0) return { kind: 'newCountry' };
+  if (ofCountry.some((cook) => cook.dishId === dish.id)) return { kind: 'cookedBefore' };
+  return { kind: 'nthDish', n: new Set(ofCountry.map((cook) => cook.dishId)).size + 1 };
+}
+
 /** `YYYY-MM-DD` of `now` in the time zone (the user's «today»). */
 export function localDateKey(now: Date, timezone: string): string {
   return new Intl.DateTimeFormat('en-CA', {
@@ -214,12 +229,6 @@ export function suggestDishes(input: SuggestionInput): SuggestionPage {
     const time = Date.parse(cook.createdAt);
     lastCook.set(cook.dishId, Math.max(lastCook.get(cook.dishId) ?? -Infinity, time));
   }
-  const cookedDishesByCountry = new Map<string, Set<string>>();
-  for (const cook of cooks) {
-    const set = cookedDishesByCountry.get(cook.countryId) ?? new Set<string>();
-    set.add(cook.dishId);
-    cookedDishesByCountry.set(cook.countryId, set);
-  }
 
   const recentSince = now.getTime() - RECENT_COOK_DAYS * DAY_MS;
   const isRecent = (dish: SuggestionDish) => (lastCook.get(dish.id) ?? -Infinity) > recentSince;
@@ -273,15 +282,9 @@ export function suggestDishes(input: SuggestionInput): SuggestionPage {
   const pageCount = Math.max(pages.length, 1);
   const page = ((Math.trunc(input.page) % pageCount) + pageCount) % pageCount;
 
-  const label = (dish: SuggestionDish): SuggestionLabel => {
-    if (!passed.has(dish.countryId)) return { kind: 'newCountry' };
-    if (lastCook.has(dish.id)) return { kind: 'cookedBefore' };
-    return { kind: 'nthDish', n: (cookedDishesByCountry.get(dish.countryId)?.size ?? 0) + 1 };
-  };
-
   const suggestions: Suggestion[] = (pages[page] ?? []).map((dish) => ({
     dishId: dish.id,
-    label: label(dish),
+    label: dishLabel(dish, cooks),
     locked: false,
   }));
   const lockedDish = lockedList[page % Math.max(lockedList.length, 1)];

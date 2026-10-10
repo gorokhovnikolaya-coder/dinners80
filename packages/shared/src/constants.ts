@@ -36,3 +36,18 @@ export const FREE_COUNTRIES_LIMIT = 10;
 
 /** Default dinner reminder time (`users.reminder_time`). */
 export const DEFAULT_REMINDER_TIME = '18:00';
+
+/** Servings on the dish card: − / + from 1 to 8 (ТЗ, экран 2). */
+export const SERVINGS_MIN = 1;
+export const SERVINGS_MAX = 8;
+
+/**
+ * Units of ingredient amounts (`dish_ingredients.unit`): grams, millilitres, pieces, table- and
+ * teaspoons, garlic cloves, pinches. An ingredient «to taste» has neither amount nor unit.
+ */
+export const INGREDIENT_UNITS = ['g', 'ml', 'pcs', 'tbsp', 'tsp', 'clove', 'pinch'] as const;
+export type IngredientUnit = (typeof INGREDIENT_UNITS)[number];
+
+/** Store aisles of the shopping list (`dish_ingredients.aisle`). */
+export const AISLES = ['meat', 'veg', 'dairy', 'grocery', 'other'] as const;
+export type Aisle = (typeof AISLES)[number];

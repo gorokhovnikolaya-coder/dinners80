@@ -3,6 +3,7 @@
  * - `?mock_error=auth` — the first request to the `auth` endpoint fails with HTTP 500
  *   (`{error: {code: 'internal'}}`), the retry succeeds; `auth:always` fails every time.
  *   Several endpoints: `?mock_error=auth,me`. Keys: `auth` (`POST /auth`), `me` (`PATCH /me`), `home` (`GET /home`),
+ *   `dish` (`GET /dishes/:id`), `shopping` (`POST /shopping`),
  *   `chunk` (the first lazy screen chunk, browser only).
  * - `?mock_delay=<ms>` — delay of every mock response, to see loading states.
  */

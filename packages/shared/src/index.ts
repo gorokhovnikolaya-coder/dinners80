@@ -56,6 +56,7 @@ export {
   SUGGESTION_MODES,
   SUGGESTIONS_PER_PAGE,
   dailyRank,
+  dishLabel,
   defaultSuggestionMode,
   isExcluded,
   localDateKey,
@@ -69,3 +70,33 @@ export {
   type SuggestionPage,
   type SuggestionUser,
 } from './suggestions.ts';
+export {
+  dishIngredientSchema,
+  dishPreviewSchema,
+  dishQuerySchema,
+  dishResponseSchema,
+  dishStepSchema,
+  hasCountryAccess,
+  paywallErrorSchema,
+  type DishIngredient,
+  type DishPreview,
+  type DishQuery,
+  type DishResponse,
+  type DishStep,
+  type PaywallError,
+} from './dish.ts';
+export {
+  FALLBACK_SERVINGS,
+  HOUSEHOLD_SERVINGS,
+  clampServings,
+  defaultServings,
+  roundAmount,
+  scaleAmount,
+  type ScalableAmount,
+} from './servings.ts';
+export {
+  addShoppingRequestSchema,
+  addShoppingResponseSchema,
+  type AddShoppingRequest,
+  type AddShoppingResponse,
+} from './shopping.ts';

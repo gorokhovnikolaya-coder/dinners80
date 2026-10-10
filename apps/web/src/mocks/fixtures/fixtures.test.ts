@@ -4,6 +4,8 @@ import {
   cookSchema,
   countrySchema,
   dishSchema,
+  dishIngredientSchema,
+  dishStepSchema,
   matchesCustomExclusion,
   userProfileSchema,
   subscriptionStatusSchema,
@@ -13,6 +15,7 @@ import { describe, expect, it } from 'vitest';
 import { cooks, countCountries } from './cooks.ts';
 import { countries } from './countries.ts';
 import { dishes, dishIngredientNames, withIngredients } from './dishes.ts';
+import { recipes } from './recipes.ts';
 import { FRIEND_IDS, TEST_USER_IDS, findUserByTgId, friendships, users } from './users.ts';
 
 const userByTgId = (tgId: number) => {
@@ -65,6 +68,38 @@ describe('content fixtures', () => {
     expect(excluded.toSorted()).toEqual(porkDishes.toSorted());
     for (const id of porkDishes) {
       expect(dishes.find((dish) => dish.id === id)?.tags, id).toContain('meat');
+    }
+  });
+
+  it('have a recipe for every dish: valid ingredients, unique keys, known placeholders', () => {
+    expect(Object.keys(recipes).toSorted()).toEqual(dishes.map((dish) => dish.id).toSorted());
+    for (const [id, recipe] of Object.entries(recipes)) {
+      const keys = recipe.ingredients.map((ingredient) => ingredient.key);
+      expect(new Set(keys).size, id).toBe(keys.length);
+      for (const ingredient of recipe.ingredients) {
+        const parsed = dishIngredientSchema.safeParse({
+          ...ingredient,
+          baseAmount: ingredient.amount,
+        });
+        expect(parsed.success, `${id}: ${ingredient.key}`).toBe(true);
+      }
+      expect(recipe.steps.length, id).toBeGreaterThanOrEqual(3);
+      recipe.steps.forEach((step, index) => {
+        expect(dishStepSchema.safeParse({ n: index + 1, ...step }).success, id).toBe(true);
+        for (const [, key] of step.text.matchAll(/\{([^}]+)\}/g)) {
+          expect(keys, `${id}, step ${String(index + 1)}`).toContain(key);
+        }
+      });
+    }
+  });
+
+  it('keep one aisle per product across dishes', () => {
+    const aisles = new Map<string, string>();
+    for (const [id, recipe] of Object.entries(recipes)) {
+      for (const { product, aisle } of recipe.ingredients) {
+        expect(aisles.get(product) ?? aisle, `${id}: ${product}`).toBe(aisle);
+        aisles.set(product, aisle);
+      }
     }
   });
 

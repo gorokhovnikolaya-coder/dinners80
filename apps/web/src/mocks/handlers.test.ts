@@ -1,10 +1,18 @@
-import { authResponseSchema, homeResponseSchema, meResponseSchema } from '@tma80/shared';
+import {
+  addShoppingResponseSchema,
+  authResponseSchema,
+  dishResponseSchema,
+  homeResponseSchema,
+  meResponseSchema,
+  paywallErrorSchema,
+} from '@tma80/shared';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import { API_URL } from '../api/config.ts';
 import { buildMockInitData, parseInitDataUserId } from '../telegram/mock/initData.ts';
-import { dishIngredientNames } from './fixtures/dishes.ts';
+import { cooks } from './fixtures/cooks.ts';
+import { dishes, dishIngredientNames } from './fixtures/dishes.ts';
 import { TEST_USER_IDS, findUserByTgId } from './fixtures/users.ts';
 import { NO_MOCK_CONTROLS, parseMockControls } from './controls.ts';
 import { createMockDb } from './db.ts';
@@ -149,6 +157,7 @@ describe('PATCH /me (MSW)', () => {
           customExclusions: ['Грибы'],
         },
         onboarded: true,
+        shopping: [],
       },
     });
     const restored = createMockDb(storage).getUser(TEST_USER_IDS.newbie);
@@ -235,5 +244,120 @@ describe('GET /home (MSW)', () => {
     server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=home')));
     expect((await home(TEST_USER_IDS.eightCountries, 'mode=weekday')).status).toBe(500);
     expect((await home(TEST_USER_IDS.eightCountries, 'mode=weekday')).status).toBe(200);
+  });
+});
+
+describe('GET /dishes/:id (MSW)', () => {
+  const getDish = (tgId: number, path: string) =>
+    fetch(`${API_BASE}/dishes/${path}`, { headers: { Authorization: `tma ${initDataOf(tgId)}` } });
+
+  const closedDishOf = (tgId: number) => {
+    const user = findUserByTgId(tgId);
+    const passed = new Set(
+      cooks.filter((cook) => cook.userId === user?.profile.id).map((cook) => cook.countryId),
+    );
+    const dish = dishes.find((item) => !passed.has(item.countryId));
+    if (!dish) throw new Error('no closed dish');
+    return dish;
+  };
+
+  it('returns the dish recalculated for the requested servings', async () => {
+    const response = await getDish(TEST_USER_IDS.eightCountries, 'pe-ceviche?servings=3');
+    expect(response.status).toBe(200);
+    const body = dishResponseSchema.parse(await response.json());
+    expect(body.servings).toBe(3);
+    expect(body.baseServings).toBe(2);
+    const fish = body.ingredients.find((item) => item.key === 'white_fish');
+    expect(fish).toMatchObject({ baseAmount: 400, amount: 600, unit: 'g' });
+    const salt = body.ingredients.find((item) => item.key === 'salt');
+    expect(salt).toMatchObject({ amount: null, unit: null });
+    expect(body.steps.map((step) => step.n)).toEqual([1, 2, 3, 4]);
+  });
+
+  it('defaults servings by «who eats» and labels the dish as on the main screen', async () => {
+    // 1003 is a family (4 servings).
+    const response = await getDish(TEST_USER_IDS.tenCountriesFree, 'it-carbonara');
+    const body = dishResponseSchema.parse(await response.json());
+    expect(body.servings).toBe(4);
+    expect(body.label.kind).not.toBe('newCountry');
+  });
+
+  it('answers 403 paywall with a preview for a closed country, 200 with a subscription', async () => {
+    const closed = closedDishOf(TEST_USER_IDS.tenCountriesFree);
+    const response = await getDish(TEST_USER_IDS.tenCountriesFree, closed.id);
+    expect(response.status).toBe(403);
+    const body = paywallErrorSchema.parse(await response.json());
+    expect(body.error.preview).toMatchObject({ dishId: closed.id, title: closed.title });
+    expect(body.error.preview).not.toHaveProperty('ingredients');
+
+    const subscribed = closedDishOf(TEST_USER_IDS.tenCountriesSubscribed);
+    expect((await getDish(TEST_USER_IDS.tenCountriesSubscribed, subscribed.id)).status).toBe(200);
+  });
+
+  it('answers 404 for an unknown dish and 401 without initData', async () => {
+    expect((await getDish(TEST_USER_IDS.eightCountries, 'xx-nothing')).status).toBe(404);
+    expect((await fetch(`${API_BASE}/dishes/pe-ceviche`)).status).toBe(401);
+  });
+
+  it('fails once with 500 when mock_error=dish is set', async () => {
+    server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=dish')));
+    expect((await getDish(TEST_USER_IDS.eightCountries, 'pe-ceviche')).status).toBe(500);
+    expect((await getDish(TEST_USER_IDS.eightCountries, 'pe-ceviche')).status).toBe(200);
+  });
+});
+
+describe('POST /shopping (MSW)', () => {
+  const post = (tgId: number, body: unknown) =>
+    fetch(`${API_BASE}/shopping`, {
+      method: 'POST',
+      headers: { Authorization: `tma ${initDataOf(tgId)}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+  it('adds the items and replaces the unchecked ones of the dish on a repeat', async () => {
+    const db = createMockDb();
+    server.use(...createHandlers(API_BASE, NO_MOCK_CONTROLS, db));
+    const tgId = TEST_USER_IDS.eightCountries;
+
+    const first = await post(tgId, {
+      dishId: 'pe-ceviche',
+      servings: 2,
+      ingredientKeys: ['white_fish', 'lime', 'salt'],
+    });
+    expect(first.status).toBe(201);
+    expect(addShoppingResponseSchema.parse(await first.json())).toEqual({ added: 3 });
+
+    await post(tgId, { dishId: 'pe-ceviche', servings: 4, ingredientKeys: ['lime'] });
+    await post(tgId, { dishId: 'it-carbonara', servings: 2, ingredientKeys: ['spaghetti'] });
+    expect(
+      db.getShopping(tgId).map(({ dishId, ingredientKey, servings }) => ({
+        dishId,
+        ingredientKey,
+        servings,
+      })),
+    ).toEqual([
+      { dishId: 'pe-ceviche', ingredientKey: 'lime', servings: 4 },
+      { dishId: 'it-carbonara', ingredientKey: 'spaghetti', servings: 2 },
+    ]);
+  });
+
+  it('rejects unknown ingredients, closed dishes and invalid bodies', async () => {
+    const tgId = TEST_USER_IDS.tenCountriesFree;
+    expect(
+      (await post(tgId, { dishId: 'pe-ceviche', servings: 2, ingredientKeys: ['nope'] })).status,
+    ).toBe(400);
+    expect(
+      (await post(tgId, { dishId: 'pe-ceviche', servings: 2, ingredientKeys: [] })).status,
+    ).toBe(400);
+    expect(
+      (await post(tgId, { dishId: 'xx-nothing', servings: 2, ingredientKeys: ['a'] })).status,
+    ).toBe(404);
+  });
+
+  it('fails once with 500 when mock_error=shopping is set', async () => {
+    server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=shopping')));
+    const body = { dishId: 'pe-ceviche', servings: 2, ingredientKeys: ['lime'] };
+    expect((await post(TEST_USER_IDS.eightCountries, body)).status).toBe(500);
+    expect((await post(TEST_USER_IDS.eightCountries, body)).status).toBe(201);
   });
 });
