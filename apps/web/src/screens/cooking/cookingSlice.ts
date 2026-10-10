@@ -14,9 +14,14 @@ export interface DishCooking {
 export interface CookingState {
   /** By dish id. */
   dishes: Record<string, DishCooking>;
+  /**
+   * Dishes finished with «Готово!» whose cook is not recorded yet: only they open the photo and
+   * stamp screen, so a reload or a link there cannot record a cook twice.
+   */
+  awaitingStamp: Record<string, true>;
 }
 
-const initialState: CookingState = { dishes: {} };
+const initialState: CookingState = { dishes: {}, awaitingStamp: {} };
 
 type DishPayload<T = object> = PayloadAction<{ dishId: string } & T>;
 
@@ -62,14 +67,24 @@ export const cookingSlice = createSlice({
         if (isOverdue(timer, now)) timers[n] = { status: 'done' };
       }
     },
-    /** «Готово!»: the dish is cooked — its step and timers are dropped. */
+    /**
+     * «Готово!»: the dish is cooked — its step and timers are dropped, and the photo and stamp
+     * screen may record the cook.
+     */
     cookingFinished(state, action: DishPayload) {
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- a record keyed by dish id
       delete state.dishes[action.payload.dishId];
+      state.awaitingStamp[action.payload.dishId] = true;
+    },
+    /** `POST /cooks` succeeded: the dish needs a new «Готово!» for another cook. */
+    cookRecorded(state, action: DishPayload) {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- a record keyed by dish id
+      delete state.awaitingStamp[action.payload.dishId];
     },
   },
   selectors: {
     selectDishCooking: (state, dishId: string): DishCooking | undefined => state.dishes[dishId],
+    selectAwaitingStamp: (state, dishId: string): boolean => state.awaitingStamp[dishId] === true,
   },
 });
 
@@ -88,5 +103,6 @@ export const {
   timerReset,
   timersElapsed,
   cookingFinished,
+  cookRecorded,
 } = cookingSlice.actions;
-export const { selectDishCooking } = injectedCookingSlice.selectors;
+export const { selectDishCooking, selectAwaitingStamp } = injectedCookingSlice.selectors;

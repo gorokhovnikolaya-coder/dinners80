@@ -1,10 +1,13 @@
 import {
   addShoppingResponseSchema,
   authResponseSchema,
+  COOKS_PER_DAY_LIMIT,
+  createCookResponseSchema,
   dishResponseSchema,
   homeResponseSchema,
   meResponseSchema,
   paywallErrorSchema,
+  uploadCookPhotoResponseSchema,
 } from '@tma80/shared';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
@@ -16,7 +19,7 @@ import { dishes, dishIngredientNames } from './fixtures/dishes.ts';
 import { TEST_USER_IDS, findUserByTgId } from './fixtures/users.ts';
 import { NO_MOCK_CONTROLS, parseMockControls } from './controls.ts';
 import { createMockDb } from './db.ts';
-import { createHandlers } from './handlers.ts';
+import { createHandlers, recordCook } from './handlers.ts';
 
 const API_BASE = `http://localhost${API_URL}`;
 const server = setupServer(...createHandlers(API_BASE));
@@ -158,6 +161,7 @@ describe('PATCH /me (MSW)', () => {
         },
         onboarded: true,
         shopping: [],
+        cooks: [],
       },
     });
     const restored = createMockDb(storage).getUser(TEST_USER_IDS.newbie);
@@ -359,5 +363,117 @@ describe('POST /shopping (MSW)', () => {
     const body = { dishId: 'pe-ceviche', servings: 2, ingredientKeys: ['lime'] };
     expect((await post(TEST_USER_IDS.eightCountries, body)).status).toBe(500);
     expect((await post(TEST_USER_IDS.eightCountries, body)).status).toBe(201);
+  });
+});
+
+describe('POST /uploads/cook-photo (MSW)', () => {
+  const upload = (tgId: number, blob: Blob) => {
+    const form = new FormData();
+    form.append('photo', blob, 'photo.jpg');
+    return fetch(`${API_BASE}/uploads/cook-photo`, {
+      method: 'POST',
+      headers: { Authorization: `tma ${initDataOf(tgId)}` },
+      body: form,
+    });
+  };
+  const jpeg = (size: number) => new Blob([new Uint8Array(size)], { type: 'image/jpeg' });
+
+  it('stores a JPEG up to 500 KB in the user folder', async () => {
+    const response = await upload(TEST_USER_IDS.eightCountries, jpeg(1000));
+    expect(response.status).toBe(201);
+    const { photoPath } = uploadCookPhotoResponseSchema.parse(await response.json());
+    expect(photoPath.startsWith(`cooks/${String(findUserByTgId(1002)?.profile.id)}/`)).toBe(true);
+  });
+
+  it('rejects a large or non-JPEG file; fails once with mock_error=upload', async () => {
+    expect((await upload(TEST_USER_IDS.eightCountries, jpeg(500 * 1024 + 1))).status).toBe(413);
+    const png = new Blob([new Uint8Array(10)], { type: 'image/png' });
+    expect((await upload(TEST_USER_IDS.eightCountries, png)).status).toBe(400);
+    server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=upload')));
+    expect((await upload(TEST_USER_IDS.eightCountries, jpeg(10))).status).toBe(500);
+    expect((await upload(TEST_USER_IDS.eightCountries, jpeg(10))).status).toBe(201);
+  });
+});
+
+describe('POST /cooks (MSW)', () => {
+  const post = (tgId: number, body: unknown) =>
+    fetch(`${API_BASE}/cooks`, {
+      method: 'POST',
+      headers: { Authorization: `tma ${initDataOf(tgId)}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+  it('a new country gives a stamp, counts and the overtaken friend', async () => {
+    const db = createMockDb();
+    server.use(...createHandlers(API_BASE, NO_MOCK_CONTROLS, db));
+    const tgId = TEST_USER_IDS.eightCountries;
+    const response = await post(tgId, { dishId: 'in-dal' });
+    expect(response.status).toBe(201);
+    expect(createCookResponseSchema.parse(await response.json())).toMatchObject({
+      newCountry: true,
+      countriesCount: 9,
+      countriesTotal: 12,
+      dishesCount: 11,
+      overtook: 'Жанна',
+    });
+    // The cook is stored: the dish is now «Уже готовили», a repeat is not a new country.
+    const repeat = createCookResponseSchema.parse(
+      await (await post(tgId, { dishId: 'in-dal' })).json(),
+    );
+    expect(repeat).toMatchObject({
+      newCountry: false,
+      countriesCount: 9,
+      dishesCount: 12,
+      overtook: null,
+    });
+    expect(db.getUser(tgId)?.cooks.filter((cook) => cook.dishId === 'in-dal')).toHaveLength(2);
+  });
+
+  it('keeps a photo of the own folder and rejects someone else’s', async () => {
+    const db = createMockDb();
+    server.use(...createHandlers(API_BASE, NO_MOCK_CONTROLS, db));
+    const own = `cooks/${String(findUserByTgId(1002)?.profile.id)}/0b6f7c1e-3d0a-4c55-9a7e-2f1d3c4b5a69.jpg`;
+    const other = `cooks/${String(findUserByTgId(1003)?.profile.id)}/0b6f7c1e-3d0a-4c55-9a7e-2f1d3c4b5a69.jpg`;
+    expect((await post(1002, { dishId: 'pe-ceviche', photoPath: own })).status).toBe(201);
+    expect(db.getUser(1002)?.cooks.at(-1)?.photoPath).toBe(own);
+    expect((await post(1002, { dishId: 'pe-ceviche', photoPath: other })).status).toBe(400);
+  });
+
+  it('answers 403 for a closed country, 404 for an unknown dish, 400 for a bad body', async () => {
+    expect((await post(TEST_USER_IDS.tenCountriesFree, { dishId: 'th-green-curry' })).status).toBe(
+      403,
+    );
+    expect((await post(TEST_USER_IDS.eightCountries, { dishId: 'xx-nothing' })).status).toBe(404);
+    expect((await post(TEST_USER_IDS.eightCountries, {})).status).toBe(400);
+  });
+
+  it('keeps the recorded cooks through the storage', () => {
+    let data: unknown;
+    const storage = {
+      load: () => data,
+      save: (value: unknown) => {
+        data = JSON.parse(JSON.stringify(value));
+      },
+    };
+    expect(recordCook(createMockDb(storage), 1002, { dishId: 'in-dal' }).kind).toBe('ok');
+    expect(createMockDb(storage).getUser(1002)?.cooks.at(-1)?.dishId).toBe('in-dal');
+  });
+
+  it('allows at most 20 cooks in 24 hours', () => {
+    const db = createMockDb();
+    const now = new Date();
+    for (let index = 0; index < COOKS_PER_DAY_LIMIT; index += 1) {
+      // Борис cooked one dish yesterday (fixture, 1 day ago — outside the 24 hours).
+      expect(recordCook(db, 1002, { dishId: 'pe-ceviche' }, now).kind).toBe('ok');
+    }
+    expect(recordCook(db, 1002, { dishId: 'pe-ceviche' }, now).kind).toBe('rateLimited');
+    const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000 + 1);
+    expect(recordCook(db, 1002, { dishId: 'pe-ceviche' }, tomorrow).kind).toBe('ok');
+  });
+
+  it('fails once with 500 when mock_error=cooks is set', async () => {
+    server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=cooks')));
+    expect((await post(TEST_USER_IDS.eightCountries, { dishId: 'pe-ceviche' })).status).toBe(500);
+    expect((await post(TEST_USER_IDS.eightCountries, { dishId: 'pe-ceviche' })).status).toBe(201);
   });
 });

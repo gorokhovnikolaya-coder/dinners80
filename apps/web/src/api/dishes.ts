@@ -27,6 +27,7 @@ export const dishesApi = api.injectEndpoints({
         params: servings === undefined ? {} : { servings },
       }),
       responseSchema: dishResponseSchema,
+      providesTags: ['Cooks'],
     }),
     /** `POST /shopping`: the dish's ingredients to buy (replaces its unchecked items). */
     addToShopping: build.mutation<AddShoppingResponse, AddShoppingRequest>({

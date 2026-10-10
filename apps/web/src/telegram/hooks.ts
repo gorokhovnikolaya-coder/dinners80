@@ -1,6 +1,9 @@
 import { backButton, swipeBehavior } from '@tma.js/sdk-react';
 import { useEffect, useState } from 'react';
 
+import { DARK_CHROME_COLOR_TOKEN } from '../theme/tokens.ts';
+import { setChromeColors } from './sdk.ts';
+
 /** True if this client can show the Telegram BackButton and report presses (Mini Apps 6.1+). */
 export function isTelegramBackButtonAvailable(): boolean {
   try {
@@ -52,4 +55,25 @@ export function useVerticalSwipesDisabled(): void {
       }
     };
   }, []);
+}
+
+/**
+ * Paints the Telegram header and background navy while `dark` is true (the stamp screen) and
+ * back to the light screen colour after, so the chrome matches the screen.
+ */
+export function useDarkTelegramChrome(dark: boolean): void {
+  useEffect(() => {
+    if (!dark) return;
+    const paint = (token?: string) => {
+      try {
+        setChromeColors(token);
+      } catch {
+        // Outside Telegram (tests): nothing to paint.
+      }
+    };
+    paint(DARK_CHROME_COLOR_TOKEN);
+    return () => {
+      paint();
+    };
+  }, [dark]);
 }

@@ -152,6 +152,9 @@ export function DevUiPage() {
           <Button variant="inverse" size="lg" fullWidth loading>
             {t.buttons.loading}
           </Button>
+          <Button variant="outlineDark" size="lg" fullWidth>
+            {t.buttons.outlineDark}
+          </Button>
           <IconButton label={t.buttons.close} icon={<IconClose size={18} />} variant="dark" />
         </Card>
       </Section>

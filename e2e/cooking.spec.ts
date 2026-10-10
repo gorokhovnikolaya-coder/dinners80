@@ -107,9 +107,10 @@ test.describe('cooking mode', () => {
     await expect(next(page)).toHaveCount(0);
     await shot(page, '04-last-step');
 
-    // «Готово!» leads to the photo and stamp screen (task 8; until then — the main screen).
+    // «Готово!» leads to the photo and stamp screen.
     await page.getByRole('button', { name: 'Готово!' }).click();
-    await expect(page).toHaveURL('/');
+    await expect(page).toHaveURL('/dishes/pe-lomo-saltado/done');
+    await expect(page.getByRole('heading', { name: 'Сфотографируйте блюдо' })).toBeVisible();
     expect((await mockParams(page)).web_app_setup_swipe_behavior).toEqual({
       allow_vertical_swipe: true,
     });

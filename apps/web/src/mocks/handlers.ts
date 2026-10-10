@@ -1,6 +1,12 @@
 import {
   AUTH_SCHEME,
+  COOK_PHOTO_FIELD,
+  COOK_PHOTO_MAX_BYTES,
+  COOK_PHOTO_TYPE,
+  COOKS_PER_DAY_LIMIT,
   addShoppingRequestSchema,
+  createCookRequestSchema,
+  findOvertakenFriend,
   clampServings,
   defaultServings,
   dishLabel,
@@ -14,6 +20,8 @@ import {
   type ApiError,
   type ApiErrorCode,
   type AuthResponse,
+  type CreateCookResponse,
+  type UploadCookPhotoResponse,
   type DishPreview,
   type DishResponse,
   type HomeResponse,
@@ -26,11 +34,11 @@ import { HttpResponse, delay, http } from 'msw';
 import { parseInitDataUserId } from '../telegram/mock/initData.ts';
 import { NO_MOCK_CONTROLS, takeFailure, type MockControls } from './controls.ts';
 import { createMockDb, type MockDb, type MockUser } from './db.ts';
-import { cooks } from './fixtures/cooks.ts';
 import { countries } from './fixtures/countries.ts';
 import { dishes, withIngredients } from './fixtures/dishes.ts';
 import { mockDishImageUrl } from './fixtures/images.ts';
 import { recipes } from './fixtures/recipes.ts';
+import { friendships } from './fixtures/users.ts';
 
 const apiError = (status: number, code: ApiErrorCode, message: string) =>
   HttpResponse.json<ApiError>({ error: { code, message } }, { status });
@@ -53,7 +61,7 @@ export const homeResponse = (
   query: { mode: HomeResponse['mode']; page: number },
   now = new Date(),
 ): HomeResponse => {
-  const userCooks = cooks.filter((cook) => cook.userId === user.profile.id);
+  const userCooks = user.cooks;
   const result = suggestDishes({
     dishes: dishes.map(withIngredients),
     cooks: userCooks,
@@ -111,7 +119,7 @@ export const dishResult = (
   const country = countries.find((candidate) => candidate.id === dish?.countryId);
   const recipe = recipes[dishId];
   if (!dish || !country || !recipe) return { kind: 'notFound' };
-  const userCooks = cooks.filter((cook) => cook.userId === user.profile.id);
+  const userCooks = user.cooks;
   const passed = new Set(userCooks.map((cook) => cook.countryId));
   const imageUrl = mockDishImageUrl(dish);
   if (!hasCountryAccess(country.id, passed, user.subscription.active)) {
@@ -152,6 +160,76 @@ export const dishResult = (
         aisle: ingredient.aisle,
       })),
       steps: recipe.steps.map((step, index) => ({ n: index + 1, ...step })),
+    },
+  };
+};
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const countryCount = (cooks: readonly { countryId: string }[]) =>
+  new Set(cooks.map((cook) => cook.countryId)).size;
+
+/** Friends of the user (Telegram ids), from the two-way friendships. */
+const friendIdsOf = (tgId: number): number[] =>
+  friendships.flatMap(([a, b]) => (a === tgId ? [b] : b === tgId ? [a] : []));
+
+/** Result of `POST /cooks` as the server decides it. */
+export type CookResult =
+  | { kind: 'ok'; result: CreateCookResponse }
+  | { kind: 'notFound' }
+  | { kind: 'paywall' }
+  | { kind: 'rateLimited' }
+  | { kind: 'forbiddenPhoto' };
+
+/**
+ * `POST /cooks` as the server does it: access by `has_access`, at most `COOKS_PER_DAY_LIMIT` cooks
+ * in 24 hours, a photo only from the user's own folder; then the counters and the friend overtaken.
+ */
+export const recordCook = (
+  db: MockDb,
+  tgId: number,
+  request: { dishId: string; photoPath?: string | null | undefined },
+  now = new Date(),
+): CookResult => {
+  const user = db.getUser(tgId);
+  const dish = dishes.find((candidate) => candidate.id === request.dishId);
+  if (!user || !dish) return { kind: 'notFound' };
+  const access = dishResult(user, dish.id, undefined);
+  if (access.kind === 'notFound') return { kind: 'notFound' };
+  if (access.kind === 'paywall') return { kind: 'paywall' };
+  const photoPath = request.photoPath ?? null;
+  if (photoPath !== null && !photoPath.startsWith(`cooks/${user.profile.id}/`))
+    return { kind: 'forbiddenPhoto' };
+  const recent = user.cooks.filter(
+    (cook) => now.getTime() - new Date(cook.createdAt).getTime() < DAY_MS,
+  );
+  if (recent.length >= COOKS_PER_DAY_LIMIT) return { kind: 'rateLimited' };
+
+  const before = countryCount(user.cooks);
+  const after = countryCount([...user.cooks, dish]);
+  const cook = db.addCook(tgId, { dishId: dish.id, countryId: dish.countryId, photoPath }, now);
+  if (!cook) return { kind: 'notFound' };
+  const friends = friendIdsOf(tgId).flatMap((friendId) => {
+    const friend = db.getUser(friendId);
+    return friend
+      ? [
+          {
+            name: friend.profile.firstName,
+            countries: countryCount(friend.cooks),
+            dishes: friend.cooks.length,
+          },
+        ]
+      : [];
+  });
+  return {
+    kind: 'ok',
+    result: {
+      cookId: cook.id,
+      newCountry: after > before,
+      countriesCount: after,
+      countriesTotal: countries.length,
+      dishesCount: user.cooks.length + 1,
+      overtook: findOvertakenFriend(before, after, friends),
     },
   };
 };
@@ -269,4 +347,52 @@ export const createHandlers = (
       return HttpResponse.json<AddShoppingResponse>({ added }, { status: 201 });
     },
   ),
+
+  http.post<never, never, UploadCookPhotoResponse | ApiError>(
+    `${apiBase}/uploads/cook-photo`,
+    async ({ request }) => {
+      if (controls.delayMs > 0) await delay(controls.delayMs);
+      if (takeFailure(controls, 'upload'))
+        return apiError(500, 'internal', 'Mock error (mock_error=upload)');
+      const auth = authenticate(request, db);
+      if (!auth) return unauthorized();
+      let photo: FormDataEntryValue | null = null;
+      try {
+        photo = (await request.formData()).get(COOK_PHOTO_FIELD);
+      } catch {
+        photo = null;
+      }
+      if (!(photo instanceof Blob) || photo.type !== COOK_PHOTO_TYPE)
+        return apiError(400, 'validation', 'A JPEG photo is expected');
+      if (photo.size === 0 || photo.size > COOK_PHOTO_MAX_BYTES)
+        return apiError(413, 'validation', 'The photo is too large');
+      return HttpResponse.json<UploadCookPhotoResponse>(
+        { photoPath: `cooks/${auth[1].profile.id}/${crypto.randomUUID()}.jpg` },
+        { status: 201 },
+      );
+    },
+  ),
+
+  http.post<never, never, CreateCookResponse | ApiError>(`${apiBase}/cooks`, async ({ request }) => {
+    if (controls.delayMs > 0) await delay(controls.delayMs);
+    if (takeFailure(controls, 'cooks'))
+      return apiError(500, 'internal', 'Mock error (mock_error=cooks)');
+    const auth = authenticate(request, db);
+    if (!auth) return unauthorized();
+    const body = createCookRequestSchema.safeParse(await readJson(request));
+    if (!body.success) return apiError(400, 'validation', 'Invalid cook');
+    const cook = recordCook(db, auth[0], body.data);
+    switch (cook.kind) {
+      case 'notFound':
+        return apiError(404, 'not_found', 'Dish not found');
+      case 'paywall':
+        return apiError(403, 'paywall', 'Subscription required');
+      case 'rateLimited':
+        return apiError(429, 'rate_limited', 'Too many cooks today');
+      case 'forbiddenPhoto':
+        return apiError(400, 'validation', 'Unknown photo');
+      case 'ok':
+        return HttpResponse.json<CreateCookResponse>(cook.result, { status: 201 });
+    }
+  }),
 ];

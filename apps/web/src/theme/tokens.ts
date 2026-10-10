@@ -6,6 +6,9 @@
 /** Screen background — also the colour of the Telegram header and background. */
 export const CHROME_COLOR_TOKEN = '--color-bg';
 
+/** Colour of the Telegram header and background on a dark (navy) screen — the stamp. */
+export const DARK_CHROME_COLOR_TOKEN = '--color-ink';
+
 type HexColor = `#${string}`;
 
 /** Normalises a CSS value to `#RRGGBB` (the format Telegram accepts) or returns `undefined`. */

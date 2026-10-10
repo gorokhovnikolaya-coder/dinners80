@@ -8,6 +8,7 @@ export const homeApi = api.injectEndpoints({
     home: build.query<HomeResponse, HomeQuery>({
       query: ({ mode, page }) => ({ url: '/home', params: { mode, page } }),
       responseSchema: homeResponseSchema,
+      providesTags: ['Cooks'],
     }),
   }),
 });

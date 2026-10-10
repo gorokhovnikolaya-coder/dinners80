@@ -15,5 +15,7 @@ export const api = createApi({
       return headers;
     },
   }),
+  /** `Cooks` — data that depends on the user's cooks (suggestions, counters, dish labels). */
+  tagTypes: ['Cooks'],
   endpoints: () => ({}),
 });

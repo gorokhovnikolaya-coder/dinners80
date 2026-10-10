@@ -12,11 +12,12 @@ import { CHROME_COLOR_TOKEN, readColorToken } from '../theme/tokens.ts';
 /**
  * Header and background colour of the Telegram chrome. The MVP theme is light and fixed, so
  * Telegram theme colours are not used: both take the screen background `--color-bg`
- * (styles/theme.css) on every screen. Without it (CSS not loaded) the header falls back to the
- * theme key.
+ * (styles/theme.css) on every screen except the navy stamp screen, which passes
+ * `DARK_CHROME_COLOR_TOKEN` while it is open. Without the token (CSS not loaded) the header falls
+ * back to the theme key.
  */
-export const setChromeColors = () => {
-  const color = readColorToken(CHROME_COLOR_TOKEN);
+export const setChromeColors = (token: string = CHROME_COLOR_TOKEN) => {
+  const color = readColorToken(token);
   if (miniApp.setHeaderColor.isAvailable()) {
     // Hex colours for the header need Mini Apps 6.9+; older clients only accept theme keys.
     miniApp.setHeaderColor(color && miniApp.setHeaderColor.supports('rgb') ? color : 'bg_color');

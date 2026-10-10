@@ -25,3 +25,20 @@ export function vibrateAlarm(): void {
   }
   if (!done && typeof navigator.vibrate === 'function') navigator.vibrate(ALARM_PATTERN);
 }
+
+/** Vibration pattern of a new stamp where Telegram haptics are not available, in ms. */
+const STAMP_PATTERN = [40, 60, 120];
+
+/**
+ * A new country's stamp (ТЗ: haptics on the stamp): the Telegram «success» notification haptic;
+ * where the client cannot do it, the browser Vibration API.
+ */
+export function vibrateStamp(): void {
+  let done = false;
+  try {
+    done = hapticFeedback.notificationOccurred.ifAvailable('success').ok;
+  } catch {
+    done = false;
+  }
+  if (!done && typeof navigator.vibrate === 'function') navigator.vibrate(STAMP_PATTERN);
+}

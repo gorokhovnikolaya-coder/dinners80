@@ -3,14 +3,15 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cx } from './cx.ts';
 import { Spinner } from './Spinner.tsx';
 
-export type ButtonVariant = 'primary' | 'accent' | 'secondary' | 'ghost' | 'inverse';
+export type ButtonVariant = 'primary' | 'accent' | 'secondary' | 'ghost' | 'inverse' | 'outlineDark';
 export type ButtonSize = 'md' | 'lg';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /**
    * `primary` — teal action; `accent` — the main orange CTA of a screen; `secondary` — outline;
    * `ghost` — text-only; `inverse` — amber CTA on dark (navy) screens; put it inside a `surface-dark` container
-   * (e.g. `Card tone="inverse"`) so the focus ring turns amber.
+   * (e.g. `Card tone="inverse"`) so the focus ring turns amber; `outlineDark` — the secondary outline
+   * button of a navy screen (also inside `surface-dark`).
    */
   variant?: ButtonVariant;
   /** `md` — 48 px high, `lg` — 56 px (bottom-bar actions). */
@@ -41,6 +42,8 @@ const variants: Record<ButtonVariant, string> = {
   ghost: 'bg-transparent font-bold text-primary enabled:hover:bg-primary-soft',
   inverse:
     'bg-amber font-extrabold text-ink enabled:hover:brightness-105 enabled:active:brightness-95',
+  outlineDark:
+    'border-[1.5px] border-navy-3 bg-transparent font-bold text-white enabled:hover:bg-navy-2 enabled:active:bg-navy-2',
 };
 
 // Disabled controls are exempt from WCAG contrast, but the pairs still pass 4.5:1:
@@ -52,6 +55,7 @@ const disabledStyles: Record<ButtonVariant, string> = {
   secondary: disabledLight,
   ghost: disabledLight,
   inverse: 'disabled:bg-navy-3 disabled:text-on-dark-muted',
+  outlineDark: 'disabled:border-navy-3 disabled:text-on-dark-muted',
 };
 
 const sizes: Record<ButtonSize, string> = {

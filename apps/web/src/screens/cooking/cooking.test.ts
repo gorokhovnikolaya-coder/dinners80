@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest';
 import { rootReducer } from '../../store/store.ts';
 import {
   cookingFinished,
+  cookRecorded,
+  selectAwaitingStamp,
   selectDishCooking,
   stepChanged,
   timerPaused,
@@ -102,6 +104,16 @@ describe('cooking slice', () => {
     store.dispatch(timerStarted({ dishId: 'it-lasagna', n: 4, durationMs: 40 * MIN, now: 0 }));
     store.dispatch(cookingFinished({ dishId: 'it-lasagna' }));
     expect(cooking(store)).toBeUndefined();
+  });
+
+  it('lets the stamp screen record a cook once per «Готово!»', () => {
+    const store = setup();
+    expect(selectAwaitingStamp(store.getState(), 'it-lasagna')).toBe(false);
+    store.dispatch(cookingFinished({ dishId: 'it-lasagna' }));
+    expect(selectAwaitingStamp(store.getState(), 'it-lasagna')).toBe(true);
+    expect(selectAwaitingStamp(store.getState(), 'fr-omelette')).toBe(false);
+    store.dispatch(cookRecorded({ dishId: 'it-lasagna' }));
+    expect(selectAwaitingStamp(store.getState(), 'it-lasagna')).toBe(false);
   });
 
   it('never stores a negative step', () => {

@@ -1,14 +1,17 @@
 import {
+  cookSchema,
   hasOnboardingAnswers,
   normalizeCustomExclusions,
   normalizeExclusions,
   updateMeRequestSchema,
   type AddShoppingRequest,
+  type Cook,
   type SubscriptionStatus,
   type UpdateMeRequest,
   type UserProfile,
 } from '@tma80/shared';
 
+import { cooks as fixtureCooks } from './fixtures/cooks.ts';
 import { findUserByTgId } from './fixtures/users.ts';
 
 /** What the mock backend knows about a user now: the fixture plus changes made in this session. */
@@ -17,6 +20,8 @@ export interface MockUser {
   /** `users.onboarded_at IS NOT NULL`. */
   onboarded: boolean;
   subscription: SubscriptionStatus;
+  /** The fixture cooks plus the ones recorded in this session (`POST /cooks`), oldest first. */
+  cooks: readonly Cook[];
 }
 
 /** An item of the user's shopping list (`shopping_items`): an ingredient of a dish to buy. */
@@ -30,14 +35,15 @@ export interface MockShoppingItem {
 }
 
 /**
- * A changed user as stored: only the applied `PATCH /me` fields, the onboarding flag and the
- * shopping list. The profile is rebuilt from the current fixture, so later fixture edits are not
+ * A changed user as stored: only the applied `PATCH /me` fields, the onboarding flag, the
+ * shopping list and the cooks recorded in the session. The profile is rebuilt from the current fixture, so later fixture edits are not
  * masked.
  */
 interface StoredUser {
   patch: UpdateMeRequest;
   onboarded: boolean;
   shopping: MockShoppingItem[];
+  cooks: Cook[];
 }
 
 const isShoppingItem = (value: unknown): value is MockShoppingItem => {
@@ -64,14 +70,23 @@ const restore = (data: unknown): Map<number, StoredUser> => {
   if (typeof data !== 'object' || data === null) return users;
   for (const [key, value] of Object.entries(data)) {
     if (typeof value !== 'object' || value === null) continue;
-    const { patch, onboarded, shopping } = value as Partial<StoredUser>;
-    const parsed = updateMeRequestSchema.safeParse(patch);
+    const { patch, onboarded, shopping, cooks } = value as Partial<StoredUser>;
+    // A user changed only by the shopping list or cooks has an empty patch, which the
+    // `PATCH /me` schema (at least one field) rejects.
+    const empty = JSON.stringify(patch) === '{}';
+    const parsed = empty
+      ? { success: true as const, data: {} }
+      : updateMeRequestSchema.safeParse(patch);
     if (parsed.success && typeof onboarded === 'boolean') {
       const items: unknown[] = Array.isArray(shopping) ? shopping : [];
       users.set(Number(key), {
         patch: parsed.data,
         onboarded,
         shopping: items.filter(isShoppingItem),
+        cooks: (Array.isArray(cooks) ? (cooks as unknown[]) : []).flatMap((cook) => {
+          const restored = cookSchema.safeParse(cook);
+          return restored.success ? [restored.data] : [];
+        }),
       });
     }
   }
@@ -118,18 +133,32 @@ export function createMockDb(storage?: MockDbStorage) {
       profile: stored ? applyPatch(fixture.profile, stored.patch) : fixture.profile,
       onboarded: stored?.onboarded ?? fixture.onboarded,
       subscription: fixture.subscription,
+      cooks: [
+        ...fixtureCooks.filter((cook) => cook.userId === fixture.profile.id),
+        ...(stored?.cooks ?? []),
+      ],
     };
+  };
+
+  /** The stored entry of a user, created from the current state on first change. */
+  const entryOf = (tgId: number, user: MockUser): StoredUser => {
+    let entry = changed.get(tgId);
+    if (!entry) {
+      entry = { patch: {}, onboarded: user.onboarded, shopping: [], cooks: [] };
+      changed.set(tgId, entry);
+    }
+    return entry;
   };
 
   /** `PATCH /me` as the server does it: normalised exclusions, `onboarded_at` set once. */
   const updateUser = (tgId: number, patch: UpdateMeRequest): MockUser | undefined => {
     const user = getUser(tgId);
     if (!user) return undefined;
-    const previous = changed.get(tgId)?.patch ?? {};
+    const entry = entryOf(tgId, user);
     const profile = applyPatch(user.profile, patch);
     const onboarded = user.onboarded || hasOnboardingAnswers(profile);
-    const shopping = changed.get(tgId)?.shopping ?? [];
-    changed.set(tgId, { patch: mergePatches(previous, patch), onboarded, shopping });
+    entry.patch = mergePatches(entry.patch, patch);
+    entry.onboarded = onboarded;
     persist();
     return { ...user, profile, onboarded };
   };
@@ -146,8 +175,8 @@ export function createMockDb(storage?: MockDbStorage) {
   const addShopping = (tgId: number, request: AddShoppingRequest): number | undefined => {
     const user = getUser(tgId);
     if (!user) return undefined;
-    const stored = changed.get(tgId);
-    const kept = (stored?.shopping ?? []).filter(
+    const entry = entryOf(tgId, user);
+    const kept = entry.shopping.filter(
       (item) => item.dishId !== request.dishId || item.checked,
     );
     const added = request.ingredientKeys.map((ingredientKey) => ({
@@ -157,16 +186,31 @@ export function createMockDb(storage?: MockDbStorage) {
       servings: request.servings,
       checked: false,
     }));
-    changed.set(tgId, {
-      patch: stored?.patch ?? {},
-      onboarded: stored?.onboarded ?? user.onboarded,
-      shopping: [...kept, ...added],
-    });
+    entry.shopping = [...kept, ...added];
     persist();
     return added.length;
   };
 
-  return { getUser, updateUser, getShopping, addShopping };
+  /** Records a cook (`POST /cooks`); access and the daily limit are checked by the handler. */
+  const addCook = (
+    tgId: number,
+    cook: Pick<Cook, 'dishId' | 'countryId' | 'photoPath'>,
+    now = new Date(),
+  ): Cook | undefined => {
+    const user = getUser(tgId);
+    if (!user) return undefined;
+    const record: Cook = {
+      id: crypto.randomUUID(),
+      userId: user.profile.id,
+      ...cook,
+      createdAt: now.toISOString(),
+    };
+    entryOf(tgId, user).cooks.push(record);
+    persist();
+    return record;
+  };
+
+  return { getUser, updateUser, getShopping, addShopping, addCook };
 }
 
 export type MockDb = ReturnType<typeof createMockDb>;

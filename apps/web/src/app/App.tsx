@@ -42,6 +42,11 @@ const CookingScreen = lazyScreen(
   <ScreenSkeleton />,
 );
 
+const CookedScreen = lazyScreen(
+  () => import('../screens/cooked/CookedScreen.tsx'),
+  <ScreenSkeleton />,
+);
+
 /** Temporary paywall (task 6) until the real one (task 12). */
 const PaywallScreen = lazyScreen(
   () => import('../screens/paywall/PaywallStubScreen.tsx'),
@@ -98,8 +103,10 @@ function AuthenticatedApp() {
         path={ROUTES.cooking}
         element={needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <CookingScreen />}
       />
-      {/* Photo and stamp (task 8): until the screen exists, «Готово!» lands on the main screen. */}
-      <Route path={ROUTES.cooked} element={<Navigate to={ROUTES.home} replace />} />
+      <Route
+        path={ROUTES.cooked}
+        element={needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <CookedScreen />}
+      />
       <Route
         path={ROUTES.paywall}
         element={needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <PaywallScreen />}
