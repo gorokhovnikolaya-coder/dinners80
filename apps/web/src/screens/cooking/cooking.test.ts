@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { rootReducer } from '../../store/store.ts';
 import {
   cookingFinished,
-  cookRecorded,
+  stampScreenClosed,
   selectAwaitingStamp,
   selectDishCooking,
   stepChanged,
@@ -112,7 +112,7 @@ describe('cooking slice', () => {
     store.dispatch(cookingFinished({ dishId: 'it-lasagna' }));
     expect(selectAwaitingStamp(store.getState(), 'it-lasagna')).toBe(true);
     expect(selectAwaitingStamp(store.getState(), 'fr-omelette')).toBe(false);
-    store.dispatch(cookRecorded({ dishId: 'it-lasagna' }));
+    store.dispatch(stampScreenClosed({ dishId: 'it-lasagna' }));
     expect(selectAwaitingStamp(store.getState(), 'it-lasagna')).toBe(false);
   });
 

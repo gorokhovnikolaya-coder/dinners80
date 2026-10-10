@@ -471,6 +471,14 @@ describe('POST /cooks (MSW)', () => {
     expect(recordCook(db, 1002, { dishId: 'pe-ceviche' }, tomorrow).kind).toBe('ok');
   });
 
+  it('answers 429 once when mock_error=cooks_limit is set', async () => {
+    server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=cooks_limit')));
+    const first = await post(TEST_USER_IDS.eightCountries, { dishId: 'pe-ceviche' });
+    expect(first.status).toBe(429);
+    expect(((await first.json()) as { error: { code: string } }).error.code).toBe('rate_limited');
+    expect((await post(TEST_USER_IDS.eightCountries, { dishId: 'pe-ceviche' })).status).toBe(201);
+  });
+
   it('fails once with 500 when mock_error=cooks is set', async () => {
     server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=cooks')));
     expect((await post(TEST_USER_IDS.eightCountries, { dishId: 'pe-ceviche' })).status).toBe(500);

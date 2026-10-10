@@ -377,6 +377,8 @@ export const createHandlers = (
     if (controls.delayMs > 0) await delay(controls.delayMs);
     if (takeFailure(controls, 'cooks'))
       return apiError(500, 'internal', 'Mock error (mock_error=cooks)');
+    if (takeFailure(controls, 'cooks_limit'))
+      return apiError(429, 'rate_limited', 'Too many cooks today (mock_error=cooks_limit)');
     const auth = authenticate(request, db);
     if (!auth) return unauthorized();
     const body = createCookRequestSchema.safeParse(await readJson(request));

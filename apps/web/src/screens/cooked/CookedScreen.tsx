@@ -17,7 +17,7 @@ import { ru } from '../../i18n/ru.ts';
 import { useAppDispatch, useAppSelector } from '../../store/hooks.ts';
 import { vibrateStamp } from '../../telegram/haptics.ts';
 import { useDarkTelegramChrome } from '../../telegram/hooks.ts';
-import { cookRecorded, selectAwaitingStamp } from '../cooking/cookingSlice.ts';
+import { selectAwaitingStamp, stampScreenClosed } from '../cooking/cookingSlice.ts';
 import { compressCookPhoto } from './compress.ts';
 import { stampCountryClass, stampDate } from './stamp.ts';
 
@@ -161,7 +161,6 @@ function StampResult({
  * without; the photo is compressed and uploaded, then the cook is recorded.
  */
 function Cooked({ dish, timezone }: { dish: DishResponse; timezone: string }) {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const onBack = useGoBack(dishPath(dish.id));
   const [phase, setPhase] = useState<Phase>({ kind: 'choose' });
@@ -178,7 +177,6 @@ function Cooked({ dish, timezone }: { dish: DishResponse; timezone: string }) {
     setPhase({ kind: 'saving' });
     try {
       const result = await createCook({ dishId: dish.id, photoPath: path }).unwrap();
-      dispatch(cookRecorded({ dishId: dish.id }));
       window.scrollTo({ top: 0 });
       setPhase({ kind: 'done', result });
     } catch (error) {
@@ -304,7 +302,8 @@ function Cooked({ dish, timezone }: { dish: DishResponse; timezone: string }) {
 
   return (
     <main className="flex min-h-dvh flex-col gap-5 bg-bg px-5 pt-13 pb-safe-8">
-      <BackNavigation onBack={onBack} />
+      {/* No «Назад» while the photo uploads or the cook is saved: leaving then would record it unseen. */}
+      <BackNavigation onBack={busy ? undefined : onBack} />
       <div className="flex flex-col gap-2">
         <h1 className="font-display text-6xl font-bold">{t.photo.title}</h1>
         <p className="text-lg text-ink-2">{t.photo.description}</p>
@@ -371,6 +370,16 @@ export default function CookedScreen() {
   const { data, error, isError, refetch } = useDishQuery(args, { skip: !allowed });
   const { data: auth } = useAuthQuery(undefined);
   const onBack = useGoBack(dishPath(id));
+  const dispatch = useAppDispatch();
+
+  // Leaving the screen, with a cook recorded or without a choice, closes it for this «Готово!»:
+  // history «forward» or a link cannot open it again.
+  useEffect(
+    () => () => {
+      dispatch(stampScreenClosed({ dishId: id }));
+    },
+    [dispatch, id],
+  );
   const closedDishId = paywallPreview(error)?.dishId;
 
   useEffect(() => {

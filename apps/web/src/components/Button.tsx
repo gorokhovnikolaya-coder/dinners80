@@ -43,7 +43,7 @@ const variants: Record<ButtonVariant, string> = {
   inverse:
     'bg-amber font-extrabold text-ink enabled:hover:brightness-105 enabled:active:brightness-95',
   outlineDark:
-    'border-[1.5px] border-navy-3 bg-transparent font-bold text-white enabled:hover:bg-navy-2 enabled:active:bg-navy-2',
+    'border-[1.5px] border-navy-line bg-transparent font-bold text-white enabled:hover:bg-navy-2 enabled:active:bg-navy-2',
 };
 
 // Disabled controls are exempt from WCAG contrast, but the pairs still pass 4.5:1:

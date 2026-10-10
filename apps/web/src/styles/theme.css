@@ -32,7 +32,8 @@
 
   /* Dark screens and cards (stamp, paywall, passport, timer) */
   --color-navy-2: #1e2d4f; /* raised surface on navy */
-  --color-navy-3: #33415c; /* borders and progress track on navy */
+  --color-navy-3: #33415c; /* progress track and dividers on navy */
+  --color-navy-line: #6b7895; /* outline of controls on navy: 3.6:1 on ink, 3.1:1 on navy-2 */
   --color-on-dark-muted: #a9b4c6; /* captions on navy */
   --color-amber: #f2a65a; /* CTA and progress on navy */
 

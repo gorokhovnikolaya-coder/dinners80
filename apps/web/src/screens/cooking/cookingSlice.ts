@@ -76,8 +76,11 @@ export const cookingSlice = createSlice({
       delete state.dishes[action.payload.dishId];
       state.awaitingStamp[action.payload.dishId] = true;
     },
-    /** `POST /cooks` succeeded: the dish needs a new «Готово!» for another cook. */
-    cookRecorded(state, action: DishPayload) {
+    /**
+     * The photo and stamp screen is done with the dish — the cook is recorded or the user left
+     * without a choice: the screen needs a new «Готово!» to open again.
+     */
+    stampScreenClosed(state, action: DishPayload) {
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- a record keyed by dish id
       delete state.awaitingStamp[action.payload.dishId];
     },
@@ -103,6 +106,6 @@ export const {
   timerReset,
   timersElapsed,
   cookingFinished,
-  cookRecorded,
+  stampScreenClosed,
 } = cookingSlice.actions;
 export const { selectDishCooking, selectAwaitingStamp } = injectedCookingSlice.selectors;

@@ -5,6 +5,7 @@
  *   Several endpoints: `?mock_error=auth,me`. Keys: `auth` (`POST /auth`), `me` (`PATCH /me`), `home` (`GET /home`),
  *   `dish` (`GET /dishes/:id`), `shopping` (`POST /shopping`), `upload`
  *   (`POST /uploads/cook-photo`), `cooks` (`POST /cooks`),
+ *   `cooks_limit` (`POST /cooks` answers `429 rate_limited` — the daily cook limit),
  *   `chunk` (the first lazy screen chunk, browser only).
  * - `?mock_delay=<ms>` — delay of every mock response, to see loading states.
  */

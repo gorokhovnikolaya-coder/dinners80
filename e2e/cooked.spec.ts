@@ -155,6 +155,36 @@ test.describe('photo and stamp', () => {
     await expect(page.getByText('Блюдо засчитано')).toBeVisible();
   });
 
+  test('the daily limit: the cook is not recorded, «На главную»', async ({ page }) => {
+    await cookToEnd(page, 'pe-lomo-saltado', 'user=1002&mock_reset=1&mock_error=cooks_limit');
+    await page.getByRole('button', { name: 'Без фото' }).click();
+    await expect(page.getByRole('status')).toHaveText(
+      'Сегодня уже 20 готовок — это дневной лимит. Попробуйте завтра',
+    );
+    await expect(page.getByRole('button', { name: 'Повторить' })).toHaveCount(0);
+    await shot(page, '06-daily-limit');
+    await page.getByRole('button', { name: 'На главную' }).click();
+    await expect(page).toHaveURL('/');
+  });
+
+  test('no «Назад» while saving; leaving without a choice closes the screen', async ({ page }) => {
+    await cookToEnd(page, 'pe-lomo-saltado', 'user=1002&mock_reset=1&mock_delay=1500');
+    await page.getByRole('button', { name: 'Без фото' }).click();
+    await expect(page.getByRole('button', { name: 'Сохраняем…' })).toBeVisible();
+    await expect(telegramBack(page)).toHaveCount(0);
+    await expect(page.getByText('Блюдо засчитано')).toBeVisible();
+    await expect(telegramBack(page)).toBeVisible();
+
+    // Another «Готово!», then «Назад» without a choice: the cook is not recorded and the screen
+    // cannot be opened again from the history.
+    await cookToEnd(page, 'pe-lomo-saltado', 'user=1002');
+    await telegramBack(page).click();
+    await expect(page).toHaveURL(/\/dishes\/pe-lomo-saltado(\?|$)/);
+    await page.goForward();
+    await expect(page).toHaveURL(/\/dishes\/pe-lomo-saltado(\?|$)/);
+    await expect(page.getByRole('button', { name: 'Начать готовить' })).toBeVisible();
+  });
+
   test('opened directly: leads to the dish card', async ({ page }) => {
     await page.goto('/dishes/in-dal/done?user=1002&mock_reset=1');
     await expect(page).toHaveURL('/dishes/in-dal');
