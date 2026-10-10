@@ -1,4 +1,4 @@
-import { splitStepText, type DishResponse, type DishStep } from '@tma80/shared';
+import type { DishResponse, DishStep } from '@tma80/shared';
 import { useEffect, useRef, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router';
 
@@ -20,7 +20,6 @@ import { ru } from '../../i18n/ru.ts';
 import { useAppDispatch, useAppSelector } from '../../store/hooks.ts';
 import { hapticStepDone, vibrateAlarm } from '../../telegram/haptics.ts';
 import { useVerticalSwipesDisabled } from '../../telegram/hooks.ts';
-import { amountFor, formatAmount } from '../dish/dish.ts';
 import { selectServings } from '../dish/dishSlice.ts';
 import {
   cookingFinished,
@@ -33,6 +32,7 @@ import {
   type DishCooking,
 } from './cookingSlice.ts';
 import { playAlarm, primeSound } from './sound.ts';
+import { stepSegments } from './stepText.ts';
 import { formatTimer, isOverdue, remainingMs, type StepTimer } from './timers.ts';
 import { useWakeLock } from './useWakeLock.ts';
 
@@ -68,20 +68,17 @@ function StepText({
   dish: DishResponse;
   servings: number;
 }) {
-  const ingredients = new Map(dish.ingredients.map((item) => [item.key, item]));
   return (
     <p className="font-display text-7xl font-medium">
-      {splitStepText(text).map((part, index) => {
-        const key = `${String(index)}-${part.kind}`;
-        if (part.kind === 'text') return <span key={key}>{part.text}</span>;
-        const ingredient = ingredients.get(part.key);
-        if (!ingredient) return <span key={key}>{`{${part.key}}`}</span>;
+      {stepSegments(text, dish, servings).map((segment, index) => {
+        const key = `${String(index)}-${segment.kind}`;
+        if (segment.kind === 'text') return <span key={key}>{segment.text}</span>;
         return (
           <mark
             key={key}
             className="rounded-chip bg-accent-soft box-decoration-clone px-1.5 font-bold text-accent-strong"
           >
-            {formatAmount(amountFor(ingredient, dish, servings), ingredient.unit)}
+            {segment.text}
           </mark>
         );
       })}

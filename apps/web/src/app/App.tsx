@@ -98,6 +98,8 @@ function AuthenticatedApp() {
         path={ROUTES.cooking}
         element={needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <CookingScreen />}
       />
+      {/* Photo and stamp (task 8): until the screen exists, «Готово!» lands on the main screen. */}
+      <Route path={ROUTES.cooked} element={<Navigate to={ROUTES.home} replace />} />
       <Route
         path={ROUTES.paywall}
         element={needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <PaywallScreen />}

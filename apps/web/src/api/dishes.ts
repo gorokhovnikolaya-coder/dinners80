@@ -60,6 +60,8 @@ export function isNotFound(error: unknown): boolean {
 export function selectLoadedDishArgs(state: RootState, id: string): DishArgs | undefined {
   for (const query of Object.values(state.api.queries)) {
     if (query?.endpointName !== 'dish' || query.status !== QueryStatus.fulfilled) continue;
+    // The cache types `originalArgs` as `unknown` for every endpoint; entries of `dish` were
+    // created by `useDishQuery`, so their arguments are `DishArgs`.
     const args = query.originalArgs as DishArgs;
     if (args.id === id) return args;
   }
