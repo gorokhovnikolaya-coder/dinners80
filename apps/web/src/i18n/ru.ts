@@ -10,6 +10,8 @@ export const ru = {
     error: 'Не удалось загрузить данные.',
     errorHint: 'Проверьте интернет и попробуйте ещё раз.',
     retry: 'Повторить',
+    back: 'Назад',
+    screenLoadError: 'Не удалось открыть экран.',
   },
   preferences: {
     household: {
@@ -79,6 +81,7 @@ export const ruDevUi = {
     skeleton: 'Skeleton',
     errorState: 'ErrorState',
     optionCard: 'OptionCard',
+    spinner: 'Spinner',
   },
   typography: {
     display: 'Что на ужин сегодня?',
@@ -96,6 +99,7 @@ export const ruDevUi = {
     back: 'Назад',
     cart: 'В список покупок',
     close: 'Закрыть',
+    loading: 'Сохраняем…',
   },
   card: {
     country: 'Перу',

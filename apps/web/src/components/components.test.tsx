@@ -10,6 +10,7 @@ import { Chip } from './Chip.tsx';
 import { ErrorState } from './ErrorState.tsx';
 import { ProgressBar } from './ProgressBar.tsx';
 import { Skeleton, SkeletonGroup } from './Skeleton.tsx';
+import { Spinner } from './Spinner.tsx';
 import { TabBar, type TabBarItem } from './TabBar.tsx';
 
 describe('Button', () => {
@@ -30,9 +31,45 @@ describe('Button', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
+  it('loading shows a spinner, stays focusable and ignores clicks', async () => {
+    const onClick = vi.fn();
+    render(
+      <Button loading icon={<svg data-testid="icon" />} onClick={onClick}>
+        Сохраняем…
+      </Button>,
+    );
+    const button = screen.getByRole('button', { name: 'Сохраняем…' });
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button).toBeEnabled();
+    expect(button.querySelector('[data-spinner]')).toBeInTheDocument();
+    expect(screen.queryByTestId('icon')).not.toBeInTheDocument();
+    button.focus();
+    expect(button).toHaveFocus();
+    await userEvent.click(button);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('without loading has no busy state and shows its icon', () => {
+    render(<Button icon={<svg data-testid="icon" />}>Дальше</Button>);
+    const button = screen.getByRole('button', { name: 'Дальше' });
+    expect(button).not.toHaveAttribute('aria-busy');
+    expect(button).not.toHaveAttribute('aria-disabled');
+    expect(screen.getByTestId('icon')).toBeInTheDocument();
+  });
+
   it('IconButton takes its accessible name from the label', () => {
     render(<IconButton label="Назад" icon={<svg />} />);
     expect(screen.getByRole('button', { name: 'Назад' })).toBeInTheDocument();
+  });
+});
+
+describe('Spinner', () => {
+  it('is decorative and spins only without reduced motion', () => {
+    const { container } = render(<Spinner size="sm" />);
+    const spinner = container.querySelector('[data-spinner]');
+    expect(spinner).toHaveAttribute('aria-hidden', 'true');
+    expect(spinner).toHaveClass('size-4', 'motion-safe:animate-spin');
   });
 });
 

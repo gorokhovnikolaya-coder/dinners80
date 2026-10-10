@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 import { cx } from './cx.ts';
+import { Spinner } from './Spinner.tsx';
 
 export type ButtonVariant = 'primary' | 'accent' | 'secondary' | 'ghost' | 'inverse';
 export type ButtonSize = 'md' | 'lg';
@@ -18,6 +19,12 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean;
   /** Leading icon (decorative; the text is the accessible name). */
   icon?: ReactNode;
+  /**
+   * An action in progress: a spinner replaces the icon, the button gets `aria-busy` and
+   * `aria-disabled` and ignores clicks, but stays focusable (focus is not lost while saving).
+   * Change the label too (e.g. «Сохраняем…»).
+   */
+  loading?: boolean;
 }
 
 const base =
@@ -58,9 +65,11 @@ export function Button({
   size = 'md',
   fullWidth = false,
   icon,
+  loading = false,
   type = 'button',
   className,
   children,
+  onClick,
   ...rest
 }: ButtonProps) {
   return (
@@ -72,11 +81,15 @@ export function Button({
         disabledStyles[variant],
         sizes[size],
         fullWidth && 'w-full',
+        loading && 'cursor-progress',
         className,
       )}
       {...rest}
+      aria-busy={loading || rest['aria-busy']}
+      aria-disabled={loading || rest['aria-disabled']}
+      onClick={loading ? undefined : onClick}
     >
-      {icon}
+      {loading ? <Spinner /> : icon}
       {children}
     </button>
   );

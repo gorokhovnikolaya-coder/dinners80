@@ -92,6 +92,17 @@ describe('detectTimeZone', () => {
     expect(detectTimeZone()).toBe('Asia/Vladivostok');
   });
 
+  it('drops a value that is not a valid IANA zone name', () => {
+    for (const timeZone of ['+03:00', 'Europe/Atlantis', '', 'Etc/Unknown zone']) {
+      vi.spyOn(Intl.DateTimeFormat.prototype, 'resolvedOptions').mockReturnValue({
+        ...new Intl.DateTimeFormat().resolvedOptions(),
+        timeZone,
+      });
+      expect(detectTimeZone()).toBeUndefined();
+      vi.restoreAllMocks();
+    }
+  });
+
   it('returns undefined when Intl fails', () => {
     vi.spyOn(Intl.DateTimeFormat.prototype, 'resolvedOptions').mockImplementation(() => {
       throw new Error('no Intl');

@@ -1,7 +1,7 @@
 import {
   hasOnboardingAnswers,
   normalizeExclusions,
-  userProfileSchema,
+  updateMeRequestSchema,
   type SubscriptionStatus,
   type UpdateMeRequest,
   type UserProfile,
@@ -17,8 +17,12 @@ export interface MockUser {
   subscription: SubscriptionStatus;
 }
 
+/**
+ * A changed user as stored: only the applied `PATCH /me` fields and the onboarding flag. The
+ * profile is rebuilt from the current fixture, so later fixture edits are not masked.
+ */
 interface StoredUser {
-  profile: UserProfile;
+  patch: UpdateMeRequest;
   onboarded: boolean;
 }
 
@@ -28,25 +32,42 @@ export interface MockDbStorage {
   save(data: Record<string, StoredUser>): void;
 }
 
-/** Restores saved users, dropping anything that no longer matches the profile schema. */
+/** Restores saved users, dropping anything that no longer matches the `PATCH /me` schema. */
 const restore = (data: unknown): Map<number, StoredUser> => {
   const users = new Map<number, StoredUser>();
   if (typeof data !== 'object' || data === null) return users;
   for (const [key, value] of Object.entries(data)) {
     if (typeof value !== 'object' || value === null) continue;
-    const { profile, onboarded } = value as Partial<StoredUser>;
-    const parsed = userProfileSchema.safeParse(profile);
+    const { patch, onboarded } = value as Partial<StoredUser>;
+    const parsed = updateMeRequestSchema.safeParse(patch);
     if (parsed.success && typeof onboarded === 'boolean') {
-      users.set(Number(key), { profile: parsed.data, onboarded });
+      users.set(Number(key), { patch: parsed.data, onboarded });
     }
   }
   return users;
 };
 
+/** Profile with the patch applied; exclusions are stored normalised, as the server does. */
+const applyPatch = (profile: UserProfile, patch: UpdateMeRequest): UserProfile => ({
+  ...profile,
+  household: patch.household ?? profile.household,
+  weekdayMinutes: patch.weekdayMinutes ?? profile.weekdayMinutes,
+  exclusions: patch.exclusions ? normalizeExclusions(patch.exclusions) : profile.exclusions,
+  timezone: patch.timezone ?? profile.timezone,
+  reminderEnabled: patch.reminderEnabled ?? profile.reminderEnabled,
+  reminderTime: patch.reminderTime ?? profile.reminderTime,
+});
+
+/** Later fields win; undefined fields do not erase earlier ones. */
+const mergePatches = (earlier: UpdateMeRequest, later: UpdateMeRequest): UpdateMeRequest => ({
+  ...earlier,
+  ...Object.fromEntries(Object.entries(later).filter(([, value]) => value !== undefined)),
+});
+
 /**
- * In-memory state of the mock backend. Fixtures are never mutated: a changed user is copied into
- * the store and, if `storage` is given, persisted so a page reload («reopening» the mini app in
- * the same tab) sees it.
+ * In-memory state of the mock backend. Fixtures are never mutated: the applied patches are kept
+ * separately and, if `storage` is given, persisted so a page reload («reopening» the mini app in
+ * the same tab) sees them.
  */
 export function createMockDb(storage?: MockDbStorage) {
   const changed = restore(storage?.load());
@@ -60,7 +81,7 @@ export function createMockDb(storage?: MockDbStorage) {
     if (!fixture) return undefined;
     const stored = changed.get(tgId);
     return {
-      profile: stored?.profile ?? fixture.profile,
+      profile: stored ? applyPatch(fixture.profile, stored.patch) : fixture.profile,
       onboarded: stored?.onboarded ?? fixture.onboarded,
       subscription: fixture.subscription,
     };
@@ -70,18 +91,10 @@ export function createMockDb(storage?: MockDbStorage) {
   const updateUser = (tgId: number, patch: UpdateMeRequest): MockUser | undefined => {
     const user = getUser(tgId);
     if (!user) return undefined;
-    const current = user.profile;
-    const profile: UserProfile = {
-      ...current,
-      household: patch.household ?? current.household,
-      weekdayMinutes: patch.weekdayMinutes ?? current.weekdayMinutes,
-      exclusions: patch.exclusions ? normalizeExclusions(patch.exclusions) : current.exclusions,
-      timezone: patch.timezone ?? current.timezone,
-      reminderEnabled: patch.reminderEnabled ?? current.reminderEnabled,
-      reminderTime: patch.reminderTime ?? current.reminderTime,
-    };
+    const previous = changed.get(tgId)?.patch ?? {};
+    const profile = applyPatch(user.profile, patch);
     const onboarded = user.onboarded || hasOnboardingAnswers(profile);
-    changed.set(tgId, { profile, onboarded });
+    changed.set(tgId, { patch: mergePatches(previous, patch), onboarded });
     persist();
     return { ...user, profile, onboarded };
   };

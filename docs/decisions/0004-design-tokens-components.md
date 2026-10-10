@@ -78,7 +78,7 @@
 
 - `border-[1.5px]` — обводка кнопок и чипов из макета. У толщины рамки в Tailwind v4 нет токенов темы;
 - `h-[1em]` в `Skeleton` `text` — высота строки зависит от размера шрифта родителя;
-- `pb-[max(8px,var(--tg-viewport-safe-area-inset-bottom,0px))]` в `TabBar` — безопасная зона Telegram;
+- ~~`pb-[max(8px,var(--tg-viewport-safe-area-inset-bottom,0px))]` в `TabBar`~~ — с задачи 4 вместо него утилита `pb-safe-<n>` в `theme.css` (`max(<n> × --spacing, --tg-viewport-safe-area-inset-bottom)`): `TabBar` — `pb-safe-2`, полноэкранный онбординг — `pb-safe-8`;
 - `cursor-[inherit]`, `transition-[width]`, `outline-(--focus-ring)` — служебные свойства, а не значения дизайна.
 - `icons.tsx` — stroke-иконки из макета (`aria-hidden`).
 

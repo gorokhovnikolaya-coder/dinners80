@@ -132,14 +132,27 @@ describe('PATCH /me (MSW)', () => {
       household: 'solo',
       weekdayMinutes: 20,
     });
+    createMockDb(storage).updateUser(TEST_USER_IDS.newbie, { exclusions: ['pork', 'meat'] });
+    // Only the applied patch is stored, not the whole profile.
+    expect(saved).toEqual({
+      [TEST_USER_IDS.newbie]: {
+        patch: { household: 'solo', weekdayMinutes: 20, exclusions: ['pork', 'meat'] },
+        onboarded: true,
+      },
+    });
     const restored = createMockDb(storage).getUser(TEST_USER_IDS.newbie);
     expect(restored?.onboarded).toBe(true);
-    expect(restored?.profile.weekdayMinutes).toBe(20);
+    expect(restored?.profile).toEqual({
+      ...findUserByTgId(TEST_USER_IDS.newbie)?.profile,
+      household: 'solo',
+      weekdayMinutes: 20,
+      exclusions: ['meat'],
+    });
 
     // Broken data is ignored.
     expect(
       createMockDb({
-        load: () => ({ 1001: { profile: {}, onboarded: true } }),
+        load: () => ({ 1001: { patch: { weekdayMinutes: 25 }, onboarded: true } }),
         save: () => undefined,
       }).getUser(TEST_USER_IDS.newbie)?.onboarded,
     ).toBe(false);

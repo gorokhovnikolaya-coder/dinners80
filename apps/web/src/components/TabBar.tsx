@@ -35,11 +35,7 @@ export function TabBar({ items, activeId, label, onNavigate, className }: TabBar
   return (
     <nav
       aria-label={label}
-      className={cx(
-        'border-t border-track bg-surface pt-2.5',
-        'pb-[max(8px,var(--tg-viewport-safe-area-inset-bottom,0px))]',
-        className,
-      )}
+      className={cx('border-t border-track bg-surface pt-2.5', 'pb-safe-2', className)}
     >
       <ul className="flex justify-around">
         {items.map((item) => {

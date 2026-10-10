@@ -1,7 +1,8 @@
+import { HttpResponse, http, passthrough } from 'msw';
 import { setupWorker } from 'msw/browser';
 
 import { API_URL } from '../api/config.ts';
-import { parseMockControls } from './controls.ts';
+import { parseMockControls, takeFailure } from './controls.ts';
 import { createMockDb, sessionMockDbStorage } from './db.ts';
 import { createHandlers } from './handlers.ts';
 
@@ -23,7 +24,15 @@ export async function startMockApi(): Promise<void> {
     }
   }
   const db = createMockDb(sessionMockDbStorage(DB_STORAGE_KEY));
-  const worker = setupWorker(...createHandlers(apiBase, parseMockControls(search), db));
+  const controls = parseMockControls(search);
+  const worker = setupWorker(
+    ...createHandlers(apiBase, controls, db),
+    // `?mock_error=chunk`: the first lazy screen chunk (Vite serves `/src/screens/**` in dev)
+    // fails with a network error, to check the screen error boundary.
+    http.get(/\/src\/screens\/.+\.tsx/, () =>
+      takeFailure(controls, 'chunk') ? HttpResponse.error() : passthrough(),
+    ),
+  );
   await worker.start({
     quiet: true,
     onUnhandledRequest(request, print) {

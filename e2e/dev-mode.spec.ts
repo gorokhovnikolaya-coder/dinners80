@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures.ts';
 
 test.describe('dev mode', () => {
   test('?user= opens the app as the chosen test user', async ({ page }) => {

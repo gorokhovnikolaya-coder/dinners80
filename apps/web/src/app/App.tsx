@@ -1,4 +1,3 @@
-import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
 
 import { useAuthQuery } from '../api/auth.ts';
@@ -6,18 +5,8 @@ import { ErrorState } from '../components/ErrorState.tsx';
 import { Skeleton, SkeletonGroup } from '../components/Skeleton.tsx';
 import { ru } from '../i18n/ru.ts';
 import { HomeScreen } from '../screens/home/HomeScreen.tsx';
+import { lazyScreen } from './lazyScreen.tsx';
 import { ROUTES } from './routes.ts';
-
-/** Screens other than the main one load lazily (ТЗ, НФТ «Производительность»). */
-const OnboardingScreen = lazy(() => import('../screens/onboarding/OnboardingScreen.tsx'));
-
-/**
- * The dev-only component gallery. `import.meta.env.DEV` is false in `vite build`, so the route and
- * its chunk are dropped from production.
- */
-const DevUiPage = import.meta.env.DEV
-  ? lazy(() => import('../dev/DevUiPage.tsx').then(({ DevUiPage }) => ({ default: DevUiPage })))
-  : undefined;
 
 const screen = 'min-h-dvh bg-bg px-5 pt-14 pb-8';
 
@@ -46,6 +35,25 @@ function DarkScreenFallback() {
 }
 
 /**
+ * Screens other than the main one load lazily (ТЗ, НФТ «Производительность»), each behind an error
+ * boundary: a chunk that fails to load shows «Повторить» instead of a blank page.
+ */
+const OnboardingScreen = lazyScreen(
+  () => import('../screens/onboarding/OnboardingScreen.tsx'),
+  <DarkScreenFallback />,
+);
+
+/**
+ * The dev-only component gallery. `import.meta.env.DEV` is false in `vite build`, so the route and
+ * its chunk are dropped from production.
+ */
+const DevUiPage = import.meta.env.DEV
+  ? lazyScreen(() =>
+      import('../dev/DevUiPage.tsx').then(({ DevUiPage }) => ({ default: DevUiPage })),
+    )
+  : undefined;
+
+/**
  * Signs the user in (`POST /auth`) and routes by `needsOnboarding`: the onboarding is shown once,
  * until the answers are saved; then the main screen. After `PATCH /me` the cached auth result is
  * updated, and the routes below switch to the main screen without a refetch.
@@ -69,15 +77,7 @@ function AuthenticatedApp() {
     <Routes>
       <Route
         path={ROUTES.onboarding}
-        element={
-          needsOnboarding ? (
-            <Suspense fallback={<DarkScreenFallback />}>
-              <OnboardingScreen />
-            </Suspense>
-          ) : (
-            <Navigate to={ROUTES.home} replace />
-          )
-        }
+        element={needsOnboarding ? <OnboardingScreen /> : <Navigate to={ROUTES.home} replace />}
       />
       <Route
         path={ROUTES.home}
@@ -93,16 +93,7 @@ function AuthenticatedApp() {
 export function App() {
   return (
     <Routes>
-      {DevUiPage && (
-        <Route
-          path={ROUTES.devUi}
-          element={
-            <Suspense>
-              <DevUiPage />
-            </Suspense>
-          }
-        />
-      )}
+      {DevUiPage && <Route path={ROUTES.devUi} element={<DevUiPage />} />}
       <Route path="*" element={<AuthenticatedApp />} />
     </Routes>
   );

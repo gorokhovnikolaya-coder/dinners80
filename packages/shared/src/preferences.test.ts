@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { meResponseSchema, updateMeRequestSchema } from './me.ts';
 import { hasOnboardingAnswers, isExclusionImplied, normalizeExclusions } from './preferences.ts';
+import { isIanaTimeZone, timezoneNameSchema, timezoneSchema, userProfileSchema } from './user.ts';
 
 describe('isExclusionImplied', () => {
   it('treats pork as excluded when meat is excluded', () => {
@@ -67,6 +68,44 @@ describe('updateMeRequestSchema', () => {
     expect(updateMeRequestSchema.safeParse({ timezone: '' }).success).toBe(false);
     expect(updateMeRequestSchema.safeParse({ reminderTime: '18:15' }).success).toBe(false);
     expect(updateMeRequestSchema.safeParse({ household: null }).success).toBe(false);
+  });
+});
+
+describe('timezoneSchema', () => {
+  it('accepts IANA zone names', () => {
+    for (const zone of [
+      'Europe/Moscow',
+      'Asia/Yekaterinburg',
+      'America/Argentina/Buenos_Aires',
+      'UTC',
+    ]) {
+      expect(timezoneSchema.safeParse(zone).success).toBe(true);
+    }
+  });
+
+  it('rejects unknown zones, offsets and garbage', () => {
+    for (const zone of ['foo', 'Europe/Atlantis', '+03:00', 'Europe/Moscow ', '', '../etc']) {
+      expect(timezoneSchema.safeParse(zone).success).toBe(false);
+    }
+    expect(isIanaTimeZone('foo')).toBe(false);
+    expect(updateMeRequestSchema.safeParse({ timezone: 'foo' }).success).toBe(false);
+  });
+});
+
+describe('timezoneNameSchema (profile in responses)', () => {
+  it('checks only the format, not the runtime ICU data', () => {
+    // A zone this runtime's Intl does not know (or a newer one, unknown to an old WebView) must not
+    // break parsing of `POST /auth` and `PATCH /me` responses on the client.
+    expect(isIanaTimeZone('Europe/Atlantis')).toBe(false);
+    expect(timezoneNameSchema.safeParse('Europe/Atlantis').success).toBe(true);
+    expect(timezoneNameSchema.safeParse('Europe/Kyiv').success).toBe(true);
+    expect(userProfileSchema.shape.timezone.safeParse('Europe/Atlantis').success).toBe(true);
+  });
+
+  it('rejects empty, too long and malformed values', () => {
+    for (const zone of ['', 'a'.repeat(65), '+03:00', 'Europe/Moscow ', '../etc', 'Europe//X']) {
+      expect(timezoneNameSchema.safeParse(zone).success).toBe(false);
+    }
   });
 });
 

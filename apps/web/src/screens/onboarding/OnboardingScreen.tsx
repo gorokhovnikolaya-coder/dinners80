@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useId, useRef } from 'react';
 
 import { useUpdateMeMutation } from '../../api/me.ts';
+import { BackNavigation } from '../../components/BackNavigation.tsx';
 import { Button } from '../../components/Button.tsx';
 import { IconAlert } from '../../components/icons.tsx';
 import {
@@ -11,7 +12,7 @@ import {
 import { ProgressBar } from '../../components/ProgressBar.tsx';
 import { ru } from '../../i18n/ru.ts';
 import { useAppDispatch, useAppSelector } from '../../store/hooks.ts';
-import { useTelegramBackButton, useTelegramChromeColor } from '../../telegram/hooks.ts';
+import { useTelegramChromeColor } from '../../telegram/hooks.ts';
 import { DARK_CHROME_COLOR_TOKEN } from '../../theme/tokens.ts';
 import {
   buildOnboardingRequest,
@@ -58,7 +59,7 @@ export default function OnboardingScreen() {
     resetSave();
     dispatch(stepBack());
   }, [dispatch, resetSave]);
-  useTelegramBackButton(draft.step > 0 && !saving ? goBack : undefined);
+  const onBack = draft.step > 0 && !saving ? goBack : undefined;
 
   // The draft lives only while the screen is shown: after a successful save it unmounts.
   useEffect(
@@ -88,16 +89,21 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <main className="surface-dark flex min-h-dvh flex-col gap-7 bg-ink px-5 pt-14 pb-[max(2rem,var(--tg-viewport-safe-area-inset-bottom,0px))] text-white">
-      <ProgressBar
-        variant="steps"
-        tone="dark"
-        size="xs"
-        value={draft.step + 1}
-        max={ONBOARDING_STEPS.length}
-        label={t.progress}
-        valueText={t.counter(draft.step + 1, ONBOARDING_STEPS.length)}
-      />
+    <main className="surface-dark flex min-h-dvh flex-col gap-7 bg-ink px-5 pt-14 pb-safe-8 text-white">
+      <div className="flex items-center gap-3">
+        {/* Telegram BackButton on steps 2–3; an in-page button only if the client lacks it. */}
+        <BackNavigation onBack={onBack} tone="dark" />
+        <ProgressBar
+          variant="steps"
+          tone="dark"
+          size="xs"
+          value={draft.step + 1}
+          max={ONBOARDING_STEPS.length}
+          label={t.progress}
+          valueText={t.counter(draft.step + 1, ONBOARDING_STEPS.length)}
+          className="flex-1"
+        />
+      </div>
 
       <div className="flex flex-col gap-3">
         <p className="text-sm font-bold tracking-caps-lg text-amber uppercase">
@@ -158,17 +164,8 @@ export default function OnboardingScreen() {
           size="lg"
           fullWidth
           disabled={!canProceed(draft)}
-          aria-disabled={saving || undefined}
-          aria-busy={saving || undefined}
+          loading={saving}
           onClick={next}
-          icon={
-            saving ? (
-              <span
-                aria-hidden="true"
-                className="size-5 rounded-full border-2 border-ink/30 border-t-ink motion-safe:animate-spin"
-              />
-            ) : undefined
-          }
         >
           {saving ? t.saving : saveFailed ? t.retry : t.next}
         </Button>

@@ -1,4 +1,5 @@
 import {
+  isIanaTimeZone,
   normalizeExclusions,
   type DishTag,
   type Household,
@@ -54,10 +55,15 @@ export function buildOnboardingRequest(
   };
 }
 
-/** IANA time zone of the device, e.g. `Europe/Moscow`; `undefined` if unavailable. */
+/**
+ * IANA time zone of the device, e.g. `Europe/Moscow`; `undefined` if unavailable or not a valid
+ * zone name (some WebViews report an offset or garbage). An invalid value would make the server
+ * reject `PATCH /me` with 400 on every retry and lock the user in onboarding, so it is not sent.
+ */
 export function detectTimeZone(): string | undefined {
   try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone || undefined;
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return isIanaTimeZone(timeZone) ? timeZone : undefined;
   } catch {
     return undefined;
   }

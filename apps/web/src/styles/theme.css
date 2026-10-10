@@ -118,3 +118,15 @@
 @utility surface-dark {
   --focus-ring: var(--color-amber);
 }
+
+/*
+ * Bottom padding that clears the Telegram safe area (home indicator): `pb-safe-<n>` is
+ * max(<n> spacing steps, --tg-viewport-safe-area-inset-bottom). For full-screen layouts and
+ * bottom bars (TabBar `pb-safe-2`, onboarding `pb-safe-8`).
+ */
+@utility pb-safe-* {
+  padding-bottom: max(
+    calc(var(--spacing) * --value(integer)),
+    var(--tg-viewport-safe-area-inset-bottom, 0px)
+  );
+}

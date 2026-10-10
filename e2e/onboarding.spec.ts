@@ -1,4 +1,6 @@
-import { expect, test, type Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
+
+import { expect, test } from './fixtures.ts';
 
 const question = (page: Page) => page.getByRole('heading', { level: 1 });
 const next = (page: Page) => page.getByRole('button', { name: 'Дальше' });
@@ -79,6 +81,14 @@ test.describe('onboarding', () => {
     await expect(telegramBack(page)).toHaveCount(0);
 
     await answerFirstTwo(page);
+    // The mock Telegram header button is first in the DOM (first Tab stop) and above the content.
+    await expect(page.locator('body > :first-child')).toHaveAttribute(
+      'aria-label',
+      'Назад (кнопка Telegram)',
+    );
+    const backBox = await telegramBack(page).boundingBox();
+    const barBox = await page.getByRole('progressbar').boundingBox();
+    expect((backBox?.y ?? 0) + (backBox?.height ?? 0)).toBeLessThanOrEqual(barBox?.y ?? 0);
     await telegramBack(page).click();
     await expect(question(page)).toHaveText('Сколько времени на ужин в будни?');
     await expect(page.getByRole('radio', { name: /30 минут/ })).toBeChecked();
@@ -87,6 +97,51 @@ test.describe('onboarding', () => {
     await expect(question(page)).toHaveText('Кто ест за вашим столом?');
     await expect(page.getByRole('radio', { name: /Мы вдвоём/ })).toBeChecked();
     await expect(telegramBack(page)).toHaveCount(0);
+  });
+
+  test('without the Telegram BackButton (old client) the screen draws its own «Назад»', async ({
+    page,
+  }) => {
+    await page.goto('/?user=1001&mock_reset=1&mock_tg_version=6.0');
+    await expect(question(page)).toHaveText('Кто ест за вашим столом?');
+    const back = page.getByRole('button', { name: 'Назад', exact: true });
+    await expect(back).toHaveCount(0);
+
+    await answerFirstTwo(page);
+    await expect(telegramBack(page)).toHaveCount(0);
+    const box = await back.boundingBox();
+    expect(box?.width).toBeGreaterThanOrEqual(44);
+    expect(box?.height).toBeGreaterThanOrEqual(44);
+
+    await back.click();
+    await expect(question(page)).toHaveText('Сколько времени на ужин в будни?');
+    await expect(page.getByRole('radio', { name: /30 минут/ })).toBeChecked();
+    await back.click();
+    await expect(question(page)).toHaveText('Кто ест за вашим столом?');
+    await expect(back).toHaveCount(0);
+  });
+
+  test('a screen chunk that fails to load shows «Повторить» and loads on retry', async ({
+    page,
+  }) => {
+    await page.goto('/?user=1001&mock_reset=1&mock_error=chunk');
+    await expect(page.getByRole('alert')).toHaveText('Не удалось открыть экран.');
+    await page.getByRole('button', { name: 'Повторить' }).click();
+    await expect(question(page)).toHaveText('Кто ест за вашим столом?');
+  });
+
+  test('if the retried chunk fails too, «Повторить» reloads the page and the screen opens', async ({
+    page,
+  }) => {
+    // `chunk:always` fails the retry as well, as engines that cache a failed `import()` do. The
+    // redirect to /onboarding drops the mock parameters, so the reloaded page loads the chunk.
+    await page.goto('/?user=1001&mock_reset=1&mock_error=chunk:always');
+    await expect(page.getByRole('alert')).toHaveText('Не удалось открыть экран.');
+    const reloaded = page.waitForEvent('load');
+    await page.getByRole('button', { name: 'Повторить' }).click();
+    await reloaded;
+    await expect(page).toHaveURL(/\/onboarding$/);
+    await expect(question(page)).toHaveText('Кто ест за вашим столом?');
   });
 
   test('a failed save shows an error, keeps the answers and succeeds on retry', async ({

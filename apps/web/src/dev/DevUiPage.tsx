@@ -21,6 +21,7 @@ import {
 import { ProgressBar } from '../components/ProgressBar.tsx';
 import { ExclusionsField, HouseholdField } from '../components/preferences/PreferenceFields.tsx';
 import { Skeleton, SkeletonGroup } from '../components/Skeleton.tsx';
+import { Spinner } from '../components/Spinner.tsx';
 import { TabBar, type TabBarItem } from '../components/TabBar.tsx';
 import { ru, ruDevUi as t } from '../i18n/ru.ts';
 
@@ -127,6 +128,9 @@ export function DevUiPage() {
         <Button variant="accent" fullWidth disabled>
           {t.buttons.disabled}
         </Button>
+        <Button variant="primary" fullWidth loading>
+          {t.buttons.loading}
+        </Button>
         <div className="flex items-center gap-3 rounded-card bg-track p-3">
           <IconButton label={t.buttons.back} icon={<IconBack size={20} />} />
           <IconButton
@@ -141,6 +145,9 @@ export function DevUiPage() {
         <Card tone="inverse" className="flex flex-col gap-3">
           <Button variant="inverse" size="lg" fullWidth>
             {t.buttons.inverse}
+          </Button>
+          <Button variant="inverse" size="lg" fullWidth loading>
+            {t.buttons.loading}
           </Button>
           <IconButton label={t.buttons.close} icon={<IconClose size={18} />} variant="dark" />
         </Card>
@@ -317,6 +324,16 @@ export function DevUiPage() {
           onChange={setExclusions}
           labelledBy="ui-option-exclusions"
         />
+      </Section>
+
+      <Section id="ui-spinner" title={t.sections.spinner}>
+        <div className="flex items-center gap-4">
+          <Spinner size="sm" className="text-primary" />
+          <Spinner className="text-ink" />
+          <span className="flex size-11 items-center justify-center rounded-full bg-ink text-amber">
+            <Spinner />
+          </span>
+        </div>
       </Section>
 
       <Section id="ui-skeleton" title={t.sections.skeleton}>

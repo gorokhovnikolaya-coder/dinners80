@@ -52,7 +52,9 @@ export function mockTelegram(): void {
     launchParams: {
       tgWebAppThemeParams: themeParams,
       tgWebAppData: buildMockInitData(user.tg),
-      tgWebAppVersion: MOCK_VERSION,
+      // `?mock_tg_version=6.0` imitates an old client (e.g. without BackButton, added in 6.1).
+      tgWebAppVersion:
+        new URLSearchParams(window.location.search).get('mock_tg_version') ?? MOCK_VERSION,
       tgWebAppPlatform: 'ios',
     },
     onEvent(event) {
