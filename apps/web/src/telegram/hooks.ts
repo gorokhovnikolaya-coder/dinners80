@@ -1,7 +1,6 @@
 import { backButton } from '@tma.js/sdk-react';
 import { useEffect, useState } from 'react';
 
-
 /** True if this client can show the Telegram BackButton and report presses (Mini Apps 6.1+). */
 export function isTelegramBackButtonAvailable(): boolean {
   try {

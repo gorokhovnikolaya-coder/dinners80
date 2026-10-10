@@ -2,6 +2,7 @@ import {
   addCustomExclusion,
   CUSTOM_EXCLUSION_MAX_LENGTH,
   CUSTOM_EXCLUSION_MIN_LENGTH,
+  CUSTOM_EXCLUSION_RAW_MAX_LENGTH,
   CUSTOM_EXCLUSIONS_MAX,
   DISH_TAGS,
   HOUSEHOLDS,
@@ -10,7 +11,7 @@ import {
   type Household,
   type WeekdayMinutes,
 } from '@tma80/shared';
-import { useId, useRef, useState, type ReactNode } from 'react';
+import { useId, useImperativeHandle, useRef, useState, type ReactNode, type Ref } from 'react';
 
 import { ru } from '../../i18n/ru.ts';
 import { Button } from '../Button.tsx';
@@ -130,6 +131,17 @@ const customErrorText = (error: Exclude<CustomExclusionError, 'empty'>): string 
   }
 };
 
+/** Imperative access to `ExclusionsField` for the screen that saves the answers. */
+export interface ExclusionsFieldHandle {
+  /**
+   * Adds a word still typed in «Своё» (not yet added with «Добавить» or Enter), so it is not lost
+   * on save. Returns the own exclusions to save: the list with that word, the current list if the
+   * field is empty — or `null` if the typed word is invalid: then the field shows why, gets the
+   * focus, and the caller must not save.
+   */
+  commitPending: () => string[] | null;
+}
+
 /**
  * «Своё»: the user's own exclusions as free text. A word is added with «Добавить» or Enter and
  * shown as a chip with a «×» button; invalid input explains why it was not added. Disabled
@@ -138,9 +150,11 @@ const customErrorText = (error: Exclude<CustomExclusionError, 'empty'>): string 
 function CustomExclusionsInput({
   words,
   onChange,
+  ref,
 }: {
   words: string[];
   onChange: (words: string[]) => void;
+  ref?: Ref<ExclusionsFieldHandle> | undefined;
 }) {
   const inputId = useId();
   const hintId = useId();
@@ -149,16 +163,26 @@ function CustomExclusionsInput({
   const [text, setText] = useState('');
   const [error, setError] = useState<Exclude<CustomExclusionError, 'empty'> | null>(null);
 
-  const add = () => {
+  /** Adds the typed word; returns the new list, `words` for an empty field, `null` if invalid. */
+  const add = (): string[] | null => {
     const result = addCustomExclusion(words, text);
     if ('error' in result) {
       setError(result.error === 'empty' ? null : result.error);
-      return;
+      return result.error === 'empty' ? words : null;
     }
     onChange(result.list);
     setText('');
     setError(null);
+    return result.list;
   };
+
+  useImperativeHandle(ref, () => ({
+    commitPending: () => {
+      const list = add();
+      if (list === null) inputRef.current?.focus();
+      return list;
+    },
+  }));
 
   const remove = (word: string) => {
     onChange(words.filter((item) => item !== word));
@@ -181,7 +205,8 @@ function CustomExclusionsInput({
           id={inputId}
           type="text"
           value={text}
-          maxLength={CUSTOM_EXCLUSION_MAX_LENGTH}
+          // Longer than a valid word, so a long paste is reported («Слишком длинно»), not cut.
+          maxLength={CUSTOM_EXCLUSION_RAW_MAX_LENGTH}
           autoComplete="off"
           placeholder={customTexts.placeholder}
           aria-describedby={`${hintId} ${errorId}`}
@@ -201,15 +226,18 @@ function CustomExclusionsInput({
             error === null ? 'border-muted' : 'border-accent-strong',
           )}
         />
-        <Button variant="secondary" icon={<IconPlus size={20} />} onClick={add}>
+        <Button
+          variant="secondary"
+          icon={<IconPlus size={20} />}
+          onClick={() => {
+            add();
+          }}
+        >
           {customTexts.add}
         </Button>
       </div>
-      <p
-        id={errorId}
-        aria-live="polite"
-        className="text-sm font-semibold text-accent-strong empty:hidden"
-      >
+      {/* Always rendered (never display: none), so screen readers announce a new error. */}
+      <p id={errorId} aria-live="polite" className="text-sm font-semibold text-accent-strong">
         {error === null ? '' : customErrorText(error)}
       </p>
       {words.length > 0 && (
@@ -234,14 +262,16 @@ function CustomExclusionsInput({
 
 /**
  * Step 3 «Что не ест»: any of meat / spicy / gluten, or nothing, plus own words («Своё»), e.g.
- * «кинза». Pork is meat: there is no separate option.
+ * «кинза». Pork is meat: there is no separate option. Before saving, call
+ * `ref.current.commitPending()` so a typed but not added word is not lost.
  */
 export function ExclusionsField({
   value,
   onChange,
   labelledBy,
   disabled,
-}: FieldProps<ExclusionsValue>) {
+  ref,
+}: FieldProps<ExclusionsValue> & { ref?: Ref<ExclusionsFieldHandle> | undefined }) {
   return (
     <Group labelledBy={labelledBy} disabled={disabled}>
       {DISH_TAGS.map((tag) => {
@@ -266,6 +296,7 @@ export function ExclusionsField({
         onChange={(customExclusions) => {
           onChange({ ...value, customExclusions });
         }}
+        ref={ref}
       />
     </Group>
   );

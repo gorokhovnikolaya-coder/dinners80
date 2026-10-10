@@ -6,6 +6,7 @@ import { Button } from '../../components/Button.tsx';
 import { IconAlert } from '../../components/icons.tsx';
 import {
   ExclusionsField,
+  type ExclusionsFieldHandle,
   HouseholdField,
   WeekdayMinutesField,
 } from '../../components/preferences/PreferenceFields.tsx';
@@ -46,6 +47,7 @@ export default function OnboardingScreen() {
   const titleId = useId();
   const titleRef = useRef<HTMLHeadingElement>(null);
   const firstRender = useRef(true);
+  const exclusionsRef = useRef<ExclusionsFieldHandle>(null);
 
   const step = stepAt(draft.step);
   const last = isLastStep(draft.step);
@@ -80,7 +82,12 @@ export default function OnboardingScreen() {
       dispatch(stepForward());
       return;
     }
-    const body = buildOnboardingRequest(draft, detectTimeZone());
+    // A word typed in «Своё» but not added yet is saved too; an invalid one stops the save.
+    const customExclusions = exclusionsRef.current
+      ? exclusionsRef.current.commitPending()
+      : draft.customExclusions;
+    if (customExclusions === null) return;
+    const body = buildOnboardingRequest({ ...draft, customExclusions }, detectTimeZone());
     if (body) void updateMe(body);
   };
 
@@ -138,6 +145,7 @@ export default function OnboardingScreen() {
           }}
           labelledBy={titleId}
           disabled={saving}
+          ref={exclusionsRef}
         />
       )}
 

@@ -28,7 +28,7 @@ const uuid = (tgId: number) => `00000000-0000-4000-8000-${String(tgId).padStart(
 
 type ProfileSettings = Pick<
   UserProfile,
-    | 'household'
+  | 'household'
   | 'weekdayMinutes'
   | 'exclusions'
   | 'customExclusions'
@@ -107,7 +107,7 @@ export const users: UserFixture[] = [
       household: 'couple',
       weekdayMinutes: 30,
       exclusions: [],
-      customExclusions: ['свинина'],
+      customExclusions: ['свин'],
       reminderEnabled: true,
       botCanWrite: true,
     },
@@ -136,7 +136,7 @@ export const users: UserFixture[] = [
       household: 'solo',
       weekdayMinutes: 20,
       exclusions: [],
-      customExclusions: ['свинина'],
+      customExclusions: ['свин'],
       reminderEnabled: true,
       botCanWrite: true,
     },

@@ -12,7 +12,7 @@ import { describe, expect, it } from 'vitest';
 
 import { cooks, countCountries } from './cooks.ts';
 import { countries } from './countries.ts';
-import { dishes } from './dishes.ts';
+import { dishes, dishIngredientNames, withIngredients } from './dishes.ts';
 import { FRIEND_IDS, TEST_USER_IDS, findUserByTgId, friendships, users } from './users.ts';
 
 const userByTgId = (tgId: number) => {
@@ -42,6 +42,29 @@ describe('content fixtures', () => {
         .filter((dish) => dish.countryId === country.id)
         .map((dish) => dish.level);
       expect(levels.toSorted()).toEqual([...DISH_LEVELS].toSorted());
+    }
+  });
+
+  it('name the ingredients of every dish; the own word «свин» excludes exactly the pork dishes', () => {
+    const porkDishes = [
+      'it-carbonara',
+      'fr-bourguignon',
+      'jp-gyoza',
+      'cn-sweet-sour-pork',
+      'cn-jiaozi',
+      'ar-choripan',
+      'br-feijoada',
+      'co-bandeja-paisa',
+    ];
+    expect(Object.keys(dishIngredientNames).toSorted()).toEqual(
+      dishes.map((dish) => dish.id).toSorted(),
+    );
+    const excluded = dishes
+      .filter((dish) => matchesCustomExclusion(withIngredients(dish), ['свин']))
+      .map((dish) => dish.id);
+    expect(excluded.toSorted()).toEqual(porkDishes.toSorted());
+    for (const id of porkDishes) {
+      expect(dishes.find((dish) => dish.id === id)?.tags, id).toContain('meat');
     }
   });
 
@@ -93,7 +116,8 @@ describe('user fixtures', () => {
       const available = dishes.filter(
         (dish) =>
           !passed.has(dish.countryId) &&
-          !dish.tags.some((tag) => user.profile.exclusions.includes(tag)),
+          !dish.tags.some((tag) => user.profile.exclusions.includes(tag)) &&
+          !matchesCustomExclusion(withIngredients(dish), user.profile.customExclusions),
       );
       expect(available.length, `user ${String(tgId)}`).toBeGreaterThanOrEqual(1);
     }
@@ -118,10 +142,9 @@ describe('user fixtures', () => {
       expect(user && dish).toBeTruthy();
       const excluded = dish?.tags.filter((tag) => user?.profile.exclusions.includes(tag));
       expect(excluded, `${cook.dishId} for ${String(user?.tg.id)}`).toEqual([]);
-      // Mock dishes have no ingredients: own exclusions are checked against the title.
       const custom =
         dish && user
-          ? matchesCustomExclusion({ ...dish, ingredients: [] }, user.profile.customExclusions)
+          ? matchesCustomExclusion(withIngredients(dish), user.profile.customExclusions)
           : false;
       expect(custom, `${cook.dishId} for ${String(user?.tg.id)}`).toBe(false);
     }

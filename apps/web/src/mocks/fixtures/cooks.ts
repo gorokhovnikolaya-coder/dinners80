@@ -26,7 +26,7 @@ const cooksOf = (tgId: number, specs: readonly CookSpec[]): Cook[] => {
 };
 
 export const cooks: Cook[] = [
-  // Борис — 8 countries, excludes «свинина» (own exclusion).
+  // Борис — 8 countries, excludes pork with the own word «свин».
   ...cooksOf(TEST_USER_IDS.eightCountries, [
     ['it-lasagna', 60],
     ['fr-omelette', 45],
@@ -53,7 +53,7 @@ export const cooks: Cook[] = [
     ['ar-choripan', 6],
     ['br-moqueca', 2],
   ]),
-  // Глеб — 10 countries, excludes «свинина» (own exclusion): no India and Thailand.
+  // Глеб — 10 countries, excludes pork with the own word «свин»: no India and Thailand.
   ...cooksOf(TEST_USER_IDS.tenCountriesSubscribed, [
     ['it-lasagna', 90],
     ['fr-omelette', 75],

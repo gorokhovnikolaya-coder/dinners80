@@ -1,17 +1,14 @@
 import { z } from 'zod/mini';
 
 import {
+  CUSTOM_EXCLUSION_RAW_MAX_LENGTH,
   CUSTOM_EXCLUSIONS_MAX,
   DISH_TAGS,
   HOUSEHOLDS,
   SUBSCRIPTION_PLANS,
   WEEKDAY_MINUTES,
 } from './constants.ts';
-import {
-  cleanCustomExclusion,
-  customExclusionKey,
-  isValidCustomExclusion,
-} from './preferences.ts';
+import { cleanCustomExclusion, customExclusionKey, isValidCustomExclusion } from './preferences.ts';
 
 /**
  * Shape of an IANA time zone name (`Europe/Moscow`, `America/Argentina/Buenos_Aires`, `UTC`):
@@ -69,12 +66,10 @@ export const exclusionsSchema = z
  */
 export const customExclusionsSchema = z
   .array(
-    z
-      .string()
-      .check(
-        z.maxLength(100),
-        z.refine((word) => isValidCustomExclusion(cleanCustomExclusion(word)), 'Invalid exclusion'),
-      ),
+    z.string().check(
+      z.maxLength(CUSTOM_EXCLUSION_RAW_MAX_LENGTH),
+      z.refine((word) => isValidCustomExclusion(cleanCustomExclusion(word)), 'Invalid exclusion'),
+    ),
   )
   .check(
     z.maxLength(CUSTOM_EXCLUSIONS_MAX),

@@ -8,7 +8,14 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig(
-  globalIgnores(['**/dist/', '**/.tsbuild/', '**/coverage/', '.data/']),
+  globalIgnores([
+    '**/dist/',
+    '**/.tsbuild/',
+    '**/coverage/',
+    '.data/',
+    'test-results/',
+    'playwright-report/',
+  ]),
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,

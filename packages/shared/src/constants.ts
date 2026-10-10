@@ -20,6 +20,8 @@ export type DishTag = (typeof DISH_TAGS)[number];
 export const CUSTOM_EXCLUSIONS_MAX = 10;
 export const CUSTOM_EXCLUSION_MIN_LENGTH = 2;
 export const CUSTOM_EXCLUSION_MAX_LENGTH = 40;
+/** Cap of the raw value before cleaning (a string of spaces must not pass). */
+export const CUSTOM_EXCLUSION_RAW_MAX_LENGTH = 100;
 
 /** Dish levels: weekday evening, weekend, challenge (`dishes.level`). */
 export const DISH_LEVELS = ['weekday', 'weekend', 'challenge'] as const;

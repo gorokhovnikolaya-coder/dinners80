@@ -72,6 +72,8 @@ test.describe('onboarding', () => {
     await expect(page.getByText('Это уже есть в списке.')).toBeVisible();
     await expect(own.getByRole('listitem')).toHaveText(['кинза', 'сельдерей']);
     expect(await background()).toBe('rgb(243, 245, 247)');
+    // The repeated word is not added; clear it, or it would stop the save.
+    await custom.fill('');
 
     const request = page.waitForRequest(
       (req) => req.url().endsWith('/api/me') && req.method() === 'PATCH',
@@ -167,6 +169,33 @@ test.describe('onboarding', () => {
     await reloaded;
     await expect(page).toHaveURL(/\/onboarding$/);
     await expect(question(page)).toHaveText('Кто ест за вашим столом?');
+  });
+
+  test('a word typed in «Своё» but not added is saved; an invalid one stops the save', async ({
+    page,
+  }) => {
+    await page.goto('/?user=1001&mock_reset=1');
+    await answerFirstTwo(page);
+    const custom = page.getByRole('textbox', { name: 'Своё' });
+
+    let patches = 0;
+    page.on('request', (req) => {
+      if (req.url().endsWith('/api/me') && req.method() === 'PATCH') patches += 1;
+    });
+    await custom.fill('к');
+    await next(page).click();
+    await expect(page.getByText('Слишком коротко: нужно хотя бы 2 символа.')).toBeVisible();
+    await expect(custom).toBeFocused();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Что вы не едите?');
+    expect(patches).toBe(0);
+
+    await custom.fill('Кинза');
+    const request = page.waitForRequest(
+      (req) => req.url().endsWith('/api/me') && req.method() === 'PATCH',
+    );
+    await next(page).click();
+    expect((await request).postDataJSON()).toMatchObject({ customExclusions: ['кинза'] });
+    await expect(page.getByText('Привет, Аня!')).toBeVisible();
   });
 
   test('a failed save shows an error, keeps the answers and succeeds on retry', async ({

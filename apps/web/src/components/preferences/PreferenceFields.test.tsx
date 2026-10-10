@@ -1,12 +1,16 @@
 // @vitest-environment jsdom
 import type { Household } from '@tma80/shared';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
+import { createRef, useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { ExclusionsValue } from './exclusions.ts';
-import { ExclusionsField, HouseholdField } from './PreferenceFields.tsx';
+import {
+  ExclusionsField,
+  HouseholdField,
+  type ExclusionsFieldHandle,
+} from './PreferenceFields.tsx';
 
 function Question({ children }: { children: React.ReactNode }) {
   return (
@@ -117,6 +121,55 @@ describe('ExclusionsField', () => {
     await userEvent.clear(input);
     await userEvent.keyboard('{Enter}');
     expect(input).toHaveAttribute('aria-invalid', 'false');
+  });
+
+  it('commitPending adds a typed but not added word, or reports an invalid one', async () => {
+    const ref = createRef<ExclusionsFieldHandle>();
+    function WithRef() {
+      const [value, setValue] = useState<ExclusionsValue>({
+        exclusions: [],
+        customExclusions: ['грибы'],
+      });
+      return (
+        <Question>
+          <ExclusionsField value={value} onChange={setValue} labelledBy="q" ref={ref} />
+          <output data-testid="custom">{value.customExclusions.join(',')}</output>
+        </Question>
+      );
+    }
+    render(<WithRef />);
+    const input = screen.getByRole('textbox', { name: 'Своё' });
+    // Empty field: the current list.
+    expect(ref.current?.commitPending()).toEqual(['грибы']);
+
+    await userEvent.type(input, ' Кинза');
+    let committed: string[] | null | undefined;
+    act(() => {
+      committed = ref.current?.commitPending();
+    });
+    expect(committed).toEqual(['грибы', 'кинза']);
+    expect(screen.getByTestId('custom')).toHaveTextContent('грибы,кинза');
+    expect(input).toHaveValue('');
+
+    await userEvent.type(input, 'к');
+    input.blur();
+    act(() => {
+      committed = ref.current?.commitPending();
+    });
+    expect(committed).toBeNull();
+    expect(input).toHaveFocus();
+    expect(input).toHaveAccessibleDescription(/Слишком коротко/);
+    expect(screen.getByTestId('custom')).toHaveTextContent(/^грибы,кинза$/);
+  });
+
+  it('reports a long paste instead of cutting it', async () => {
+    render(<Controlled />);
+    const input = screen.getByRole('textbox', { name: 'Своё' });
+    await userEvent.click(input);
+    await userEvent.paste('а'.repeat(45));
+    expect(input).toHaveValue('а'.repeat(45));
+    await userEvent.keyboard('{Enter}');
+    expect(input).toHaveAccessibleDescription(/Слишком длинно/);
   });
 
   it('is disabled together with the group', () => {

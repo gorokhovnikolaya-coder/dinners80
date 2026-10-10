@@ -130,7 +130,10 @@ describe('onboardingSlice', () => {
     state = reducer(state, stepForward());
     state = reducer(state, weekdayMinutesSelected(20));
     state = reducer(state, stepForward());
-    state = reducer(state, exclusionsChanged({ exclusions: ['spicy'], customExclusions: ['кинза'] }));
+    state = reducer(
+      state,
+      exclusionsChanged({ exclusions: ['spicy'], customExclusions: ['кинза'] }),
+    );
     state = reducer(state, stepForward());
     expect(state).toEqual({
       step: 2,

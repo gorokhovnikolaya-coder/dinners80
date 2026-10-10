@@ -62,9 +62,7 @@ export function OptionCard({
       )}
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="text-xl font-extrabold">{title}</span>
-        {description !== undefined && (
-          <span className="text-sm text-muted">{description}</span>
-        )}
+        {description !== undefined && <span className="text-sm text-muted">{description}</span>}
       </span>
       {type === 'checkbox' ? (
         <span
@@ -80,9 +78,7 @@ export function OptionCard({
           {checked && <IconCheck size={16} />}
         </span>
       ) : (
-        checked && (
-          <IconCheck size={24} className="shrink-0 text-primary" />
-        )
+        checked && <IconCheck size={24} className="shrink-0 text-primary" />
       )}
     </label>
   );
