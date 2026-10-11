@@ -5,6 +5,7 @@ import {
   COOK_PHOTO_TYPE,
   COOKS_PER_DAY_LIMIT,
   addShoppingRequestSchema,
+  buildLeaderboard,
   buildPassport,
   createCookRequestSchema,
   findOvertakenFriend,
@@ -14,6 +15,8 @@ import {
   dishQuerySchema,
   hasCountryAccess,
   homeQuerySchema,
+  latestFriendStamps,
+  leaderboardQuerySchema,
   scaleAmount,
   suggestDishes,
   updateMeRequestSchema,
@@ -25,7 +28,11 @@ import {
   type UploadCookPhotoResponse,
   type DishPreview,
   type DishResponse,
+  type FeedResponse,
   type HomeResponse,
+  type LeaderboardParticipant,
+  type LeaderboardPeriod,
+  type LeaderboardResponse,
   type MapResponse,
   type PaywallError,
   type MeResponse,
@@ -38,7 +45,7 @@ import { NO_MOCK_CONTROLS, takeFailure, type MockControls } from './controls.ts'
 import { createMockDb, type MockDb, type MockUser } from './db.ts';
 import { countries } from './fixtures/countries.ts';
 import { dishes, withIngredients } from './fixtures/dishes.ts';
-import { mockDishImageUrl } from './fixtures/images.ts';
+import { mockCookPhotoUrl, mockDishImageUrl } from './fixtures/images.ts';
 import { recipes } from './fixtures/recipes.ts';
 import { friendships } from './fixtures/users.ts';
 
@@ -184,6 +191,66 @@ const countryCount = (cooks: readonly { countryId: string }[]) =>
 const friendIdsOf = (tgId: number): number[] =>
   friendships.flatMap(([a, b]) => (a === tgId ? [b] : b === tgId ? [a] : []));
 
+const participantOf = (user: MockUser): LeaderboardParticipant => ({
+  userId: user.profile.id,
+  firstName: user.profile.firstName,
+  photoUrl: user.profile.photoUrl,
+  cooks: user.cooks,
+});
+
+const friendsOf = (db: MockDb, tgId: number): MockUser[] =>
+  friendIdsOf(tgId).flatMap((friendId) => {
+    const friend = db.getUser(friendId);
+    return friend ? [friend] : [];
+  });
+
+/** `GET /friends/leaderboard` as the server does it: the shared `buildLeaderboard`. */
+export const leaderboardResponse = (
+  db: MockDb,
+  tgId: number,
+  period: LeaderboardPeriod,
+  now = new Date(),
+): LeaderboardResponse | undefined => {
+  const user = db.getUser(tgId);
+  if (!user) return undefined;
+  return buildLeaderboard({
+    me: participantOf(user),
+    friends: friendsOf(db, tgId).map(participantOf),
+    period,
+    now,
+    timezone: user.profile.timezone,
+  });
+};
+
+/**
+ * `GET /friends/feed` as the server does it: the latest first stamps of friends with the dish,
+ * the country and a link to the photo (the server signs it for an hour; the mock draws one).
+ */
+export const feedResponse = (db: MockDb, tgId: number): FeedResponse => ({
+  items: latestFriendStamps(
+    friendsOf(db, tgId).map((friend) =>
+      friend.cooks.map((cook) => ({ ...cook, firstName: friend.profile.firstName })),
+    ),
+  ).flatMap((cook) => {
+    const dish = dishes.find((candidate) => candidate.id === cook.dishId);
+    const country = countries.find((candidate) => candidate.id === cook.countryId);
+    if (!dish || !country) return [];
+    return [
+      {
+        cookId: cook.id,
+        userId: cook.userId,
+        firstName: cook.firstName,
+        countryId: country.id,
+        countryName: country.nameRu,
+        dishId: dish.id,
+        dishTitle: dish.title,
+        photoUrl: cook.photoPath === null ? null : mockCookPhotoUrl(cook.photoPath),
+        createdAt: cook.createdAt,
+      },
+    ];
+  }),
+});
+
 /** Result of `POST /cooks` as the server decides it. */
 export type CookResult =
   | { kind: 'ok'; result: CreateCookResponse }
@@ -220,18 +287,11 @@ export const recordCook = (
   const after = countryCount([...user.cooks, dish]);
   const cook = db.addCook(tgId, { dishId: dish.id, countryId: dish.countryId, photoPath }, now);
   if (!cook) return { kind: 'notFound' };
-  const friends = friendIdsOf(tgId).flatMap((friendId) => {
-    const friend = db.getUser(friendId);
-    return friend
-      ? [
-          {
-            name: friend.profile.firstName,
-            countries: countryCount(friend.cooks),
-            dishes: friend.cooks.length,
-          },
-        ]
-      : [];
-  });
+  const friends = friendsOf(db, tgId).map((friend) => ({
+    name: friend.profile.firstName,
+    countries: countryCount(friend.cooks),
+    dishes: friend.cooks.length,
+  }));
   return {
     kind: 'ok',
     result: {
@@ -312,6 +372,33 @@ export const createHandlers = (
     const auth = authenticate(request, db);
     if (!auth) return unauthorized();
     return HttpResponse.json<MapResponse>(mapResponse(auth[1]));
+  }),
+
+  http.get<never, never, LeaderboardResponse | ApiError>(
+    `${apiBase}/friends/leaderboard`,
+    async ({ request }) => {
+      if (controls.delayMs > 0) await delay(controls.delayMs);
+      if (takeFailure(controls, 'friends'))
+        return apiError(500, 'internal', 'Mock error (mock_error=friends)');
+      const auth = authenticate(request, db);
+      if (!auth) return unauthorized();
+      const query = leaderboardQuerySchema.safeParse({
+        period: new URL(request.url).searchParams.get('period') ?? undefined,
+      });
+      if (!query.success) return apiError(400, 'validation', 'Invalid leaderboard period');
+      const result = leaderboardResponse(db, auth[0], query.data.period);
+      if (!result) return unauthorized();
+      return HttpResponse.json<LeaderboardResponse>(result);
+    },
+  ),
+
+  http.get<never, never, FeedResponse | ApiError>(`${apiBase}/friends/feed`, async ({ request }) => {
+    if (controls.delayMs > 0) await delay(controls.delayMs);
+    if (takeFailure(controls, 'friends_feed'))
+      return apiError(500, 'internal', 'Mock error (mock_error=friends_feed)');
+    const auth = authenticate(request, db);
+    if (!auth) return unauthorized();
+    return HttpResponse.json<FeedResponse>(feedResponse(db, auth[0]));
   }),
 
   http.get<{ id: string }, never, DishResponse | PaywallError | ApiError>(

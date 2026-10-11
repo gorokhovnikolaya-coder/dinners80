@@ -4,7 +4,9 @@ import {
   COOKS_PER_DAY_LIMIT,
   createCookResponseSchema,
   dishResponseSchema,
+  feedResponseSchema,
   homeResponseSchema,
+  leaderboardResponseSchema,
   mapResponseSchema,
   meResponseSchema,
   paywallErrorSchema,
@@ -290,6 +292,85 @@ describe('GET /map (MSW)', () => {
     server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=map')));
     expect((await map(TEST_USER_IDS.eightCountries)).status).toBe(500);
     expect((await map(TEST_USER_IDS.eightCountries)).status).toBe(200);
+  });
+});
+
+describe('GET /friends/leaderboard (MSW)', () => {
+  const leaderboard = (tgId: number, period: string) =>
+    fetch(`${API_BASE}/friends/leaderboard?period=${period}`, {
+      headers: { Authorization: `tma ${initDataOf(tgId)}` },
+    });
+
+  it('ranks the user and the three friends for all time', async () => {
+    const response = await leaderboard(TEST_USER_IDS.eightCountries, 'all');
+    expect(response.status).toBe(200);
+    const body = leaderboardResponseSchema.parse(await response.json());
+    expect(body.period).toBe('all');
+    expect(body.entries.map((row) => [row.firstName, row.place, row.countries, row.isMe])).toEqual([
+      ['Зоя', 1, 11, false],
+      ['Борис', 2, 8, true],
+      ['Жанна', 3, 8, false],
+      ['Егор', 4, 5, false],
+    ]);
+  });
+
+  it('counts only this week for «Эта неделя»', async () => {
+    const body = leaderboardResponseSchema.parse(
+      await (await leaderboard(TEST_USER_IDS.eightCountries, 'week')).json(),
+    );
+    expect(body.entries).toHaveLength(4);
+    const all = leaderboardResponseSchema.parse(
+      await (await leaderboard(TEST_USER_IDS.eightCountries, 'all')).json(),
+    );
+    for (const row of body.entries) {
+      const total = all.entries.find((item) => item.userId === row.userId);
+      expect(row.dishes).toBeLessThanOrEqual(total?.dishes ?? 0);
+      expect(row.countries).toBeLessThanOrEqual(total?.countries ?? 0);
+    }
+  });
+
+  it('lists only the user when there are no friends', async () => {
+    const body = leaderboardResponseSchema.parse(
+      await (await leaderboard(TEST_USER_IDS.newbie, 'week')).json(),
+    );
+    expect(body.entries).toEqual([expect.objectContaining({ isMe: true, place: 1 })]);
+  });
+
+  it('validates the period, needs the user; fails once with mock_error=friends', async () => {
+    expect((await leaderboard(TEST_USER_IDS.eightCountries, 'month')).status).toBe(400);
+    expect((await fetch(`${API_BASE}/friends/leaderboard?period=all`)).status).toBe(401);
+    server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=friends')));
+    expect((await leaderboard(TEST_USER_IDS.eightCountries, 'all')).status).toBe(500);
+    expect((await leaderboard(TEST_USER_IDS.eightCountries, 'all')).status).toBe(200);
+  });
+});
+
+describe('GET /friends/feed (MSW)', () => {
+  const feed = (tgId: number) =>
+    fetch(`${API_BASE}/friends/feed`, { headers: { Authorization: `tma ${initDataOf(tgId)}` } });
+
+  it('returns the latest first stamps of friends, newest first, with or without a photo', async () => {
+    const body = feedResponseSchema.parse(await (await feed(TEST_USER_IDS.eightCountries)).json());
+    // 5 + 8 + 11 countries of Егор, Жанна, Зоя; capped at 20.
+    expect(body.items).toHaveLength(20);
+    const times = body.items.map((item) => Date.parse(item.createdAt));
+    expect(times).toEqual([...times].sort((a, b) => b - a));
+    // Жанна's paella is a repeat (Spain), not a stamp.
+    expect(
+      body.items.some((item) => item.dishId === 'es-paella' && item.firstName === 'Жанна'),
+    ).toBe(false);
+    expect(body.items.some((item) => item.photoUrl !== null)).toBe(true);
+    expect(body.items.some((item) => item.photoUrl === null)).toBe(true);
+    expect(body.items.every((item) => item.firstName !== 'Борис')).toBe(true);
+  });
+
+  it('is empty without friends; fails once with mock_error=friends_feed', async () => {
+    const body = feedResponseSchema.parse(await (await feed(TEST_USER_IDS.newbie)).json());
+    expect(body.items).toEqual([]);
+    expect((await fetch(`${API_BASE}/friends/feed`)).status).toBe(401);
+    server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=friends_feed')));
+    expect((await feed(TEST_USER_IDS.eightCountries)).status).toBe(500);
+    expect((await feed(TEST_USER_IDS.eightCountries)).status).toBe(200);
   });
 });
 

@@ -175,3 +175,14 @@ export function IconCamera(props: IconProps) {
     </Icon>
   );
 }
+
+/** A round passport stamp: the feed entry of a friend who cooked without a photo. */
+export function IconStamp(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="5.5" strokeDasharray="2 2" />
+      <path d="M10 12l1.5 1.5L14.5 10.5" />
+    </Icon>
+  );
+}

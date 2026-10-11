@@ -54,6 +54,11 @@ const CountryScreen = lazyScreen(
   <ScreenSkeleton />,
 );
 
+const FriendsScreen = lazyScreen(
+  () => import('../screens/friends/FriendsScreen.tsx'),
+  <ScreenSkeleton />,
+);
+
 /** Temporary paywall (task 6) until the real one (task 12). */
 const PaywallScreen = lazyScreen(
   () => import('../screens/paywall/PaywallStubScreen.tsx'),
@@ -121,6 +126,10 @@ function AuthenticatedApp() {
       <Route
         path={ROUTES.country}
         element={needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <CountryScreen />}
+      />
+      <Route
+        path={ROUTES.friends}
+        element={needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <FriendsScreen />}
       />
       <Route
         path={ROUTES.paywall}

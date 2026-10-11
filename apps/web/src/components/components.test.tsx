@@ -9,6 +9,7 @@ import { Checkbox } from './Checkbox.tsx';
 import { Chip } from './Chip.tsx';
 import { ErrorState } from './ErrorState.tsx';
 import { ProgressBar } from './ProgressBar.tsx';
+import { SegmentedControl } from './SegmentedControl.tsx';
 import { Skeleton, SkeletonGroup } from './Skeleton.tsx';
 import { Spinner } from './Spinner.tsx';
 import { TabBar, type TabBarItem } from './TabBar.tsx';
@@ -219,5 +220,32 @@ describe('ErrorState', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
     rerender(<ErrorState title="Ошибка" onRetry={() => undefined} retrying />);
     expect(screen.getByRole('button', { name: 'Повторить' })).toBeDisabled();
+  });
+});
+
+describe('SegmentedControl', () => {
+  it('is a labelled group of toggle buttons; a press reports the value', async () => {
+    function Controlled() {
+      const [value, setValue] = useState<'week' | 'all'>('week');
+      return (
+        <SegmentedControl
+          label="Период"
+          options={[
+            { value: 'week', label: 'Эта неделя' },
+            { value: 'all', label: 'Всё время' },
+          ]}
+          value={value}
+          onChange={setValue}
+        />
+      );
+    }
+    render(<Controlled />);
+    expect(screen.getByRole('group', { name: 'Период' })).toBeInTheDocument();
+    const week = screen.getByRole('button', { name: 'Эта неделя' });
+    const all = screen.getByRole('button', { name: 'Всё время' });
+    expect(week).toHaveAttribute('aria-pressed', 'true');
+    await userEvent.click(all);
+    expect(all).toHaveAttribute('aria-pressed', 'true');
+    expect(week).toHaveAttribute('aria-pressed', 'false');
   });
 });

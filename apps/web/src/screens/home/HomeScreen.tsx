@@ -12,9 +12,9 @@ import { useHomeQuery } from '../../api/home.ts';
 import { MainTabBar } from '../../app/MainTabBar.tsx';
 import { ROUTES } from '../../app/routes.ts';
 import { Button } from '../../components/Button.tsx';
-import { cx } from '../../components/cx.ts';
 import { ErrorState } from '../../components/ErrorState.tsx';
 import { IconRefresh } from '../../components/icons.tsx';
+import { SegmentedControl } from '../../components/SegmentedControl.tsx';
 import { Skeleton, SkeletonGroup } from '../../components/Skeleton.tsx';
 import { ru } from '../../i18n/ru.ts';
 import { useAppDispatch, useAppSelector } from '../../store/hooks.ts';
@@ -89,27 +89,12 @@ function ModeSwitch({
         ? t.modes.weekday
         : t.modes.weekdayWithMinutes(weekdayMinutes);
   return (
-    <div role="group" aria-label={t.modes.label} className="flex gap-2 rounded-tile bg-track p-1">
-      {SUGGESTION_MODES.map((item) => {
-        const active = item === mode;
-        return (
-          <button
-            key={item}
-            type="button"
-            aria-pressed={active}
-            onClick={() => {
-              onChange(item);
-            }}
-            className={cx(
-              'min-h-11 flex-1 rounded-segment text-base transition-colors',
-              active ? 'bg-surface font-bold text-ink shadow-card' : 'font-semibold text-muted',
-            )}
-          >
-            {label(item)}
-          </button>
-        );
-      })}
-    </div>
+    <SegmentedControl
+      label={t.modes.label}
+      options={SUGGESTION_MODES.map((item) => ({ value: item, label: label(item) }))}
+      value={mode}
+      onChange={onChange}
+    />
   );
 }
 

@@ -5,13 +5,20 @@ import { FRIEND_IDS, TEST_USER_IDS, findUserByTgId } from './users.ts';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/** `[dishId, daysAgo]`: dates are relative to now, so the 14-day and "this week" rules stay meaningful. */
-type CookSpec = readonly [dishId: string, daysAgo: number];
+/**
+ * `[dishId, daysAgo, withPhoto?]`: dates are relative to now, so the 14-day and "this week" rules
+ * stay meaningful; `withPhoto` gives the cook a photo in the user's private folder.
+ */
+type CookSpec = readonly [dishId: string, daysAgo: number, withPhoto?: boolean];
+
+/** A stable uuid of the n-th fixture photo, for `cooks/{user_id}/{uuid}.jpg`. */
+const photoUuid = (tgId: number, n: number) =>
+  `00000000-0000-4000-9000-${String(tgId * 100 + n).padStart(12, '0')}`;
 
 const cooksOf = (tgId: number, specs: readonly CookSpec[]): Cook[] => {
   const user = findUserByTgId(tgId);
   if (!user) throw new Error(`Fixture user ${String(tgId)} not found`);
-  return specs.map(([dishId, daysAgo], index) => {
+  return specs.map(([dishId, daysAgo, withPhoto = false], index) => {
     const dish = dishes.find((item) => item.id === dishId);
     if (!dish) throw new Error(`Fixture dish ${dishId} not found`);
     return {
@@ -19,7 +26,7 @@ const cooksOf = (tgId: number, specs: readonly CookSpec[]): Cook[] => {
       userId: user.profile.id,
       dishId,
       countryId: dish.countryId,
-      photoPath: null,
+      photoPath: withPhoto ? `cooks/${user.profile.id}/${photoUuid(tgId, index + 1)}.jpg` : null,
       createdAt: new Date(Date.now() - daysAgo * DAY_MS).toISOString(),
     };
   });
@@ -78,8 +85,8 @@ export const cooks: Cook[] = [
     ['it-carbonara', 30],
     ['jp-oyakodon', 22],
     ['cn-kung-pao', 14],
-    ['th-pad-kra-pao', 6],
-    ['pe-lomo-saltado', 1],
+    ['th-pad-kra-pao', 6, true],
+    ['pe-lomo-saltado', 1, true],
   ]),
   // Жанна — 8 countries, excludes gluten (Italy, Greece, Japan, China have no gluten-free dish).
   ...cooksOf(FRIEND_IDS.zhanna, [
@@ -90,7 +97,7 @@ export const cooks: Cook[] = [
     ['pe-ceviche', 20],
     ['ar-asado', 10],
     ['br-moqueca', 3],
-    ['co-arepas', 2],
+    ['co-arepas', 2, true],
     ['es-paella', 1],
   ]),
   // Зоя — 11 countries, yearly subscription.
@@ -104,7 +111,7 @@ export const cooks: Cook[] = [
     ['in-biryani', 40],
     ['th-massaman', 30],
     ['pe-ceviche', 20],
-    ['ar-asado', 8],
+    ['ar-asado', 8, true],
     ['co-sancocho', 1],
   ]),
 ];

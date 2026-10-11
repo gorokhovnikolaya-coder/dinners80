@@ -31,3 +31,19 @@ export function mockDishImageUrl(dish: Pick<Dish, 'id'>): string {
     `<circle cx="200" cy="160" r="62" fill="#ffffff" fill-opacity="0.25"/></svg>`;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
+
+/**
+ * Stand-in for a signed link to a user's cook photo (`/media/cooks/...` in production): an SVG
+ * «snapshot» — a plate on a table — tinted by the photo path. Only for the mock API.
+ */
+export function mockCookPhotoUrl(photoPath: string): string {
+  const [from, to] = TINTS[hash(photoPath) % TINTS.length] ?? TINTS[0];
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">` +
+    `<rect width="300" height="300" fill="#8a6a4f"/>` +
+    `<circle cx="150" cy="150" r="118" fill="#f4efe6"/>` +
+    `<circle cx="150" cy="150" r="84" fill="${from}"/>` +
+    `<circle cx="128" cy="134" r="34" fill="${to}"/>` +
+    `<circle cx="178" cy="170" r="24" fill="${to}" fill-opacity="0.7"/></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}

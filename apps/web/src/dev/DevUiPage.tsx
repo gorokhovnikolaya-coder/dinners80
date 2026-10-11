@@ -22,6 +22,7 @@ import { ProgressBar } from '../components/ProgressBar.tsx';
 import type { ExclusionsValue } from '../components/preferences/exclusions.ts';
 import { ExclusionsField, HouseholdField } from '../components/preferences/PreferenceFields.tsx';
 import { Skeleton, SkeletonGroup } from '../components/Skeleton.tsx';
+import { SegmentedControl } from '../components/SegmentedControl.tsx';
 import { Spinner } from '../components/Spinner.tsx';
 import { TabBar, type TabBarItem } from '../components/TabBar.tsx';
 import { ru, ruDevUi as t } from '../i18n/ru.ts';
@@ -75,6 +76,7 @@ export function DevUiPage() {
     tomato: true,
   });
   const [tab, setTab] = useState('dinner');
+  const [segment, setSegment] = useState<'week' | 'all'>('week');
   const [retries, setRetries] = useState(0);
   const [household, setHousehold] = useState<Household | null>('couple');
   const [exclusions, setExclusions] = useState<ExclusionsValue>({
@@ -339,6 +341,18 @@ export function DevUiPage() {
           value={exclusions}
           onChange={setExclusions}
           labelledBy="ui-option-exclusions"
+        />
+      </Section>
+
+      <Section id="ui-segmented" title={t.sections.segmentedControl}>
+        <SegmentedControl
+          label={t.segmented.label}
+          options={[
+            { value: 'week', label: t.segmented.week },
+            { value: 'all', label: t.segmented.all },
+          ]}
+          value={segment}
+          onChange={setSegment}
         />
       </Section>
 

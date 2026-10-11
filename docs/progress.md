@@ -5,7 +5,6 @@
 Проблемы и идеи, замеченные вне текущей задачи. Пункт удаляется, когда его взяли в работу.
 
 - e2e: под высокой нагрузкой машины (load average > 15) сценарии изредка падали по таймауту `page.goto` на холодном dev-сервере; на свободной машине стабильно зелёные. Если повторится в CI — поднять `timeout`/`navigationTimeout` в `playwright.config.ts`.
-- Экран 6: сегментный переключатель «Эта неделя / Всё время» — на экране 1 он собран локально (`ModeSwitch` в `screens/home/HomeScreen.tsx`); при задаче 10 вынести в общий компонент `src/components/`.
 
 ## Журнал
 
@@ -18,6 +17,12 @@
 - Решения: docs/decisions/NNNN-… (если были)
 - Осталось / сомнения: …
 ```
+
+### Задача 10 — Друзья (2026-10-11, ветка task/10-friends)
+- Сделано: в `packages/shared` — `friends.ts`: схемы `GET /friends/leaderboard?period=week|all` и `GET /friends/feed`, чистые `weekStart` (понедельник 00:00 в поясе смотрящего, с DST), `firstStamps`, `buildLeaderboard` (страны → блюда → имя, общие места 1, 2, 2, 4), `latestFriendStamps` (первые штампы друзей, до 20); мок: оба эндпоинта, ключи `?mock_error=friends` / `friends_feed`, фото у части готовок друзей (`mockCookPhotoUrl`); RTK Query `useFriendsLeaderboardQuery` (тег `Cooks`) и `useFriendsFeedQuery`; экран `/friends` (ленивый): переключатель «Эта неделя / Всё время» (слайс `friends`), рейтинг со строкой «Вы», лента «Маша — Грузия в паспорте» с фото или плиткой-штампом и относительным временем, кнопка «Позвать друга в Telegram» (`shareURL` → `t.me/share/url`, ссылка `t.me/<бот>/<приложение>?startapp=<код>` из `VITE_BOT_USERNAME`/`VITE_APP_SHORT_NAME`), пустое состояние, загрузка и ошибки (отдельный «Повторить» у ленты); `SegmentedControl` вынесен в `src/components/` (главный экран и `/dev/ui`), иконка `IconStamp`. ТЗ (экран 6, «Принятые решения»), AGENTS.md (ключи мока), `.env.example`. Тесты: `friends.test.ts` (shared), `screens/friends/friends.test.ts`, MSW `/friends/*`, `SegmentedControl`; e2e `e2e/friends.spec.ts`
+- Проверено: npm run check ✓ (256 тестов, стартовый JS 147.31 kB gzip из 200 kB, CSS 6.31 kB из 20 kB), npm run e2e ✓ (46 сценариев; в одном прогоне под нагрузкой разово упал `cooked.spec.ts › a failed save is retried`, повтор зелёный), скриншоты docs/screens/task-10/
+- Решения: docs/decisions/0012-friends-leaderboard-feed-invite.md
+- Осталось / сомнения: реальные имя бота и короткое имя приложения — открытый вопрос ТЗ (задать переменные к задачам 18/23); подпись ссылок на фото друзей — задача 17.
 
 ### Задача 09 — Карта и паспорт (2026-10-10, ветка task/09-map-passport)
 - Сделано: в `packages/shared` — `CONTINENTS` (europe, asia, americas, africa_oceania; `countrySchema.continent` — enum), `map.ts`: схема `GET /map` и чистая `buildPassport` (континенты и страны по порядку, `passed`, `locked` по `has_access`, дата первого штампа, `cooked` у блюд, счётчики); мок: `GET /map`, ключ `?mock_error=map`, фикстура `south_america` → `americas`; RTK Query `useMapQuery` (тег `Cooks`); экран `/map` (ленивый): «Мой паспорт · N блюд», navy-карточка «8/12» с прогрессом, группы континентов «3 из 4», плитки стран (залита / пунктир / пунктир с замком), загрузка и ошибка с «Повторить»; экран страны `/map/countries/:id` (ленивый, системная «Назад» → карта): континент, название, статус («В паспорте с …» / «Ещё не пройдена» / «Откроется с подпиской»), 3 блюда с «Приготовлено», у закрытой страны — замки и переход на пейвол, «Страна не найдена»; `DishPhoto` вынесен в `src/components/`. ТЗ (экран 5, «Принятые решения»), AGENTS.md (ключ мока). Тесты: `buildPassport`, схема континента, хелперы экрана (`passport.test.ts`), MSW `GET /map`; e2e `e2e/map.spec.ts` (4 сценария), `cooked.spec.ts` — «Открыть карту» после новой страны.

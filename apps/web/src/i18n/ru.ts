@@ -148,8 +148,7 @@ export const ru = {
     dishes: (count: number) => `${String(count)} ${plural(count, 'блюдо', 'блюда', 'блюд')}`,
     countriesCaption: 'стран пройдено',
     progressLabel: 'Пройдено стран',
-    progressValue: (count: number, total: number) =>
-      `${String(count)} из ${String(total)} стран`,
+    progressValue: (count: number, total: number) => `${String(count)} из ${String(total)} стран`,
     continents: {
       europe: 'Европа',
       asia: 'Азия',
@@ -175,6 +174,39 @@ export const ru = {
       title: 'Страна не найдена',
       action: 'К карте',
     },
+  },
+  friends: {
+    title: 'Друзья',
+    periods: {
+      label: 'Период рейтинга',
+      week: 'Эта неделя',
+      all: 'Всё время',
+    },
+    leaderboard: 'Рейтинг друзей',
+    me: 'Вы',
+    /** Initial in the user's own avatar. */
+    meInitial: 'Я',
+    /** Hidden before the place number for screen readers. */
+    place: (place: number) => `${String(place)}-е место`,
+    dishes: (count: number) => `${String(count)} ${plural(count, 'блюдо', 'блюда', 'блюд')}`,
+    countries: (count: number) => `${String(count)} ${plural(count, 'страна', 'страны', 'стран')}`,
+    feed: {
+      title: 'Последние штампы',
+      empty: 'У друзей пока нет штампов',
+      inPassport: (country: string) => `${country} в паспорте`,
+      photo: (dish: string) => `Фото: ${dish}`,
+      error: 'Не удалось загрузить штампы друзей.',
+      time: {
+        justNow: 'только что',
+        minutes: (count: number) => `${String(count)} мин назад`,
+        hours: (count: number) => `${String(count)} ч назад`,
+        yesterday: 'вчера',
+      },
+    },
+    empty: 'Позовите друзей, чтобы соревноваться',
+    invite: 'Позвать друга в Telegram',
+    inviteText:
+      'Готовлю ужины из кухонь разных стран и собираю штампы в паспорт. Присоединяйся — посоревнуемся!',
   },
   paywallStub: {
     title: 'Откроется с подпиской',
@@ -271,6 +303,12 @@ export const ruDevUi = {
     errorState: 'ErrorState',
     optionCard: 'OptionCard',
     spinner: 'Spinner',
+    segmentedControl: 'SegmentedControl',
+  },
+  segmented: {
+    label: 'Период',
+    week: 'Эта неделя',
+    all: 'Всё время',
   },
   typography: {
     display: 'Что на ужин сегодня?',
