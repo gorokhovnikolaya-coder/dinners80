@@ -1,4 +1,5 @@
 import {
+  buildShoppingList,
   defaultSuggestionMode,
   SUGGESTION_MODES,
   type HomeResponse,
@@ -9,11 +10,12 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 
 import { useHomeQuery } from '../../api/home.ts';
+import { useShoppingQuery } from '../../api/shopping.ts';
 import { MainTabBar } from '../../app/MainTabBar.tsx';
 import { ROUTES } from '../../app/routes.ts';
 import { Button } from '../../components/Button.tsx';
 import { ErrorState } from '../../components/ErrorState.tsx';
-import { IconRefresh } from '../../components/icons.tsx';
+import { IconCart, IconRefresh } from '../../components/icons.tsx';
 import { SegmentedControl } from '../../components/SegmentedControl.tsx';
 import { Skeleton, SkeletonGroup } from '../../components/Skeleton.tsx';
 import { ru } from '../../i18n/ru.ts';
@@ -47,6 +49,37 @@ function Avatar({ user }: { user: UserProfile }) {
         />
       ) : (
         <span aria-hidden="true">{initials(user.firstName)}</span>
+      )}
+    </Link>
+  );
+}
+
+/**
+ * The cart: opens the shopping list; the badge counts the rows still to buy (as on the list).
+ * Without data (loading or error) it is a plain cart.
+ */
+function ShoppingLink() {
+  const { toBuy } = useShoppingQuery(undefined, {
+    selectFromResult: ({ data }) => {
+      if (!data) return { toBuy: 0 };
+      const list = buildShoppingList(data.items);
+      return { toBuy: list.rowsCount - list.checkedCount };
+    },
+  });
+  return (
+    <Link
+      to={ROUTES.shopping}
+      aria-label={ru.shopping.open(toBuy)}
+      className="relative flex size-11 shrink-0 items-center justify-center rounded-full bg-surface text-ink no-underline shadow-card"
+    >
+      <IconCart size={22} />
+      {toBuy > 0 && (
+        <span
+          aria-hidden="true"
+          className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-2xs font-extrabold text-white"
+        >
+          {toBuy}
+        </span>
       )}
     </Link>
   );
@@ -205,7 +238,10 @@ export function HomeScreen({ user }: { user: UserProfile }) {
             <h1 className="font-display text-6xl font-bold text-balance">{t.title}</h1>
           </div>
           <div className="flex shrink-0 items-start gap-2">
-            <Avatar user={user} />
+            <div className="flex flex-col gap-2">
+              <Avatar user={user} />
+              <ShoppingLink />
+            </div>
             <CountriesTile data={data} />
           </div>
         </header>

@@ -12,6 +12,7 @@ import {
 } from '@tma80/shared';
 
 import { cooks as fixtureCooks } from './fixtures/cooks.ts';
+import { shoppingFixtures } from './fixtures/shopping.ts';
 import { findUserByTgId } from './fixtures/users.ts';
 
 /** What the mock backend knows about a user now: the fixture plus changes made in this session. */
@@ -32,6 +33,8 @@ export interface MockShoppingItem {
   ingredientKey: string;
   servings: number;
   checked: boolean;
+  /** ISO 8601. */
+  createdAt: string;
 }
 
 /**
@@ -54,7 +57,8 @@ const isShoppingItem = (value: unknown): value is MockShoppingItem => {
     typeof item.dishId === 'string' &&
     typeof item.ingredientKey === 'string' &&
     typeof item.servings === 'number' &&
-    typeof item.checked === 'boolean'
+    typeof item.checked === 'boolean' &&
+    typeof item.createdAt === 'string'
   );
 };
 
@@ -144,7 +148,12 @@ export function createMockDb(storage?: MockDbStorage) {
   const entryOf = (tgId: number, user: MockUser): StoredUser => {
     let entry = changed.get(tgId);
     if (!entry) {
-      entry = { patch: {}, onboarded: user.onboarded, shopping: [], cooks: [] };
+      entry = {
+        patch: {},
+        onboarded: user.onboarded,
+        shopping: (shoppingFixtures[tgId] ?? []).map((item) => ({ ...item })),
+        cooks: [],
+      };
       changed.set(tgId, entry);
     }
     return entry;
@@ -163,28 +172,31 @@ export function createMockDb(storage?: MockDbStorage) {
     return { ...user, profile, onboarded };
   };
 
-  /** The user's shopping list (empty in the fixtures). */
+  /** The user's shopping list: the fixture one until it is changed in this session. */
   const getShopping = (tgId: number): readonly MockShoppingItem[] =>
-    changed.get(tgId)?.shopping ?? [];
+    changed.get(tgId)?.shopping ?? shoppingFixtures[tgId] ?? [];
 
   /**
    * `POST /shopping` as the server does it: the dish's unchecked items are replaced with the sent
    * ingredients (no duplicates when a dish is added again); bought items stay.
    * @returns the number of the dish's items added, or `undefined` for an unknown user.
    */
-  const addShopping = (tgId: number, request: AddShoppingRequest): number | undefined => {
+  const addShopping = (
+    tgId: number,
+    request: AddShoppingRequest,
+    now = new Date(),
+  ): number | undefined => {
     const user = getUser(tgId);
     if (!user) return undefined;
     const entry = entryOf(tgId, user);
-    const kept = entry.shopping.filter(
-      (item) => item.dishId !== request.dishId || item.checked,
-    );
+    const kept = entry.shopping.filter((item) => item.dishId !== request.dishId || item.checked);
     const added = request.ingredientKeys.map((ingredientKey) => ({
       id: crypto.randomUUID(),
       dishId: request.dishId,
       ingredientKey,
       servings: request.servings,
       checked: false,
+      createdAt: now.toISOString(),
     }));
     entry.shopping = [...kept, ...added];
     persist();
@@ -210,7 +222,48 @@ export function createMockDb(storage?: MockDbStorage) {
     return record;
   };
 
-  return { getUser, updateUser, getShopping, addShopping, addCook };
+  /**
+   * `PATCH /shopping/:id`: marks the user's item bought or not.
+   * @returns the changed item, or `undefined` if the user has no such item.
+   */
+  const setShoppingChecked = (
+    tgId: number,
+    id: string,
+    checked: boolean,
+  ): MockShoppingItem | undefined => {
+    const user = getUser(tgId);
+    if (!user || !getShopping(tgId).some((item) => item.id === id)) return undefined;
+    const item = entryOf(tgId, user).shopping.find((candidate) => candidate.id === id);
+    if (!item) return undefined;
+    item.checked = checked;
+    persist();
+    return item;
+  };
+
+  /**
+   * `DELETE /shopping/checked`: removes the user's bought items.
+   * @returns how many were removed, or `undefined` for an unknown user.
+   */
+  const clearCheckedShopping = (tgId: number): number | undefined => {
+    const user = getUser(tgId);
+    if (!user) return undefined;
+    const entry = entryOf(tgId, user);
+    const kept = entry.shopping.filter((item) => !item.checked);
+    const removed = entry.shopping.length - kept.length;
+    entry.shopping = kept;
+    persist();
+    return removed;
+  };
+
+  return {
+    getUser,
+    updateUser,
+    getShopping,
+    addShopping,
+    setShoppingChecked,
+    clearCheckedShopping,
+    addCook,
+  };
 }
 
 export type MockDb = ReturnType<typeof createMockDb>;

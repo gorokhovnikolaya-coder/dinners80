@@ -97,8 +97,23 @@ export {
 export {
   addShoppingRequestSchema,
   addShoppingResponseSchema,
+  buildShoppingList,
+  clearShoppingResponseSchema,
+  shoppingItemSchema,
+  shoppingResponseSchema,
+  updateShoppingItemRequestSchema,
+  updateShoppingItemResponseSchema,
   type AddShoppingRequest,
   type AddShoppingResponse,
+  type ClearShoppingResponse,
+  type ShoppingAisle,
+  type ShoppingItem,
+  type ShoppingList,
+  type ShoppingResponse,
+  type ShoppingRow,
+  type ShoppingRowDish,
+  type UpdateShoppingItemRequest,
+  type UpdateShoppingItemResponse,
 } from './shopping.ts';
 export {
   findStepPlaceholderProblems,

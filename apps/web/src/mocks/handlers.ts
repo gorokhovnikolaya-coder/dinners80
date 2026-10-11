@@ -6,6 +6,7 @@ import {
   COOKS_PER_DAY_LIMIT,
   addShoppingRequestSchema,
   buildLeaderboard,
+  updateShoppingItemRequestSchema,
   buildPassport,
   createCookRequestSchema,
   findOvertakenFriend,
@@ -22,6 +23,9 @@ import {
   updateMeRequestSchema,
   type AddShoppingResponse,
   type ApiError,
+  type ClearShoppingResponse,
+  type ShoppingItem,
+  type ShoppingResponse,
   type ApiErrorCode,
   type AuthResponse,
   type CreateCookResponse,
@@ -42,7 +46,7 @@ import { HttpResponse, delay, http } from 'msw';
 
 import { parseInitDataUserId } from '../telegram/mock/initData.ts';
 import { NO_MOCK_CONTROLS, takeFailure, type MockControls } from './controls.ts';
-import { createMockDb, type MockDb, type MockUser } from './db.ts';
+import { createMockDb, type MockDb, type MockShoppingItem, type MockUser } from './db.ts';
 import { countries } from './fixtures/countries.ts';
 import { dishes, withIngredients } from './fixtures/dishes.ts';
 import { mockCookPhotoUrl, mockDishImageUrl } from './fixtures/images.ts';
@@ -305,6 +309,41 @@ export const recordCook = (
   };
 };
 
+/**
+ * An item of `GET /shopping` as the server builds it: the ingredient and the dish of the stored
+ * item, the amount recalculated for its servings. Items of unknown dishes or ingredients are
+ * dropped.
+ */
+export const shoppingItemOf = (item: MockShoppingItem): ShoppingItem | undefined => {
+  const dish = dishes.find((candidate) => candidate.id === item.dishId);
+  const ingredient = recipes[item.dishId]?.ingredients.find(
+    (candidate) => candidate.key === item.ingredientKey,
+  );
+  if (!dish || !ingredient) return undefined;
+  return {
+    id: item.id,
+    dishId: dish.id,
+    dishTitle: dish.title,
+    product: ingredient.product,
+    name: ingredient.name,
+    amount: scaleAmount(ingredient, dish.baseServings, item.servings),
+    unit: ingredient.unit,
+    aisle: ingredient.aisle,
+    checked: item.checked,
+    createdAt: item.createdAt,
+  };
+};
+
+/** `GET /shopping`: the user's items, oldest first. */
+export const shoppingResponse = (db: MockDb, tgId: number): ShoppingResponse => ({
+  items: [...db.getShopping(tgId)]
+    .sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt) || a.id.localeCompare(b.id))
+    .flatMap((item) => {
+      const built = shoppingItemOf(item);
+      return built ? [built] : [];
+    }),
+});
+
 const readJson = async (request: Request): Promise<unknown> => {
   try {
     return (await request.json()) as unknown;
@@ -392,14 +431,17 @@ export const createHandlers = (
     },
   ),
 
-  http.get<never, never, FeedResponse | ApiError>(`${apiBase}/friends/feed`, async ({ request }) => {
-    if (controls.delayMs > 0) await delay(controls.delayMs);
-    if (takeFailure(controls, 'friends_feed'))
-      return apiError(500, 'internal', 'Mock error (mock_error=friends_feed)');
-    const auth = authenticate(request, db);
-    if (!auth) return unauthorized();
-    return HttpResponse.json<FeedResponse>(feedResponse(db, auth[0]));
-  }),
+  http.get<never, never, FeedResponse | ApiError>(
+    `${apiBase}/friends/feed`,
+    async ({ request }) => {
+      if (controls.delayMs > 0) await delay(controls.delayMs);
+      if (takeFailure(controls, 'friends_feed'))
+        return apiError(500, 'internal', 'Mock error (mock_error=friends_feed)');
+      const auth = authenticate(request, db);
+      if (!auth) return unauthorized();
+      return HttpResponse.json<FeedResponse>(feedResponse(db, auth[0]));
+    },
+  ),
 
   http.get<{ id: string }, never, DishResponse | PaywallError | ApiError>(
     `${apiBase}/dishes/:id`,
@@ -430,6 +472,49 @@ export const createHandlers = (
         case 'ok':
           return HttpResponse.json<DishResponse>(result.dish);
       }
+    },
+  ),
+
+  http.get<never, never, ShoppingResponse | ApiError>(
+    `${apiBase}/shopping`,
+    async ({ request }) => {
+      if (controls.delayMs > 0) await delay(controls.delayMs);
+      if (takeFailure(controls, 'shopping_list'))
+        return apiError(500, 'internal', 'Mock error (mock_error=shopping_list)');
+      const auth = authenticate(request, db);
+      if (!auth) return unauthorized();
+      return HttpResponse.json<ShoppingResponse>(shoppingResponse(db, auth[0]));
+    },
+  ),
+
+  http.delete<never, never, ClearShoppingResponse | ApiError>(
+    `${apiBase}/shopping/checked`,
+    async ({ request }) => {
+      if (controls.delayMs > 0) await delay(controls.delayMs);
+      if (takeFailure(controls, 'shopping_clear'))
+        return apiError(500, 'internal', 'Mock error (mock_error=shopping_clear)');
+      const auth = authenticate(request, db);
+      if (!auth) return unauthorized();
+      const removed = db.clearCheckedShopping(auth[0]);
+      if (removed === undefined) return unauthorized();
+      return HttpResponse.json<ClearShoppingResponse>({ removed });
+    },
+  ),
+
+  http.patch<{ id: string }, never, ShoppingItem | ApiError>(
+    `${apiBase}/shopping/:id`,
+    async ({ request, params }) => {
+      if (controls.delayMs > 0) await delay(controls.delayMs);
+      if (takeFailure(controls, 'shopping_check'))
+        return apiError(500, 'internal', 'Mock error (mock_error=shopping_check)');
+      const auth = authenticate(request, db);
+      if (!auth) return unauthorized();
+      const body = updateShoppingItemRequestSchema.safeParse(await readJson(request));
+      if (!body.success) return apiError(400, 'validation', 'Invalid shopping item');
+      const changed = db.setShoppingChecked(auth[0], params.id, body.data.checked);
+      const item = changed && shoppingItemOf(changed);
+      if (!item) return apiError(404, 'not_found', 'Shopping item not found');
+      return HttpResponse.json<ShoppingItem>(item);
     },
   ),
 
@@ -480,28 +565,31 @@ export const createHandlers = (
     },
   ),
 
-  http.post<never, never, CreateCookResponse | ApiError>(`${apiBase}/cooks`, async ({ request }) => {
-    if (controls.delayMs > 0) await delay(controls.delayMs);
-    if (takeFailure(controls, 'cooks'))
-      return apiError(500, 'internal', 'Mock error (mock_error=cooks)');
-    if (takeFailure(controls, 'cooks_limit'))
-      return apiError(429, 'rate_limited', 'Too many cooks today (mock_error=cooks_limit)');
-    const auth = authenticate(request, db);
-    if (!auth) return unauthorized();
-    const body = createCookRequestSchema.safeParse(await readJson(request));
-    if (!body.success) return apiError(400, 'validation', 'Invalid cook');
-    const cook = recordCook(db, auth[0], body.data);
-    switch (cook.kind) {
-      case 'notFound':
-        return apiError(404, 'not_found', 'Dish not found');
-      case 'paywall':
-        return apiError(403, 'paywall', 'Subscription required');
-      case 'rateLimited':
-        return apiError(429, 'rate_limited', 'Too many cooks today');
-      case 'forbiddenPhoto':
-        return apiError(400, 'validation', 'Unknown photo');
-      case 'ok':
-        return HttpResponse.json<CreateCookResponse>(cook.result, { status: 201 });
-    }
-  }),
+  http.post<never, never, CreateCookResponse | ApiError>(
+    `${apiBase}/cooks`,
+    async ({ request }) => {
+      if (controls.delayMs > 0) await delay(controls.delayMs);
+      if (takeFailure(controls, 'cooks'))
+        return apiError(500, 'internal', 'Mock error (mock_error=cooks)');
+      if (takeFailure(controls, 'cooks_limit'))
+        return apiError(429, 'rate_limited', 'Too many cooks today (mock_error=cooks_limit)');
+      const auth = authenticate(request, db);
+      if (!auth) return unauthorized();
+      const body = createCookRequestSchema.safeParse(await readJson(request));
+      if (!body.success) return apiError(400, 'validation', 'Invalid cook');
+      const cook = recordCook(db, auth[0], body.data);
+      switch (cook.kind) {
+        case 'notFound':
+          return apiError(404, 'not_found', 'Dish not found');
+        case 'paywall':
+          return apiError(403, 'paywall', 'Subscription required');
+        case 'rateLimited':
+          return apiError(429, 'rate_limited', 'Too many cooks today');
+        case 'forbiddenPhoto':
+          return apiError(400, 'validation', 'Unknown photo');
+        case 'ok':
+          return HttpResponse.json<CreateCookResponse>(cook.result, { status: 201 });
+      }
+    },
+  ),
 ];

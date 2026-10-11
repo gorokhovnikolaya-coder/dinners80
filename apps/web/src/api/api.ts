@@ -15,7 +15,10 @@ export const api = createApi({
       return headers;
     },
   }),
-  /** `Cooks` — data that depends on the user's cooks (suggestions, counters, dish labels). */
-  tagTypes: ['Cooks'],
+  /**
+   * `Cooks` — data that depends on the user's cooks (suggestions, counters, dish labels);
+   * `Shopping` — the shopping list (`GET /shopping`), changed by the dish card's cart.
+   */
+  tagTypes: ['Cooks', 'Shopping'],
   endpoints: () => ({}),
 });

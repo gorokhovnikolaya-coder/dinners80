@@ -208,6 +208,35 @@ export const ru = {
     inviteText:
       'Готовлю ужины из кухонь разных стран и собираю штампы в паспорт. Присоединяйся — посоревнуемся!',
   },
+  shopping: {
+    title: 'Покупки',
+    /** The cart button on the main screen; `count` — rows not bought yet. */
+    open: (count: number) =>
+      count > 0 ? `Список покупок: осталось купить ${String(count)}` : 'Список покупок',
+    /** «2 блюда · куплено 2 из 7». */
+    summary: (dishes: number, checked: number, total: number) =>
+      `${String(dishes)} ${plural(dishes, 'блюдо', 'блюда', 'блюд')} · куплено ${String(checked)} из ${String(total)}`,
+    aisles: {
+      meat: 'Мясо и рыба',
+      veg: 'Овощи и зелень',
+      dairy: 'Молочное',
+      grocery: 'Бакалея',
+      other: 'Другое',
+    },
+    clear: 'Очистить купленное',
+    clearing: 'Очищаем…',
+    clearError: 'Не удалось очистить купленное. Попробуйте ещё раз.',
+    checkError: 'Не удалось сохранить отметку. Попробуйте ещё раз.',
+    send: 'Отправить список в чат',
+    /** Text of the list sent to a chat: a heading, then the aisles with their rows. */
+    shareTitle: 'Список покупок',
+    shareRow: (name: string, amount: string) => `• ${name} — ${amount}`,
+    empty: {
+      title: 'Список покупок пуст',
+      description: 'Добавляйте недостающее с карточки блюда — кнопкой корзины',
+      action: 'Выбрать ужин',
+    },
+  },
   paywallStub: {
     title: 'Откроется с подпиской',
     description: 'Рецепт этого блюда откроется после оформления подписки.',

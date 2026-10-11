@@ -1,6 +1,10 @@
 import {
   addShoppingResponseSchema,
   authResponseSchema,
+  buildShoppingList,
+  clearShoppingResponseSchema,
+  shoppingItemSchema,
+  shoppingResponseSchema,
   COOKS_PER_DAY_LIMIT,
   createCookResponseSchema,
   dishResponseSchema,
@@ -457,11 +461,14 @@ describe('POST /shopping (MSW)', () => {
     await post(tgId, { dishId: 'pe-ceviche', servings: 4, ingredientKeys: ['lime'] });
     await post(tgId, { dishId: 'it-carbonara', servings: 2, ingredientKeys: ['spaghetti'] });
     expect(
-      db.getShopping(tgId).map(({ dishId, ingredientKey, servings }) => ({
-        dishId,
-        ingredientKey,
-        servings,
-      })),
+      db
+        .getShopping(tgId)
+        .filter(({ dishId }) => dishId === 'pe-ceviche' || dishId === 'it-carbonara')
+        .map(({ dishId, ingredientKey, servings }) => ({
+          dishId,
+          ingredientKey,
+          servings,
+        })),
     ).toEqual([
       { dishId: 'pe-ceviche', ingredientKey: 'lime', servings: 4 },
       { dishId: 'it-carbonara', ingredientKey: 'spaghetti', servings: 2 },
@@ -486,6 +493,81 @@ describe('POST /shopping (MSW)', () => {
     const body = { dishId: 'pe-ceviche', servings: 2, ingredientKeys: ['lime'] };
     expect((await post(TEST_USER_IDS.eightCountries, body)).status).toBe(500);
     expect((await post(TEST_USER_IDS.eightCountries, body)).status).toBe(201);
+  });
+});
+
+describe('GET, PATCH, DELETE /shopping (MSW)', () => {
+  const request = (tgId: number, path: string, init: RequestInit = {}) =>
+    fetch(`${API_BASE}/shopping${path}`, {
+      ...init,
+      headers: { Authorization: `tma ${initDataOf(tgId)}`, 'Content-Type': 'application/json' },
+    });
+
+  it('returns the fixture list with amounts for the servings', async () => {
+    server.use(...createHandlers(API_BASE, NO_MOCK_CONTROLS, createMockDb()));
+    const response = await request(TEST_USER_IDS.eightCountries, '');
+    expect(response.status).toBe(200);
+    const { items } = shoppingResponseSchema.parse(await response.json());
+    const list = buildShoppingList(items);
+    expect(list.dishesCount).toBe(2);
+    const rice = list.aisles.flatMap((aisle) => aisle.rows).find((row) => row.product === 'rice');
+    expect(rice?.amount).toBe(300);
+    expect(rice?.dishes.map((dish) => dish.id)).toEqual(['pe-lomo-saltado', 'jp-oyakodon']);
+    expect(list.checkedCount).toBe(2);
+
+    const empty = await request(TEST_USER_IDS.newbie, '');
+    expect(shoppingResponseSchema.parse(await empty.json()).items).toEqual([]);
+  });
+
+  it('marks an item and clears the bought ones', async () => {
+    const db = createMockDb();
+    server.use(...createHandlers(API_BASE, NO_MOCK_CONTROLS, db));
+    const tgId = TEST_USER_IDS.eightCountries;
+    const [first] = db.getShopping(tgId);
+    if (!first) throw new Error('missing fixture item');
+
+    const patched = await request(tgId, `/${first.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ checked: true }),
+    });
+    expect(patched.status).toBe(200);
+    expect(shoppingItemSchema.parse(await patched.json()).checked).toBe(true);
+
+    const cleared = await request(tgId, '/checked', { method: 'DELETE' });
+    expect(clearShoppingResponseSchema.parse(await cleared.json())).toEqual({ removed: 3 });
+    expect(db.getShopping(tgId).every((item) => !item.checked)).toBe(true);
+    expect(db.getShopping(tgId)).toHaveLength(9);
+  });
+
+  it('answers 404 for an unknown item and 400 for an invalid body', async () => {
+    const tgId = TEST_USER_IDS.eightCountries;
+    expect(
+      (await request(tgId, '/nope', { method: 'PATCH', body: JSON.stringify({ checked: true }) }))
+        .status,
+    ).toBe(404);
+    expect(
+      (await request(tgId, '/fx-lomo-01', { method: 'PATCH', body: JSON.stringify({}) })).status,
+    ).toBe(400);
+  });
+
+  it('fails once with 500 for the shopping_list, shopping_check and shopping_clear keys', async () => {
+    server.use(
+      ...createHandlers(
+        API_BASE,
+        parseMockControls('?mock_error=shopping_list,shopping_check,shopping_clear'),
+        createMockDb(),
+      ),
+    );
+    const tgId = TEST_USER_IDS.eightCountries;
+    const patch = () =>
+      request(tgId, '/fx-lomo-01', { method: 'PATCH', body: JSON.stringify({ checked: true }) });
+    const clear = () => request(tgId, '/checked', { method: 'DELETE' });
+    expect((await request(tgId, '')).status).toBe(500);
+    expect((await request(tgId, '')).status).toBe(200);
+    expect((await patch()).status).toBe(500);
+    expect((await patch()).status).toBe(200);
+    expect((await clear()).status).toBe(500);
+    expect((await clear()).status).toBe(200);
   });
 });
 

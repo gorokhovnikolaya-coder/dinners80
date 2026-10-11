@@ -96,6 +96,15 @@ export function IconCart(props: IconProps) {
   );
 }
 
+/** «Отправить»: an arrow up out of a tray (the shopping list's «Отправить список в чат»). */
+export function IconShare(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 3v12M7 8l5-5 5 5M5 14v6h14v-6" />
+    </Icon>
+  );
+}
+
 export function IconPlus(props: IconProps) {
   return (
     <Icon strokeWidth={2.2} {...props}>

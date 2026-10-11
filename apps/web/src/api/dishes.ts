@@ -33,6 +33,7 @@ export const dishesApi = api.injectEndpoints({
     addToShopping: build.mutation<AddShoppingResponse, AddShoppingRequest>({
       query: (body) => ({ url: '/shopping', method: 'POST', body }),
       responseSchema: addShoppingResponseSchema,
+      invalidatesTags: ['Shopping'],
     }),
   }),
 });

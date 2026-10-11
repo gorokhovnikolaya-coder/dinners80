@@ -23,16 +23,20 @@ export function shareLink(url: string, text: string): string {
 }
 
 /**
- * Sends the invite link to a chat the user picks: `shareURL` of the SDK (`openTelegramLink` to
+ * Opens the chat picker with the URL and the text: `shareURL` of the SDK (`openTelegramLink` to
  * `t.me/share/url`); outside Telegram or in a client without it — the same link in a new tab.
  */
-export function shareInvite(inviteCode: string, text: string): void {
-  const link = inviteLink(inviteCode);
+export function shareToChat(url: string, text: string): void {
   let shared = false;
   try {
-    shared = shareURL.ifAvailable(link, text).ok;
+    shared = shareURL.ifAvailable(url, text).ok;
   } catch {
     shared = false;
   }
-  if (!shared) window.open(shareLink(link, text), '_blank', 'noopener');
+  if (!shared) window.open(shareLink(url, text), '_blank', 'noopener');
+}
+
+/** Sends the invite link with the text to a chat the user picks (`shareToChat`). */
+export function shareInvite(inviteCode: string, text: string): void {
+  shareToChat(inviteLink(inviteCode), text);
 }
