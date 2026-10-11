@@ -24,7 +24,8 @@ export const shoppingApi = api.injectEndpoints({
     }),
     /**
      * `PATCH /shopping/:id` for every item of a row. The list is updated at once (optimistic) and
-     * rolled back if any request fails.
+     * rolled back if any request fails, then
+     * refetched: the other items of the row may be marked on the server already.
      */
     checkShopping: build.mutation<null, CheckShoppingArgs>({
       async queryFn({ ids, checked }, _api, _extra, baseQuery) {
@@ -64,6 +65,8 @@ export const shoppingApi = api.injectEndpoints({
           await queryFulfilled;
         } catch {
           patch.undo();
+          // Some items of the row may be marked on the server already: reload the list.
+          dispatch(api.util.invalidateTags(['Shopping']));
         }
       },
     }),
