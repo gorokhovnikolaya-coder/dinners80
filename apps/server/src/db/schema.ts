@@ -101,6 +101,7 @@ export const users = pgTable(
     lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
+    index('users_invited_by_idx').on(table.invitedBy),
     check('users_household_check', oneOf(table.household, HOUSEHOLDS)),
     check('users_weekday_minutes_check', oneOf(table.weekdayMinutes, WEEKDAY_MINUTES)),
     check('users_exclusions_check', subsetOf(table.exclusions, DISH_TAGS)),
@@ -233,6 +234,8 @@ export const cooks = pgTable(
       columns: [table.dishId, table.countryId],
       foreignColumns: [dishes.id, dishes.countryId],
     }),
+    // FK lookups when a dish changes; `dishes.country_id` is covered by `dishes_country_slug_unique`.
+    index('cooks_dish_country_idx').on(table.dishId, table.countryId),
     index('cooks_user_created_idx').on(table.userId, table.createdAt),
     index('cooks_user_country_idx').on(table.userId, table.countryId),
   ],
@@ -251,6 +254,7 @@ export const friendships = pgTable(
   },
   (table) => [
     primaryKey({ columns: [table.userId, table.friendId] }),
+    index('friendships_friend_idx').on(table.friendId),
     check('friendships_not_self_check', sql`${table.userId} <> ${table.friendId}`),
   ],
 );
@@ -275,6 +279,7 @@ export const shoppingItems = pgTable(
       foreignColumns: [dishIngredients.id, dishIngredients.dishId],
     }).onDelete('cascade'),
     index('shopping_items_user_idx').on(table.userId),
+    index('shopping_items_ingredient_dish_idx').on(table.ingredientId, table.dishId),
     check(
       'shopping_items_servings_check',
       sql`${table.servings} between ${sql.raw(String(SERVINGS_MIN))} and ${sql.raw(String(SERVINGS_MAX))}`,

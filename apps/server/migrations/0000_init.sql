@@ -149,8 +149,12 @@ ALTER TABLE "shopping_items" ADD CONSTRAINT "shopping_items_user_id_users_id_fk"
 ALTER TABLE "shopping_items" ADD CONSTRAINT "shopping_items_ingredient_dish_fk" FOREIGN KEY ("ingredient_id","dish_id") REFERENCES "public"."dish_ingredients"("id","dish_id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "users" ADD CONSTRAINT "users_invited_by_users_id_fk" FOREIGN KEY ("invited_by") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "cooks_dish_country_idx" ON "cooks" USING btree ("dish_id","country_id");--> statement-breakpoint
 CREATE INDEX "cooks_user_created_idx" ON "cooks" USING btree ("user_id","created_at");--> statement-breakpoint
 CREATE INDEX "cooks_user_country_idx" ON "cooks" USING btree ("user_id","country_id");--> statement-breakpoint
 CREATE INDEX "events_name_created_idx" ON "events" USING btree ("name","created_at");--> statement-breakpoint
+CREATE INDEX "friendships_friend_idx" ON "friendships" USING btree ("friend_id");--> statement-breakpoint
 CREATE INDEX "shopping_items_user_idx" ON "shopping_items" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX "subscriptions_user_expires_idx" ON "subscriptions" USING btree ("user_id","expires_at");
+CREATE INDEX "shopping_items_ingredient_dish_idx" ON "shopping_items" USING btree ("ingredient_id","dish_id");--> statement-breakpoint
+CREATE INDEX "subscriptions_user_expires_idx" ON "subscriptions" USING btree ("user_id","expires_at");--> statement-breakpoint
+CREATE INDEX "users_invited_by_idx" ON "users" USING btree ("invited_by");

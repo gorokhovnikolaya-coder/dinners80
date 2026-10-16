@@ -1,5 +1,5 @@
 {
-  "id": "f8fd29d1-9f4e-4f94-b859-e5cb3b39cde2",
+  "id": "e5b97970-6890-46fc-9960-f8047f137ac9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -48,6 +48,27 @@
         }
       },
       "indexes": {
+        "cooks_dish_country_idx": {
+          "name": "cooks_dish_country_idx",
+          "columns": [
+            {
+              "expression": "dish_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "country_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "cooks_user_created_idx": {
           "name": "cooks_user_created_idx",
           "columns": [
@@ -564,7 +585,23 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "friendships_friend_idx": {
+          "name": "friendships_friend_idx",
+          "columns": [
+            {
+              "expression": "friend_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "friendships_user_id_users_id_fk": {
           "name": "friendships_user_id_users_id_fk",
@@ -657,6 +694,27 @@
           "columns": [
             {
               "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "shopping_items_ingredient_dish_idx": {
+          "name": "shopping_items_ingredient_dish_idx",
+          "columns": [
+            {
+              "expression": "ingredient_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "dish_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -953,7 +1011,23 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "users_invited_by_idx": {
+          "name": "users_invited_by_idx",
+          "columns": [
+            {
+              "expression": "invited_by",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "users_invited_by_users_id_fk": {
           "name": "users_invited_by_users_id_fk",

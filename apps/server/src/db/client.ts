@@ -5,12 +5,20 @@ import * as schema from './schema.ts';
 
 export type Db = NodePgDatabase<typeof schema>;
 
-/** The local Postgres of docker-compose.yml (dev credentials, as in .env.example). */
-export const LOCAL_DATABASE_URL = 'postgres://tma80:tma80@127.0.0.1:5433/tma80';
-
-/** `DATABASE_URL` from the environment; without it — the local dev database. */
-export function databaseUrl(): string {
-  return process.env.DATABASE_URL ?? LOCAL_DATABASE_URL;
+/**
+ * `DATABASE_URL` from the environment: the password lives only there and in `.env` (the npm
+ * scripts load `.env` of the repository root; the local value is in `.env.example`).
+ */
+export function databaseUrl(
+  env: Readonly<Record<string, string | undefined>> = process.env,
+): string {
+  const url = env.DATABASE_URL;
+  if (url === undefined || url === '') {
+    throw new Error(
+      'DATABASE_URL is not set: copy .env.example to .env (local Postgres of docker-compose) or set it in the environment',
+    );
+  }
+  return url;
 }
 
 export interface Database {
