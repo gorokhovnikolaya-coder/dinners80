@@ -246,4 +246,41 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('POST /api/auth', () => {
 
     expect((await app.inject({ method: 'GET', url: '/api/test-whoami' })).statusCode).toBe(401);
   });
+
+  it('repeats an invitation without duplicate friendships either way', async () => {
+    const inviter = await signIn(initData(newTgId()));
+    const inviteeTgId = newTgId();
+    const invitee = await signIn(initData(inviteeTgId, { startParam: inviter.user.inviteCode }));
+    await signIn(initData(inviteeTgId, { startParam: inviter.user.inviteCode }));
+    await signIn(initData(inviteeTgId, { startParam: inviter.user.inviteCode }));
+
+    expect(await friendsOf(invitee.user.id)).toEqual([inviter.user.id]);
+    expect(await friendsOf(inviter.user.id)).toEqual([invitee.user.id]);
+    expect(await inviteEvents(invitee.user.id)).toHaveLength(1);
+  });
+
+  it('survives a parallel first sign-in with one user and one friendship pair', async () => {
+    const inviter = await signIn(initData(newTgId()));
+    const tgId = newTgId();
+    const raw = initData(tgId, { startParam: inviter.user.inviteCode });
+
+    const responses = await Promise.all([auth(raw), auth(raw), auth(raw)]);
+    expect(responses.map((response) => response.statusCode)).toEqual([200, 200, 200]);
+    const bodies = responses.map((response) => authResponseSchema.parse(response.json()));
+    const ids = new Set(bodies.map((body) => body.user.id));
+    expect(ids.size).toBe(1);
+    const [userId] = ids;
+    if (userId === undefined) throw new Error('no user');
+
+    expect(
+      await database.db
+        .select()
+        .from(users)
+        .where(inArray(users.tgId, [tgId])),
+    ).toHaveLength(1);
+    expect(await friendsOf(userId)).toEqual([inviter.user.id]);
+    expect(await friendsOf(inviter.user.id)).toEqual([userId]);
+    expect((await userRow(userId)).invitedBy).toBe(inviter.user.id);
+    expect(await inviteEvents(userId)).toHaveLength(1);
+  });
 });
