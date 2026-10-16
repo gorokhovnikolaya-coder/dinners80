@@ -9,7 +9,7 @@ import { events, friendships, subscriptions, users } from './schema.ts';
 
 export type UserRow = typeof users.$inferSelect;
 export type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
-type Executor = Db | Tx;
+export type Executor = Db | Tx;
 
 export async function findUserByTgId(db: Executor, tgId: number): Promise<UserRow | undefined> {
   const [row] = await db.select().from(users).where(eq(users.tgId, tgId)).limit(1);

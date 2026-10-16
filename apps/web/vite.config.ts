@@ -1,10 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 
 /// <reference types="vitest/config" />
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig, loadEnv, type Plugin } from 'vite';
+
+import { localApi } from './localApi.ts';
 
 // One .env for the whole monorepo lives in the repository root.
 const envDir = '../..';
@@ -51,8 +54,25 @@ export default defineConfig(({ command, mode }) => {
     }
   }
 
+  const plugins = [react(), tailwindcss(), mswWorker()];
+  if (command === 'serve' && process.env.VITE_API === 'local') {
+    // Server-side variables (no VITE_ prefix): they stay in Node and never reach the bundle.
+    const serverEnv = loadEnv(mode, envDir, '');
+    const botToken = serverEnv.BOT_TOKEN?.trim() ?? '';
+    if (botToken === '') {
+      throw new Error('VITE_API=local needs BOT_TOKEN in .env: the same test token as the server');
+    }
+    plugins.push(
+      localApi({
+        target: `http://127.0.0.1:${serverEnv.PORT ?? '3080'}`,
+        botToken,
+        contentDir: fileURLToPath(new URL('../../content', import.meta.url)),
+      }),
+    );
+  }
+
   return {
-    plugins: [react(), tailwindcss(), mswWorker()],
+    plugins,
     envDir,
     build: {
       // dist/.vite/manifest.json — size-limit uses it to find the initial chunks.

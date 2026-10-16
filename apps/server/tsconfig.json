@@ -2,9 +2,18 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": ".tsbuild",
-    "rootDir": ".",
+    "rootDir": "../..",
     "types": ["node"]
   },
-  "include": ["src", "seed", "drizzle.config.ts"],
+  "include": [
+    "src",
+    "seed",
+    "drizzle.config.ts",
+    "../web/src/mocks/fixtures/cooks.ts",
+    "../web/src/mocks/fixtures/dishes.ts",
+    "../web/src/mocks/fixtures/recipes.ts",
+    "../web/src/mocks/fixtures/shopping.ts",
+    "../web/src/mocks/fixtures/users.ts"
+  ],
   "references": [{ "path": "../../packages/shared" }]
 }

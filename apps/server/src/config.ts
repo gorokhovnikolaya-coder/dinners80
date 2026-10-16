@@ -11,3 +11,12 @@ export function botToken(env: Readonly<Record<string, string | undefined>> = pro
   }
   return token.trim();
 }
+
+/**
+ * `MEDIA_URL`: public base URL of media files (nginx serves `/media/content/*` photos of the
+ * content); `/media` on our own domain by default. A trailing slash is dropped.
+ */
+export function mediaUrl(env: Readonly<Record<string, string | undefined>> = process.env): string {
+  const url = env.MEDIA_URL?.trim();
+  return (url === undefined || url === '' ? '/media' : url).replace(/\/+$/, '');
+}
