@@ -2,9 +2,9 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": ".tsbuild",
-    "rootDir": "src",
+    "rootDir": ".",
     "types": ["node"]
   },
-  "include": ["src"],
+  "include": ["src", "seed", "drizzle.config.ts"],
   "references": [{ "path": "../../packages/shared" }]
 }

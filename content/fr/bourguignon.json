@@ -1,0 +1,76 @@
+{
+  "title": "Говядина по-бургундски",
+  "level": "challenge",
+  "minutes": 180,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Говядина, томлённая в красном вине с беконом и грибами.",
+  "fact": "Блюдо прославила Джулия Чайлд в своём телешоу.",
+  "ingredients": [
+    {
+      "key": "beef",
+      "name": "Говядина",
+      "amount": 800,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "bacon",
+      "name": "Бекон из свинины",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "red_wine",
+      "name": "Красное вино",
+      "amount": 500,
+      "unit": "ml",
+      "aisle": "grocery"
+    },
+    {
+      "key": "mushrooms",
+      "name": "Шампиньоны",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "carrot",
+      "name": "Морковь",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {bacon} бекона, затем {beef} крупно нарезанной говядины.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Добавьте {onion} лука и {carrot} моркови, влейте {red_wine} красного вина."
+    },
+    {
+      "text": "Тушите под крышкой на слабом огне.",
+      "timerMinutes": 150
+    },
+    {
+      "text": "Обжарьте {mushrooms} шампиньонов и добавьте в рагу за 10 минут до конца."
+    }
+  ]
+}

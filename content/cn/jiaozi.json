@@ -1,0 +1,63 @@
+{
+  "title": "Цзяоцзы",
+  "level": "challenge",
+  "minutes": 120,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Варёные пельмени со свининой и китайской капустой.",
+  "fact": "Цзяоцзы обязательно лепят всей семьёй на китайский Новый год.",
+  "ingredients": [
+    {
+      "key": "pork_mince",
+      "name": "Свиной фарш",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "chinese_cabbage",
+      "product": "napa_cabbage",
+      "name": "Китайская капуста",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "flour",
+      "name": "Мука",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "ginger",
+      "name": "Имбирь",
+      "amount": 15,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "soy_sauce",
+      "name": "Соевый соус",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Замесите тесто из {flour} муки и холодной воды, дайте отдохнуть.",
+      "timerMinutes": 30
+    },
+    {
+      "text": "Смешайте {pork_mince} свиного фарша с {chinese_cabbage} рубленой китайской капусты, {ginger} имбиря и {soy_sauce} соевого соуса."
+    },
+    {
+      "text": "Раскатайте кружки, разложите начинку и слепите пельмени."
+    },
+    {
+      "text": "Варите в кипящей воде после всплытия.",
+      "timerMinutes": 4
+    }
+  ]
+}

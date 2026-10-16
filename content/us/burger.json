@@ -1,0 +1,102 @@
+{
+  "title": "Классический бургер",
+  "level": "weekend",
+  "minutes": 45,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Сочная говяжья котлета с сыром, овощами и соусом в мягкой булочке.",
+  "fact": "Каждый год американцы съедают около 50 млрд бургеров.",
+  "ingredients": [
+    {
+      "key": "beef_mince",
+      "name": "Фарш говяжий",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "buns",
+      "name": "Булочки для бургеров",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "cheese",
+      "name": "Сыр чеддер ломтиками",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "tomato",
+      "name": "Помидоры",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "lettuce",
+      "name": "Салат ромэн",
+      "amount": 50,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "pickles",
+      "name": "Маринованные огурцы",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "red_onion",
+      "name": "Красный лук",
+      "amount": 0.5,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "ketchup",
+      "name": "Кетчуп",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    },
+    {
+      "key": "pepper",
+      "product": "black_pepper",
+      "name": "Чёрный перец",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Разделите {beef_mince} говяжьего фарша на 2 части и сформуйте котлеты шире булочки."
+    },
+    {
+      "text": "Посолите и поперчите котлеты, обжарьте на раскалённой сковороде по 3–4 минуты с каждой стороны.",
+      "timerMinutes": 7
+    },
+    {
+      "text": "В конце разложите на котлеты {cheese} сыра и накройте крышкой на минуту.",
+      "timerMinutes": 1
+    },
+    {
+      "text": "Подрумяньте {buns} булочек срезом вниз.",
+      "timerMinutes": 1
+    },
+    {
+      "text": "Соберите бургер: {ketchup} кетчупа, {lettuce} салата, котлета, {tomato} помидора, {pickles} огурцов и {red_onion} красного лука."
+    }
+  ]
+}

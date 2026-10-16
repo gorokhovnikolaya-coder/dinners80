@@ -1,0 +1,65 @@
+{
+  "title": "Эмпанадас",
+  "level": "weekend",
+  "minutes": 90,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Пирожки с говяжьим фаршем, яйцом и оливками.",
+  "fact": "В каждой провинции Аргентины свой способ защипывать края.",
+  "ingredients": [
+    {
+      "key": "dough",
+      "product": "empanada_dough",
+      "name": "Тесто для эмпанадас",
+      "amount": 10,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "beef_mince",
+      "name": "Говяжий фарш",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "eggs",
+      "product": "egg",
+      "name": "Яйца",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "olives",
+      "name": "Оливки",
+      "amount": 50,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {onion} лука с {beef_mince} говяжьего фарша.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Сварите вкрутую {eggs} яиц, нарежьте их и {olives} оливок.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Разложите начинку по {dough} кругов теста и защипните края."
+    },
+    {
+      "text": "Запекайте при 200 °C до золотистого цвета.",
+      "timerMinutes": 20
+    }
+  ]
+}

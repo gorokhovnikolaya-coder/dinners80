@@ -16,11 +16,16 @@
     "typecheck": "tsc -b",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:db": "DATABASE_URL=${DATABASE_URL:-postgres://tma80:tma80@127.0.0.1:5433/tma80} vitest run apps/server/src/db",
     "size": "npm run build -w @tma80/web && size-limit",
     "check": "npm run typecheck && npm run lint && npm run test && npm run size",
     "format": "prettier --write .",
     "db:up": "docker compose up -d --wait postgres",
     "db:down": "docker compose down",
+    "db:migrate": "npm run db:migrate -w @tma80/server",
+    "db:seed": "npm run db:seed -w @tma80/server",
+    "db:reset": "npm run db:reset -w @tma80/server",
+    "db:generate": "npm run db:generate -w @tma80/server",
     "e2e": "playwright test"
   },
   "devDependencies": {

@@ -1,0 +1,80 @@
+{
+  "title": "Калду верде",
+  "level": "weekend",
+  "minutes": 50,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Картофельный суп с тонкой зеленью капусты и колбасой.",
+  "fact": "Капусту для калду верде режут так тонко, что она похожа на зелёные нити.",
+  "ingredients": [
+    {
+      "key": "potato",
+      "name": "Картофель",
+      "amount": 500,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 2,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "kale",
+      "name": "Капуста кале",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "chorizo",
+      "name": "Колбаса чоризо",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "olive_oil",
+      "name": "Оливковое масло",
+      "amount": 3,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {onion} лука и {garlic} чеснока на половине {olive_oil} оливкового масла до мягкости.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Добавьте {potato} картофеля кубиками и 1 л воды, варите до мягкости.",
+      "timerMinutes": 20
+    },
+    {
+      "text": "Измельчите суп блендером в пюре и посолите."
+    },
+    {
+      "text": "Нарежьте {kale} капусты кале тонкой соломкой, добавьте в суп и варите 5 минут.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Обжарьте {chorizo} чоризо кружками и разложите по тарелкам, сбрызнув маслом."
+    }
+  ]
+}

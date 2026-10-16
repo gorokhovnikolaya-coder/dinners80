@@ -1,0 +1,71 @@
+{
+  "title": "Санкочо",
+  "level": "weekend",
+  "minutes": 120,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Густой суп с курицей, кукурузой и маниокой.",
+  "fact": "Санкочо варят в большом котле на всю семью по воскресеньям.",
+  "ingredients": [
+    {
+      "key": "chicken",
+      "name": "Курица",
+      "amount": 800,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "corn",
+      "product": "corn_cob",
+      "name": "Кукуруза",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "cassava",
+      "name": "Маниока",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "cilantro",
+      "name": "Кинза",
+      "amount": 20,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "potatoes",
+      "product": "potato",
+      "name": "Картофель",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Залейте {chicken} курицы водой и варите.",
+      "timerMinutes": 40
+    },
+    {
+      "text": "Добавьте {cassava} маниоки, {potatoes} картофеля и {corn} кукурузы кусками."
+    },
+    {
+      "text": "Варите до мягкости овощей.",
+      "timerMinutes": 30
+    },
+    {
+      "text": "Посыпьте {cilantro} кинзы перед подачей."
+    }
+  ]
+}

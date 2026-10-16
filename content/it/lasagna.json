@@ -1,0 +1,72 @@
+{
+  "title": "Лазанья болоньезе",
+  "level": "weekend",
+  "minutes": 120,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Слои пасты, мясного рагу и соуса бешамель.",
+  "fact": "Рагу болоньезе в Болонье томят не меньше трёх часов.",
+  "ingredients": [
+    {
+      "key": "sheets",
+      "product": "lasagna_sheets",
+      "name": "Листы лазаньи",
+      "amount": 250,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "beef_mince",
+      "name": "Говяжий фарш",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "tomatoes",
+      "product": "tomato",
+      "name": "Томаты",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "bechamel",
+      "name": "Соус бешамель",
+      "amount": 400,
+      "unit": "ml",
+      "aisle": "dairy"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {onion} лука и {beef_mince} говяжьего фарша до румяности.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Добавьте {tomatoes} томатов и томите рагу под крышкой.",
+      "timerMinutes": 40
+    },
+    {
+      "text": "Соберите слоями {sheets} листов лазаньи, рагу и {bechamel} соуса бешамель."
+    },
+    {
+      "text": "Запекайте при 180 °C до золотистой корочки.",
+      "timerMinutes": 40
+    }
+  ]
+}

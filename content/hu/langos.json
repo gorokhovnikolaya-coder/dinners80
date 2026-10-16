@@ -1,0 +1,98 @@
+{
+  "title": "Лангош",
+  "level": "challenge",
+  "minutes": 90,
+  "baseServings": 2,
+  "tags": ["gluten"],
+  "description": "Жаренная во фритюре лепёшка со сметаной, чесноком и сыром.",
+  "fact": "Лангош — главная уличная еда у озера Балатон.",
+  "ingredients": [
+    {
+      "key": "flour",
+      "name": "Мука",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "potato",
+      "name": "Картофель",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "yeast",
+      "name": "Сухие дрожжи",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "milk",
+      "name": "Тёплое молоко",
+      "amount": 150,
+      "unit": "ml",
+      "aisle": "dairy"
+    },
+    {
+      "key": "sour_cream",
+      "name": "Сметана",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "cheese",
+      "name": "Твёрдый сыр",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло для фритюра",
+      "amount": 500,
+      "unit": "ml",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Отварите {potato} картофеля и разомните в пюре.",
+      "timerMinutes": 20
+    },
+    {
+      "text": "Смешайте {yeast} дрожжей с {milk} тёплого молока, добавьте картофель, {flour} муки и соль, замесите тесто."
+    },
+    {
+      "text": "Оставьте тесто подходить в тепле.",
+      "timerMinutes": 45
+    },
+    {
+      "text": "Разделите тесто на 4 части и растяните руками в тонкие лепёшки."
+    },
+    {
+      "text": "Жарьте лепёшки в разогретом {oil} масла по минуте с каждой стороны.",
+      "timerMinutes": 2
+    },
+    {
+      "text": "Смажьте {sour_cream} сметаны с {garlic} давленого чеснока и посыпьте {cheese} тёртого сыра."
+    }
+  ]
+}

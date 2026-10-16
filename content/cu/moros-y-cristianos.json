@@ -1,0 +1,84 @@
+{
+  "title": "Морос и кристианос",
+  "level": "weekend",
+  "minutes": 70,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Рис, сваренный вместе с чёрной фасолью, беконом и специями.",
+  "fact": "Название — «мавры и христиане» — отсылает к чёрной фасоли и белому рису.",
+  "ingredients": [
+    {
+      "key": "black_beans",
+      "name": "Чёрная фасоль сухая",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "rice",
+      "name": "Рис",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "bacon",
+      "name": "Бекон из свинины",
+      "amount": 80,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "bell_pepper",
+      "name": "Сладкий перец",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 2,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "cumin",
+      "name": "Молотый кумин",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Замочите {black_beans} чёрной фасоли на ночь, затем отварите до мягкости, сохранив отвар.",
+      "timerMinutes": 50
+    },
+    {
+      "text": "Обжарьте {bacon} бекона, добавьте {onion} лука, {bell_pepper} сладкого перца и {garlic} чеснока.",
+      "timerMinutes": 7
+    },
+    {
+      "text": "Всыпьте {rice} риса и {cumin} кумина, перемешайте."
+    },
+    {
+      "text": "Добавьте фасоль и 350 мл отвара, посолите и варите под крышкой.",
+      "timerMinutes": 20
+    }
+  ]
+}

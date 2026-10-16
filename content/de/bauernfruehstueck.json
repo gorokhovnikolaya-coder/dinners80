@@ -1,0 +1,90 @@
+{
+  "title": "Крестьянский завтрак",
+  "level": "weekday",
+  "minutes": 30,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Жареная картошка с беконом, луком и яйцами на одной сковороде.",
+  "fact": "Несмотря на название, немцы едят его в любое время дня, чаще на ужин.",
+  "ingredients": [
+    {
+      "key": "potato",
+      "name": "Картофель",
+      "amount": 500,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "bacon",
+      "name": "Бекон из свинины",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "egg",
+      "name": "Яйца",
+      "amount": 4,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "chives",
+      "name": "Зелёный лук",
+      "amount": 10,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    },
+    {
+      "key": "pepper",
+      "product": "black_pepper",
+      "name": "Чёрный перец",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Отварите {potato} картофеля в мундире до готовности, остудите и нарежьте кружками.",
+      "timerMinutes": 20
+    },
+    {
+      "text": "Обжарьте {bacon} бекона полосками до хруста, добавьте {onion} лука и жарьте до золотистого цвета.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Добавьте картофель и обжарьте его до корочки.",
+      "timerMinutes": 8
+    },
+    {
+      "text": "Взбейте {egg} яиц с солью и перцем, залейте картофель и готовьте под крышкой.",
+      "timerMinutes": 4
+    },
+    {
+      "text": "Посыпьте {chives} зелёного лука перед подачей."
+    }
+  ]
+}

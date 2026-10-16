@@ -1,0 +1,88 @@
+{
+  "title": "Говядина с лемонграссом",
+  "level": "weekday",
+  "minutes": 25,
+  "baseServings": 2,
+  "tags": ["meat", "spicy"],
+  "description": "Быстрая жареная говядина с лемонграссом, чесноком и перцем.",
+  "fact": "Лемонграсс во Вьетнаме растёт почти в каждом дворе.",
+  "ingredients": [
+    {
+      "key": "beef",
+      "name": "Говядина",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "lemongrass",
+      "name": "Лемонграсс",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "chili",
+      "name": "Острый перчик",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "fish_sauce",
+      "name": "Рыбный соус",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "rice",
+      "name": "Рис",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Отварите {rice} риса.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Мелко порубите {lemongrass} лемонграсса, {garlic} чеснока и {chili} острого перчика."
+    },
+    {
+      "text": "Нарежьте {beef} говядины тонкими полосками и смешайте с половиной лемонграсса и {fish_sauce} рыбного соуса."
+    },
+    {
+      "text": "Обжарьте остаток лемонграсса и {onion} лука на {oil} растительного масла.",
+      "timerMinutes": 2
+    },
+    {
+      "text": "Добавьте говядину и жарьте на сильном огне.",
+      "timerMinutes": 3
+    }
+  ]
+}

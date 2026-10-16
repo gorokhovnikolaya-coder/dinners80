@@ -1,0 +1,96 @@
+{
+  "title": "Чили кон карне",
+  "level": "weekend",
+  "minutes": 90,
+  "baseServings": 2,
+  "tags": ["meat", "spicy"],
+  "description": "Густое рагу из говяжьего фарша, фасоли и помидоров с перцем чили.",
+  "fact": "Чили кон карне — официальное блюдо штата Техас, хотя корни у него мексиканские.",
+  "ingredients": [
+    {
+      "key": "beef_mince",
+      "name": "Фарш говяжий",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 2,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "canned_tomatoes",
+      "name": "Томаты в собственном соку",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "red_beans",
+      "name": "Красная фасоль консервированная",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "chili",
+      "name": "Острый перчик",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "cumin",
+      "name": "Молотый кумин",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {onion} лука и {garlic} чеснока на {oil} растительного масла.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Добавьте {beef_mince} говяжьего фарша и жарьте, разбивая комки, до румяности.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Всыпьте {cumin} кумина, добавьте {chili} острого перчика и {canned_tomatoes} томатов в собственном соку."
+    },
+    {
+      "text": "Тушите под крышкой на слабом огне.",
+      "timerMinutes": 45
+    },
+    {
+      "text": "Добавьте {red_beans} фасоли без жидкости, посолите и тушите ещё 15 минут.",
+      "timerMinutes": 15
+    }
+  ]
+}

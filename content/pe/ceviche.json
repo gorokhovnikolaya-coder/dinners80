@@ -1,0 +1,68 @@
+{
+  "title": "Севиче",
+  "level": "challenge",
+  "minutes": 45,
+  "baseServings": 2,
+  "tags": ["spicy"],
+  "description": "Сырая рыба, маринованная в соке лайма с луком и перцем.",
+  "fact": "Маринад севиче перуанцы называют «тигровым молоком».",
+  "ingredients": [
+    {
+      "key": "white_fish",
+      "name": "Филе белой рыбы",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "lime",
+      "name": "Лайм",
+      "amount": 4,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "red_onion",
+      "name": "Красный лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "chili",
+      "name": "Чили",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "cilantro",
+      "name": "Кинза",
+      "amount": 15,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Нарежьте {white_fish} филе белой рыбы кубиками по 2 см и посолите."
+    },
+    {
+      "text": "Выжмите сок из {lime} лайма и залейте рыбу."
+    },
+    {
+      "text": "Добавьте {red_onion} тонко нарезанного красного лука и {chili} чили, оставьте мариноваться.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Посыпьте {cilantro} кинзы и сразу подавайте."
+    }
+  ]
+}

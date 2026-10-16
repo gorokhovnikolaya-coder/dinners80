@@ -1,0 +1,78 @@
+{
+  "title": "Кесадильи с курицей",
+  "level": "weekday",
+  "minutes": 20,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Пшеничные лепёшки с курицей, сыром и перцем, поджаренные до хруста.",
+  "fact": "Слово кесадилья происходит от исп. queso — «сыр».",
+  "ingredients": [
+    {
+      "key": "tortillas",
+      "name": "Пшеничные тортильи",
+      "amount": 4,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "chicken_fillet",
+      "name": "Куриное филе",
+      "amount": 250,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "cheese",
+      "name": "Твёрдый сыр",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "bell_pepper",
+      "name": "Сладкий перец",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "paprika",
+      "name": "Сладкая паприка",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Нарежьте {chicken_fillet} куриного филе полосками, посолите, посыпьте {paprika} паприки и обжарьте на {oil} масла.",
+      "timerMinutes": 7
+    },
+    {
+      "text": "Добавьте {bell_pepper} сладкого перца полосками и жарьте ещё 3 минуты.",
+      "timerMinutes": 3
+    },
+    {
+      "text": "На половину каждой из {tortillas} тортилий выложите курицу и {cheese} тёртого сыра, сложите пополам."
+    },
+    {
+      "text": "Обжарьте на сухой сковороде по 2 минуты с каждой стороны.",
+      "timerMinutes": 4
+    }
+  ]
+}

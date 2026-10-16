@@ -1,0 +1,93 @@
+{
+  "title": "Пикадильо",
+  "level": "weekday",
+  "minutes": 30,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Говяжий фарш с томатами, оливками и изюмом, подаётся с рисом.",
+  "fact": "Сочетание сладкого изюма и солёных оливок — главная черта кубинского пикадильо.",
+  "ingredients": [
+    {
+      "key": "beef_mince",
+      "name": "Фарш говяжий",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "bell_pepper",
+      "name": "Сладкий перец",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "tomato_paste",
+      "name": "Томатная паста",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "olives",
+      "name": "Оливки",
+      "amount": 50,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "raisins",
+      "name": "Изюм",
+      "amount": 30,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "rice",
+      "name": "Рис",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Отварите {rice} риса.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Обжарьте {onion} лука и {bell_pepper} сладкого перца на {oil} растительного масла.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Добавьте {beef_mince} говяжьего фарша и жарьте до румяности.",
+      "timerMinutes": 8
+    },
+    {
+      "text": "Вмешайте {tomato_paste} томатной пасты, {olives} оливок, {raisins} изюма и 100 мл воды, тушите.",
+      "timerMinutes": 10
+    }
+  ]
+}

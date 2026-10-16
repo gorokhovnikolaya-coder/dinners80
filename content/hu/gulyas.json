@@ -1,0 +1,96 @@
+{
+  "title": "Гуляш",
+  "level": "weekend",
+  "minutes": 120,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Густой суп из говядины с паприкой, картофелем и морковью.",
+  "fact": "Гуляш — суп венгерских пастухов, его варили в котле на костре.",
+  "ingredients": [
+    {
+      "key": "beef",
+      "name": "Говядина",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "paprika",
+      "name": "Сладкая паприка",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "potato",
+      "name": "Картофель",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "carrot",
+      "name": "Морковь",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "bell_pepper",
+      "name": "Сладкий перец",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "caraway",
+      "name": "Тмин",
+      "amount": 0.5,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {onion} лука на {oil} растительного масла до золотистого цвета.",
+      "timerMinutes": 8
+    },
+    {
+      "text": "Добавьте {beef} говядины кубиками и обжарьте со всех сторон.",
+      "timerMinutes": 7
+    },
+    {
+      "text": "Снимите с огня, вмешайте {paprika} паприки и {caraway} тмина, влейте 1 л воды и тушите.",
+      "timerMinutes": 60
+    },
+    {
+      "text": "Добавьте {potato} картофеля, {carrot} моркови и {bell_pepper} сладкого перца кубиками, посолите."
+    },
+    {
+      "text": "Варите, пока овощи не станут мягкими.",
+      "timerMinutes": 25
+    }
+  ]
+}

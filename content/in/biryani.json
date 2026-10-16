@@ -1,0 +1,71 @@
+{
+  "title": "Бирьяни",
+  "level": "challenge",
+  "minutes": 120,
+  "baseServings": 2,
+  "tags": ["meat", "spicy"],
+  "description": "Слоёный рис с курицей, шафраном и жареным луком.",
+  "fact": "Бирьяни готовят под крышкой, запечатанной тестом.",
+  "ingredients": [
+    {
+      "key": "basmati",
+      "name": "Рис басмати",
+      "amount": 250,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "chicken",
+      "name": "Курица",
+      "amount": 600,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "saffron",
+      "name": "Шафран",
+      "amount": 1,
+      "unit": "pinch",
+      "aisle": "grocery"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "yogurt",
+      "name": "Йогурт",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "garam_masala",
+      "name": "Гарам масала",
+      "amount": 2,
+      "unit": "tsp",
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Замаринуйте {chicken} курицы в {yogurt} йогурта с {garam_masala} гарам масалы.",
+      "timerMinutes": 60
+    },
+    {
+      "text": "Обжарьте {onion} лука до тёмно-золотистого цвета.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Отварите {basmati} риса басмати до полуготовности.",
+      "timerMinutes": 6
+    },
+    {
+      "text": "Выложите слоями курицу, лук и рис, полейте водой с {saffron} шафрана и томите.",
+      "timerMinutes": 40
+    }
+  ]
+}

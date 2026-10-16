@@ -1,0 +1,121 @@
+{
+  "title": "Кускус с бараниной и овощами",
+  "level": "challenge",
+  "minutes": 120,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Кускус на пару с томлёной бараниной и семью овощами.",
+  "fact": "Кускус по пятницам — семейная традиция во многих марокканских домах.",
+  "ingredients": [
+    {
+      "key": "lamb",
+      "name": "Баранина",
+      "amount": 500,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "couscous",
+      "name": "Кускус",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "carrot",
+      "name": "Морковь",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "zucchini",
+      "name": "Кабачок",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "pumpkin",
+      "name": "Тыква",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "chickpeas",
+      "product": "canned_chickpeas",
+      "name": "Нут консервированный",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "tomato",
+      "name": "Помидоры",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "ras_el_hanout",
+      "name": "Рас-эль-ханут",
+      "amount": 2,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "butter",
+      "name": "Сливочное масло",
+      "amount": 30,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "olive_oil",
+      "name": "Оливковое масло",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {lamb} баранины кусками с {onion} лука на {olive_oil} оливкового масла.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Добавьте {ras_el_hanout} рас-эль-ханута, {tomato} помидоров и 1 л воды, тушите.",
+      "timerMinutes": 60
+    },
+    {
+      "text": "Добавьте {carrot} моркови и {pumpkin} тыквы крупными кусками, варите 15 минут.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Добавьте {zucchini} кабачка и {chickpeas} нута, варите ещё 10 минут.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Залейте {couscous} кускуса 250 мл горячего бульона, накройте на 5 минут, затем вмешайте {butter} масла и разрыхлите вилкой.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Выложите кускус горкой, сверху мясо и овощи, полейте бульоном."
+    }
+  ]
+}

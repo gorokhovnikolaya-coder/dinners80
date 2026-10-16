@@ -1,0 +1,59 @@
+{
+  "title": "Омлет с травами и сыром",
+  "level": "weekday",
+  "minutes": 20,
+  "baseServings": 2,
+  "tags": [],
+  "description": "Нежный французский омлет, свёрнутый рулетом.",
+  "fact": "Во французских кулинарных школах омлет — экзамен на технику.",
+  "ingredients": [
+    {
+      "key": "eggs",
+      "product": "egg",
+      "name": "Яйца",
+      "amount": 4,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "butter",
+      "name": "Сливочное масло",
+      "amount": 20,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "gruyere",
+      "name": "Сыр грюйер",
+      "amount": 40,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "chives",
+      "name": "Шнитт-лук",
+      "amount": 10,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Взбейте {eggs} яиц с солью до однородности."
+    },
+    {
+      "text": "Растопите {butter} сливочного масла на сковороде и вылейте яйца, постоянно помешивая.",
+      "timerMinutes": 3
+    },
+    {
+      "text": "Посыпьте {gruyere} грюйера и {chives} шнитт-лука, сверните омлет рулетом."
+    }
+  ]
+}

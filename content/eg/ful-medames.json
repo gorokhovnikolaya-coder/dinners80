@@ -1,0 +1,89 @@
+{
+  "title": "Фуль медамес",
+  "level": "weekday",
+  "minutes": 20,
+  "baseServings": 2,
+  "tags": [],
+  "description": "Тушёные бобы с чесноком, лимоном, кумином и оливковым маслом.",
+  "fact": "Фуль едят в Египте больше тысячи лет — с времён фараонов.",
+  "ingredients": [
+    {
+      "key": "fava_beans",
+      "name": "Бобы консервированные",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 2,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "cumin",
+      "name": "Молотый кумин",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "lemon",
+      "name": "Лимон",
+      "amount": 0.5,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "tomato",
+      "name": "Помидоры",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "parsley",
+      "name": "Петрушка",
+      "amount": 15,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "pita",
+      "name": "Пита",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "olive_oil",
+      "name": "Оливковое масло",
+      "amount": 3,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Прогрейте {fava_beans} бобов вместе с жидкостью и слегка разомните.",
+      "timerMinutes": 7
+    },
+    {
+      "text": "Вмешайте {garlic} давленого чеснока, {cumin} кумина, сок {lemon} лимона и соль."
+    },
+    {
+      "text": "Выложите в миску, полейте {olive_oil} оливкового масла, посыпьте {tomato} помидора кубиками и {parsley} петрушки."
+    },
+    {
+      "text": "Подавайте с {pita} питы."
+    }
+  ]
+}

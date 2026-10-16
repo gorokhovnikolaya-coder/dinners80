@@ -1,0 +1,104 @@
+{
+  "title": "Кошари",
+  "level": "weekend",
+  "minutes": 60,
+  "baseServings": 2,
+  "tags": ["gluten"],
+  "description": "Рис, чечевица и макароны под пряным томатным соусом и хрустящим луком.",
+  "fact": "Кошари — национальная уличная еда Египта, есть даже рестораны только с ним.",
+  "ingredients": [
+    {
+      "key": "rice",
+      "name": "Рис",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "lentils",
+      "product": "green_lentils",
+      "name": "Коричневая чечевица",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "macaroni",
+      "name": "Короткие макароны",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "canned_tomatoes",
+      "name": "Томаты в собственном соку",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "cumin",
+      "name": "Молотый кумин",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "wine_vinegar",
+      "name": "Винный уксус",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 4,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Отварите {lentils} чечевицы до мягкости.",
+      "timerMinutes": 20
+    },
+    {
+      "text": "Отдельно отварите {rice} риса и {macaroni} макарон.",
+      "timerMinutes": 12
+    },
+    {
+      "text": "Нарежьте {onion} лука тонкими кольцами и жарьте на {oil} растительного масла до хруста.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "В том же масле обжарьте {garlic} чеснока, добавьте {canned_tomatoes} томатов, {cumin} кумина, {wine_vinegar} уксуса и уварите соус.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Выложите слоями рис, чечевицу, макароны, полейте соусом и посыпьте луком."
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "title": "Пибимпап",
+  "level": "challenge",
+  "minutes": 75,
+  "baseServings": 2,
+  "tags": ["meat", "spicy"],
+  "description": "Рис с отдельно приготовленными овощами, говядиной, яйцом и кочхуджаном.",
+  "fact": "Каждый ингредиент готовят отдельно, а перемешивают уже за столом.",
+  "ingredients": [
+    {
+      "key": "rice",
+      "name": "Рис",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "beef_mince",
+      "name": "Фарш говяжий",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "carrot",
+      "name": "Морковь",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "zucchini",
+      "name": "Кабачок",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "spinach",
+      "name": "Шпинат",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "mushrooms",
+      "name": "Шампиньоны",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "egg",
+      "name": "Яйца",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "gochujang",
+      "name": "Паста кочхуджан",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "soy_sauce",
+      "name": "Соевый соус",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "sesame_oil",
+      "name": "Кунжутное масло",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Отварите {rice} риса.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Бланшируйте {spinach} шпината 30 секунд, отожмите и заправьте половиной {sesame_oil} кунжутного масла."
+    },
+    {
+      "text": "По очереди обжарьте на {oil} растительного масла {carrot} моркови, {zucchini} кабачка и {mushrooms} шампиньонов соломкой.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Обжарьте {beef_mince} говяжьего фарша с {soy_sauce} соевого соуса.",
+      "timerMinutes": 7
+    },
+    {
+      "text": "Пожарьте {egg} яиц глазуньей.",
+      "timerMinutes": 3
+    },
+    {
+      "text": "Выложите на рис всё по секторам, яйцо в центр, рядом {gochujang} кочхуджана, и сбрызните остатком кунжутного масла."
+    }
+  ]
+}

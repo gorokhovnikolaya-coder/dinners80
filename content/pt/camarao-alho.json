@@ -1,0 +1,73 @@
+{
+  "title": "Креветки с чесноком",
+  "level": "weekday",
+  "minutes": 20,
+  "baseServings": 2,
+  "tags": ["spicy"],
+  "description": "Креветки в оливковом масле с чесноком, перцем и лимоном.",
+  "fact": "В Португалии их подают с хлебом, чтобы собрать весь соус.",
+  "ingredients": [
+    {
+      "key": "shrimp",
+      "name": "Креветки очищенные",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 5,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "chili",
+      "name": "Острый перчик",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "lemon",
+      "name": "Лимон",
+      "amount": 0.5,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "parsley",
+      "name": "Петрушка",
+      "amount": 15,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "olive_oil",
+      "name": "Оливковое масло",
+      "amount": 4,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Разогрейте {olive_oil} оливкового масла, добавьте {garlic} чеснока пластинками и {chili} острого перчика.",
+      "timerMinutes": 1
+    },
+    {
+      "text": "Выложите {shrimp} креветок одним слоем и жарьте по 2 минуты с каждой стороны.",
+      "timerMinutes": 4
+    },
+    {
+      "text": "Выжмите сок {lemon} лимона, посолите и посыпьте {parsley} рубленой петрушки."
+    }
+  ]
+}

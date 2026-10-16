@@ -1,0 +1,85 @@
+{
+  "title": "Тибс",
+  "level": "weekend",
+  "minutes": 50,
+  "baseServings": 2,
+  "tags": ["meat", "spicy"],
+  "description": "Обжаренная говядина с луком, перцем и топлёным маслом с пряностями.",
+  "fact": "Тибс в Эфиопии готовят на праздник и в знак уважения к гостю.",
+  "ingredients": [
+    {
+      "key": "beef",
+      "name": "Говядина",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "red_onion",
+      "name": "Красный лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "bell_pepper",
+      "name": "Сладкий перец",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "chili",
+      "name": "Острый перчик",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "rosemary",
+      "name": "Розмарин",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "berbere",
+      "name": "Смесь специй бербере",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "butter",
+      "name": "Сливочное масло",
+      "amount": 40,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Растопите {butter} сливочного масла с {berbere} бербере и {rosemary} веточек розмарина на слабом огне.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Обжарьте {beef} говядины кубиками на сильном огне до корочки.",
+      "timerMinutes": 6
+    },
+    {
+      "text": "Добавьте {red_onion} красного лука, {bell_pepper} сладкого перца и {chili} острого перчика, жарьте.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Влейте пряное масло, посолите и прогрейте ещё минуту.",
+      "timerMinutes": 1
+    }
+  ]
+}

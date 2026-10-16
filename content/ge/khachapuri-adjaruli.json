@@ -1,0 +1,100 @@
+{
+  "title": "Хачапури по-аджарски",
+  "level": "challenge",
+  "minutes": 90,
+  "baseServings": 2,
+  "tags": ["gluten"],
+  "description": "Лодочка из дрожжевого теста с сыром, желтком и маслом.",
+  "fact": "Форма лодочки — отсылка к морю: Аджария лежит на берегу Чёрного моря.",
+  "ingredients": [
+    {
+      "key": "flour",
+      "name": "Мука",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "milk",
+      "name": "Тёплое молоко",
+      "amount": 180,
+      "unit": "ml",
+      "aisle": "dairy"
+    },
+    {
+      "key": "yeast",
+      "name": "Сухие дрожжи",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "sugar",
+      "name": "Сахар",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "suluguni",
+      "product": "cheese",
+      "name": "Сулугуни",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "adyghe",
+      "product": "soft_cheese",
+      "name": "Адыгейский сыр",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "egg",
+      "name": "Яйца",
+      "amount": 3,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "butter",
+      "name": "Сливочное масло",
+      "amount": 40,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Растворите {yeast} сухих дрожжей и {sugar} сахара в {milk} тёплого молока.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Вмешайте {flour} муки и щепотку соли, замесите мягкое тесто и оставьте подходить.",
+      "timerMinutes": 40
+    },
+    {
+      "text": "Натрите {suluguni} сулугуни и {adyghe} адыгейского сыра, смешайте с одним яйцом."
+    },
+    {
+      "text": "Разделите тесто на две части, раскатайте овалы, загните края лодочкой и выложите сыр."
+    },
+    {
+      "text": "Выпекайте при 220 °C до румяных краёв.",
+      "timerMinutes": 12
+    },
+    {
+      "text": "Сделайте в сыре углубления, вылейте желтки и верните в духовку на 2 минуты, затем добавьте {butter} масла.",
+      "timerMinutes": 2
+    }
+  ]
+}

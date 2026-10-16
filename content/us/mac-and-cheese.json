@@ -1,0 +1,77 @@
+{
+  "title": "Мак энд чиз",
+  "level": "weekday",
+  "minutes": 25,
+  "baseServings": 2,
+  "tags": ["gluten"],
+  "description": "Макароны в густом сырном соусе, запечённые до корочки.",
+  "fact": "Рецепт популяризировал Томас Джефферсон, привёзший машинку для пасты из Италии.",
+  "ingredients": [
+    {
+      "key": "macaroni",
+      "name": "Короткие макароны",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "cheese",
+      "name": "Сыр чеддер",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "milk",
+      "name": "Молоко",
+      "amount": 300,
+      "unit": "ml",
+      "aisle": "dairy"
+    },
+    {
+      "key": "flour",
+      "name": "Мука",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "butter",
+      "name": "Сливочное масло",
+      "amount": 30,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "mustard",
+      "name": "Горчица",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Отварите {macaroni} макарон на 2 минуты меньше, чем указано на упаковке.",
+      "timerMinutes": 8
+    },
+    {
+      "text": "Растопите {butter} сливочного масла, обжарьте {flour} муки и тонкой струйкой влейте {milk} молока.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Добавьте {cheese} тёртого сыра и {mustard} горчицы, мешайте, пока сыр не расплавится."
+    },
+    {
+      "text": "Смешайте макароны с соусом и запекайте при 200 °C до корочки.",
+      "timerMinutes": 10
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "title": "Лосось с сальсой из киви",
+  "level": "weekday",
+  "minutes": 25,
+  "baseServings": 2,
+  "tags": [],
+  "description": "Жареный лосось с яркой сальсой из киви, лайма и красного лука.",
+  "fact": "Киви назвали в честь птицы киви — символа Новой Зеландии.",
+  "ingredients": [
+    {
+      "key": "salmon",
+      "name": "Филе лосося",
+      "amount": 350,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "kiwi",
+      "name": "Киви",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "red_onion",
+      "name": "Красный лук",
+      "amount": 0.5,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "lime",
+      "name": "Лайм",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "cilantro",
+      "name": "Кинза",
+      "amount": 10,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "rice",
+      "name": "Рис",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "olive_oil",
+      "name": "Оливковое масло",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Отварите {rice} риса.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Нарежьте {kiwi} киви и {red_onion} красного лука мелкими кубиками, смешайте с соком {lime} лайма и {cilantro} кинзы."
+    },
+    {
+      "text": "Посолите {salmon} филе лосося и обжарьте на {olive_oil} оливкового масла кожей вниз.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Переверните рыбу и жарьте ещё 2 минуты.",
+      "timerMinutes": 2
+    },
+    {
+      "text": "Подавайте лосося с рисом и сальсой."
+    }
+  ]
+}

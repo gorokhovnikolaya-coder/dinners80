@@ -1,0 +1,69 @@
+{
+  "title": "Гёдза",
+  "level": "challenge",
+  "minutes": 90,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Обжаренные пельмени со свининой и капустой.",
+  "fact": "Гёдза пришли в Японию из Китая после Второй мировой войны.",
+  "ingredients": [
+    {
+      "key": "pork_mince",
+      "name": "Свиной фарш",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "napa_cabbage",
+      "name": "Пекинская капуста",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "wrappers",
+      "product": "gyoza_wrappers",
+      "name": "Тесто для гёдза",
+      "amount": 24,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "soy_sauce",
+      "name": "Соевый соус",
+      "amount": 3,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 2,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "ginger",
+      "name": "Имбирь",
+      "amount": 10,
+      "unit": "g",
+      "aisle": "veg"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Мелко нарубите {napa_cabbage} пекинской капусты, отожмите и смешайте с {pork_mince} свиного фарша."
+    },
+    {
+      "text": "Добавьте {garlic} натёртого чеснока, {ginger} имбиря и {soy_sauce} соевого соуса."
+    },
+    {
+      "text": "Разложите начинку по {wrappers} теста для гёдза и защипните края."
+    },
+    {
+      "text": "Обжарьте, влейте немного воды и готовьте под крышкой.",
+      "timerMinutes": 8
+    }
+  ]
+}

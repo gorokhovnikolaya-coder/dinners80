@@ -1,0 +1,70 @@
+{
+  "title": "Фейжоада",
+  "level": "challenge",
+  "minutes": 180,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Чёрная фасоль, томлённая с копчёностями и свининой.",
+  "fact": "Фейжоаду в Бразилии едят по субботам.",
+  "ingredients": [
+    {
+      "key": "black_beans",
+      "name": "Чёрная фасоль",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "pork_ribs",
+      "name": "Свиные рёбрышки",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "smoked_sausage",
+      "name": "Копчёная свиная колбаса",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "rice",
+      "name": "Рис",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Замочите {black_beans} чёрной фасоли на ночь и отварите.",
+      "timerMinutes": 60
+    },
+    {
+      "text": "Обжарьте {pork_ribs} свиных рёбрышек и {smoked_sausage} копчёной колбасы с {onion} лука и {garlic} чеснока.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Соедините мясо с фасолью и тушите.",
+      "timerMinutes": 90
+    },
+    {
+      "text": "Подайте с {rice} отварного риса."
+    }
+  ]
+}

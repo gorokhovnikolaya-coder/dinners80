@@ -40,8 +40,11 @@
 | `npm run db:up` / `npm run db:down` | Локальный Postgres 17 в Docker Compose (`127.0.0.1:5433`, том `postgres-data`)                                                                                                             | 1      |
 | `npm run dev:server`                | Node-сервер локально (`node --watch`, порт 3080, `GET /api/health`); воркер — с задачи 21                                                                                                  | 1      |
 | `npm run e2e`                       | Playwright (`e2e/`, Chromium 390 × 844) в mock-режиме; сам поднимает dev-сервер на порту 5179. Первый раз — `npx playwright install chromium`                                              | 2      |
-| `npm run db:migrate`                | Применить миграции к локальной базе                                                                                                                                                        | 14     |
-| `npm run db:reset`                  | Пересоздать локальную базу: миграции + seed из `content/`                                                                                                                                  | 14     |
+| `npm run db:migrate`                | Применить новые миграции из `apps/server/migrations` (без `DATABASE_URL` — локальная база `127.0.0.1:5433`)                                                                                | 14     |
+| `npm run db:reset`                  | Пересоздать локальную базу (только localhost): проверка `content/` → удаление схем → миграции → seed; при ошибке в контенте база не трогается                                              | 14     |
+| `npm run db:seed`                   | Загрузить `content/` в базу без пересоздания (upsert, повторный запуск безопасен); `CONTENT_DIR=<папка>` — другая папка контента                                                           | 14     |
+| `npm run db:generate`               | Сгенерировать SQL-миграцию из `apps/server/src/db/schema.ts` (Drizzle Kit); функции и представления — вручную, `--custom`                                                                  | 14     |
+| `npm run test:db`                   | Тесты базы (`has_access`, `user_countries`) на локальной базе после `db:reset`; в `npm run check` пропускаются                                                                             | 14     |
 
 Скрипт отдельного пакета: `npm run <скрипт> -w @tma80/web` (`@tma80/server`, `@tma80/shared`).
 
@@ -66,10 +69,10 @@ apps/server/         Node-сервер (Node 24, Fastify, Drizzle, grammY)
   src/worker/        воркер: напоминания, очистка share
   src/db/            схема Drizzle, запросы
   migrations/        SQL-миграции
-  seed/              загрузка content/ в базу
+  seed/              загрузка content/ в базу (валидация — validateContent в packages/shared)
 packages/shared/     zod-схемы API, типы, константы, чистая логика (подбор блюд, порции, покупки)
 e2e/                 Playwright-сценарии (mock-режим), конфиг — playwright.config.ts
-content/             рецепты: content/<страна>/<блюдо>.json + фото
+content/             рецепты: content/<страна>/country.json, <slug>.json + фото <slug>.webp (формат — решение 0016)
 deploy/              nginx.conf, docker-compose для VPS
 docs/                ТЗ, решения, прогресс, скриншоты
 ```

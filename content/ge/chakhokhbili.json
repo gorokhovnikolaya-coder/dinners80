@@ -1,0 +1,89 @@
+{
+  "title": "Чахохбили",
+  "level": "weekend",
+  "minutes": 60,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Курица, тушённая в густом соусе из помидоров, лука и трав.",
+  "fact": "Изначально чахохбили готовили из фазана — «хохоби» по-грузински.",
+  "ingredients": [
+    {
+      "key": "chicken",
+      "product": "chicken_thigh",
+      "name": "Куриные бёдра",
+      "amount": 600,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "tomato",
+      "name": "Помидоры",
+      "amount": 4,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "hops_suneli",
+      "name": "Хмели-сунели",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "cilantro",
+      "name": "Кинза",
+      "amount": 20,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "butter",
+      "name": "Сливочное масло",
+      "amount": 20,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {chicken} куриных бёдер на сухой сковороде кожей вниз до золотистого цвета.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Добавьте {butter} сливочного масла и {onion} лука полукольцами, жарьте до мягкости.",
+      "timerMinutes": 7
+    },
+    {
+      "text": "Ошпарьте {tomato} помидоров, снимите кожицу, нарежьте и добавьте к курице."
+    },
+    {
+      "text": "Всыпьте {hops_suneli} хмели-сунели, посолите и тушите под крышкой.",
+      "timerMinutes": 30
+    },
+    {
+      "text": "Добавьте {garlic} давленого чеснока и {cilantro} кинзы, прогрейте 2 минуты.",
+      "timerMinutes": 2
+    }
+  ]
+}

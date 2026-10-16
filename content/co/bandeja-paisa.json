@@ -1,0 +1,73 @@
+{
+  "title": "Бандеха пайса",
+  "level": "challenge",
+  "minutes": 150,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Фасоль, рис, фарш, чичаррон, яйцо и авокадо на одной тарелке.",
+  "fact": "Это блюдо готовили для крестьян перед долгим днём в поле.",
+  "ingredients": [
+    {
+      "key": "red_beans",
+      "name": "Красная фасоль",
+      "amount": 250,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "rice",
+      "name": "Рис",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "beef_mince",
+      "name": "Говяжий фарш",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "chicharron",
+      "product": "pork_belly",
+      "name": "Чичаррон (свиная грудинка)",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "eggs",
+      "product": "egg",
+      "name": "Яйца",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "avocado",
+      "name": "Авокадо",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Отварите {red_beans} красной фасоли до мягкости.",
+      "timerMinutes": 60
+    },
+    {
+      "text": "Обжарьте {chicharron} чичаррона до хруста.",
+      "timerMinutes": 25
+    },
+    {
+      "text": "Обжарьте {beef_mince} говяжьего фарша и отварите {rice} риса.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Пожарьте {eggs} яиц и разложите всё на большой тарелке с {avocado} авокадо.",
+      "timerMinutes": 3
+    }
+  ]
+}

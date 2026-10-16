@@ -1,0 +1,103 @@
+{
+  "title": "Доро вот",
+  "level": "challenge",
+  "minutes": 150,
+  "baseServings": 2,
+  "tags": ["meat", "spicy"],
+  "description": "Курица в густом остром соусе из долго томлённого лука, с яйцами.",
+  "fact": "Лук для доро вот томят без масла почти час — в этом весь секрет.",
+  "ingredients": [
+    {
+      "key": "chicken",
+      "product": "chicken_drumsticks",
+      "name": "Куриные голени",
+      "amount": 700,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 4,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 4,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "ginger",
+      "name": "Имбирь",
+      "amount": 20,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "berbere",
+      "name": "Смесь специй бербере",
+      "amount": 3,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "tomato_paste",
+      "name": "Томатная паста",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "egg",
+      "name": "Яйца",
+      "amount": 4,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "butter",
+      "name": "Сливочное масло",
+      "amount": 60,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "lemon",
+      "name": "Лимон",
+      "amount": 0.5,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Сбрызните {chicken} куриных голеней соком {lemon} лимона и посолите."
+    },
+    {
+      "text": "Измельчите {onion} лука блендером и томите на сухой кастрюле на слабом огне, помешивая.",
+      "timerMinutes": 45
+    },
+    {
+      "text": "Добавьте {butter} сливочного масла, {garlic} чеснока, {ginger} имбиря, {berbere} бербере и {tomato_paste} томатной пасты.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Положите курицу, влейте 300 мл воды и тушите под крышкой.",
+      "timerMinutes": 45
+    },
+    {
+      "text": "Сварите {egg} яиц вкрутую, очистите, надрежьте и добавьте в соус на 10 минут.",
+      "timerMinutes": 10
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "title": "Греческий салат с питой",
+  "level": "weekday",
+  "minutes": 20,
+  "baseServings": 2,
+  "tags": ["gluten"],
+  "description": "Томаты, огурцы, маслины и фета с тёплой питой.",
+  "fact": "В Греции фету в салат кладут целым куском, а не кубиками.",
+  "ingredients": [
+    {
+      "key": "tomatoes",
+      "product": "tomato",
+      "name": "Томаты",
+      "amount": 3,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "cucumbers",
+      "product": "cucumber",
+      "name": "Огурцы",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "olives",
+      "name": "Маслины",
+      "amount": 50,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "feta",
+      "name": "Фета",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "pita",
+      "name": "Пита",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "olive_oil",
+      "name": "Оливковое масло",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Крупно нарежьте {tomatoes} томатов и {cucumbers} огурцов."
+    },
+    {
+      "text": "Добавьте {olives} маслин и положите сверху {feta} феты одним куском."
+    },
+    {
+      "text": "Полейте {olive_oil} оливкового масла и подайте с {pita} питы."
+    }
+  ]
+}

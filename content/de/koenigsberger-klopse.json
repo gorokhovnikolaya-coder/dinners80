@@ -1,0 +1,95 @@
+{
+  "title": "Кёнигсбергские клопсы",
+  "level": "weekend",
+  "minutes": 60,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Мясные фрикадельки в сливочном соусе с каперсами.",
+  "fact": "Блюдо родом из Кёнигсберга — нынешнего Калининграда.",
+  "ingredients": [
+    {
+      "key": "mince",
+      "product": "beef_mince",
+      "name": "Фарш говяжий",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "bread",
+      "product": "white_bread",
+      "name": "Белый хлеб",
+      "amount": 40,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "egg",
+      "name": "Яйца",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "flour",
+      "name": "Мука",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "cream",
+      "name": "Сливки 20%",
+      "amount": 100,
+      "unit": "ml",
+      "aisle": "dairy"
+    },
+    {
+      "key": "capers",
+      "name": "Каперсы",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "butter",
+      "name": "Сливочное масло",
+      "amount": 20,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Замочите {bread} белого хлеба в воде, отожмите и смешайте с {mince} фарша, {egg} яйца и тёртым {onion} лука."
+    },
+    {
+      "text": "Сформуйте фрикадельки размером с грецкий орех."
+    },
+    {
+      "text": "Опустите фрикадельки в кипящую подсоленную воду и варите на слабом огне.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Растопите {butter} сливочного масла, обжарьте {flour} муки и влейте 300 мл бульона от фрикаделек."
+    },
+    {
+      "text": "Добавьте {cream} сливок и {capers} каперсов, верните фрикадельки и прогрейте.",
+      "timerMinutes": 5
+    }
+  ]
+}

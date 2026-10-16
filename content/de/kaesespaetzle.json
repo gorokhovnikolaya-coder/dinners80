@@ -1,0 +1,80 @@
+{
+  "title": "Кесешпецле",
+  "level": "challenge",
+  "minutes": 60,
+  "baseServings": 2,
+  "tags": ["gluten"],
+  "description": "Домашние яичные клёцки, запечённые с сыром и жареным луком.",
+  "fact": "Тесто для шпецле традиционно срезают ножом прямо с доски в кипящую воду.",
+  "ingredients": [
+    {
+      "key": "flour",
+      "name": "Мука",
+      "amount": 250,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "egg",
+      "name": "Яйца",
+      "amount": 3,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "water",
+      "name": "Вода",
+      "amount": 80,
+      "unit": "ml",
+      "aisle": "other"
+    },
+    {
+      "key": "cheese",
+      "name": "Твёрдый сыр",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "butter",
+      "name": "Сливочное масло",
+      "amount": 30,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Смешайте {flour} муки, {egg} яиц, {water} воды и соль, взбивайте ложкой до пузырьков."
+    },
+    {
+      "text": "Оставьте тесто отдохнуть.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Продавливайте тесто через дуршлаг с крупными отверстиями в кипящую подсоленную воду, всплывшие клёцки вынимайте."
+    },
+    {
+      "text": "Обжарьте {onion} лука тонкими кольцами на {butter} сливочного масла до тёмно-золотого цвета.",
+      "timerMinutes": 12
+    },
+    {
+      "text": "Выложите шпецле слоями с {cheese} тёртого сыра, сверху лук, и запекайте при 200 °C.",
+      "timerMinutes": 10
+    }
+  ]
+}

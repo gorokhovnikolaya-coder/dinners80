@@ -1,0 +1,77 @@
+{
+  "title": "Гаспачо",
+  "level": "weekday",
+  "minutes": 20,
+  "baseServings": 2,
+  "tags": ["gluten"],
+  "description": "Холодный суп из томатов, огурца, перца и хлеба.",
+  "fact": "Изначально гаспачо готовили без томатов — их привезли из Америки.",
+  "ingredients": [
+    {
+      "key": "tomatoes",
+      "product": "tomato",
+      "name": "Томаты",
+      "amount": 600,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "cucumber",
+      "name": "Огурец",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "bell_pepper",
+      "name": "Сладкий перец",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "bread",
+      "product": "white_bread",
+      "name": "Белый хлеб",
+      "amount": 50,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "olive_oil",
+      "name": "Оливковое масло",
+      "amount": 3,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 1,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Замочите {bread} белого хлеба в воде на пару минут."
+    },
+    {
+      "text": "Нарежьте {tomatoes} томатов, {cucumber} огурца, {bell_pepper} сладкого перца и {garlic} чеснока."
+    },
+    {
+      "text": "Взбейте всё блендером с {olive_oil} оливкового масла и солью."
+    },
+    {
+      "text": "Охладите суп в холодильнике.",
+      "timerMinutes": 15
+    }
+  ]
+}

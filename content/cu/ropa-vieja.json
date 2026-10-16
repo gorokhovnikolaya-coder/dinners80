@@ -1,0 +1,102 @@
+{
+  "title": "Ропа вьеха",
+  "level": "challenge",
+  "minutes": 150,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Томлёная говядина, разобранная на волокна, в соусе из перцев и томатов.",
+  "fact": "Название значит «старая одежда»: волокна мяса похожи на лоскуты.",
+  "ingredients": [
+    {
+      "key": "beef",
+      "name": "Говядина (лопатка)",
+      "amount": 600,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "bell_pepper",
+      "name": "Сладкий перец",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "canned_tomatoes",
+      "name": "Томаты в собственном соку",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "cumin",
+      "name": "Молотый кумин",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "bay_leaf",
+      "name": "Лавровый лист",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "olives",
+      "name": "Оливки",
+      "amount": 50,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Залейте {beef} говядины водой, добавьте {bay_leaf} лавровых листов и варите до мягкости.",
+      "timerMinutes": 100
+    },
+    {
+      "text": "Остудите мясо и разберите вилками на волокна."
+    },
+    {
+      "text": "Обжарьте {onion} лука, {bell_pepper} сладкого перца полосками и {garlic} чеснока на {oil} растительного масла.",
+      "timerMinutes": 8
+    },
+    {
+      "text": "Добавьте {canned_tomatoes} томатов, {cumin} кумина, мясо и 200 мл бульона, тушите.",
+      "timerMinutes": 20
+    },
+    {
+      "text": "Вмешайте {olives} оливок и посолите."
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "title": "Мусака",
+  "level": "weekend",
+  "minutes": 120,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Запеканка из баклажанов, мясного фарша и бешамеля.",
+  "fact": "Современный рецепт мусаки придумал шеф Николаос Целементес в 1920-х.",
+  "ingredients": [
+    {
+      "key": "eggplant",
+      "name": "Баклажаны",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "beef_mince",
+      "name": "Говяжий фарш",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "tomatoes",
+      "product": "tomato",
+      "name": "Томаты",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "bechamel",
+      "name": "Соус бешамель",
+      "amount": 300,
+      "unit": "ml",
+      "aisle": "dairy"
+    },
+    {
+      "key": "cinnamon",
+      "name": "Корица",
+      "amount": 1,
+      "unit": "pinch",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Нарежьте {eggplant} баклажанов пластинами и обжарьте.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Потушите {beef_mince} говяжьего фарша с {tomatoes} томатов и {cinnamon} корицы.",
+      "timerMinutes": 20
+    },
+    {
+      "text": "Выложите слоями баклажаны и фарш, залейте {bechamel} соуса бешамель."
+    },
+    {
+      "text": "Запекайте при 180 °C.",
+      "timerMinutes": 45
+    }
+  ]
+}

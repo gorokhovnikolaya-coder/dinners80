@@ -1,0 +1,63 @@
+{
+  "title": "Спанакопита",
+  "level": "challenge",
+  "minutes": 90,
+  "baseServings": 2,
+  "tags": ["gluten"],
+  "description": "Пирог из теста фило со шпинатом и фетой.",
+  "fact": "Тесто фило раскатывают так тонко, что сквозь него можно читать.",
+  "ingredients": [
+    {
+      "key": "filo",
+      "name": "Тесто фило",
+      "amount": 250,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "spinach",
+      "name": "Шпинат",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "feta",
+      "name": "Фета",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "eggs",
+      "product": "egg",
+      "name": "Яйца",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "butter",
+      "name": "Сливочное масло",
+      "amount": 50,
+      "unit": "g",
+      "aisle": "dairy"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Припустите {spinach} шпината и отожмите лишнюю воду.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Смешайте шпинат с {feta} раскрошенной феты и {eggs} яиц."
+    },
+    {
+      "text": "Выложите в форму {filo} теста фило слоями, смазывая каждый {butter} растопленного сливочного масла."
+    },
+    {
+      "text": "Положите начинку, накройте листами и запекайте при 180 °C.",
+      "timerMinutes": 45
+    }
+  ]
+}

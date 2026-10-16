@@ -1,0 +1,63 @@
+{
+  "title": "Асадо с чимичурри",
+  "level": "challenge",
+  "minutes": 180,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Говядина на гриле с соусом из петрушки и чеснока.",
+  "fact": "Асадо в Аргентине — повод собраться, а не просто ужин.",
+  "ingredients": [
+    {
+      "key": "beef_ribs",
+      "name": "Говяжьи рёбра",
+      "amount": 1200,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "parsley",
+      "name": "Петрушка",
+      "amount": 30,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "vinegar",
+      "product": "wine_vinegar",
+      "name": "Винный уксус",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Посолите {beef_ribs} говяжьих рёбер крупной солью."
+    },
+    {
+      "text": "Жарьте на углях на слабом жаре, переворачивая один раз.",
+      "timerMinutes": 150
+    },
+    {
+      "text": "Смешайте {parsley} петрушки, {garlic} чеснока и {vinegar} винного уксуса для чимичурри."
+    },
+    {
+      "text": "Дайте мясу отдохнуть и подайте с соусом.",
+      "timerMinutes": 10
+    }
+  ]
+}

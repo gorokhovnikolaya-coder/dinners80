@@ -1,0 +1,64 @@
+{
+  "title": "Оякодон",
+  "level": "weekday",
+  "minutes": 25,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Рис с курицей и яйцом в сладковатом соусе.",
+  "fact": "Название значит «родитель и ребёнок» — курица и яйцо.",
+  "ingredients": [
+    {
+      "key": "rice",
+      "name": "Рис",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "chicken_thigh",
+      "name": "Куриное бедро",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "eggs",
+      "product": "egg",
+      "name": "Яйца",
+      "amount": 3,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "soy_sauce",
+      "name": "Соевый соус",
+      "amount": 3,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Отварите {rice} риса.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Потушите {chicken_thigh} куриного бедра с {onion} лука в {soy_sauce} соевого соуса с водой.",
+      "timerMinutes": 7
+    },
+    {
+      "text": "Влейте {eggs} слегка взбитых яиц и держите под крышкой минуту.",
+      "timerMinutes": 1
+    },
+    {
+      "text": "Выложите курицу с яйцом на рис."
+    }
+  ]
+}

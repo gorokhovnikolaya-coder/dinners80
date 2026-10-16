@@ -1,0 +1,72 @@
+{
+  "title": "Курица тикка масала",
+  "level": "weekend",
+  "minutes": 75,
+  "baseServings": 2,
+  "tags": ["meat", "spicy"],
+  "description": "Курица в пряном томатно-сливочном соусе.",
+  "fact": "По одной из версий, блюдо придумали в Глазго.",
+  "ingredients": [
+    {
+      "key": "chicken_fillet",
+      "name": "Куриное филе",
+      "amount": 500,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "yogurt",
+      "name": "Йогурт",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "tomatoes",
+      "product": "tomato",
+      "name": "Томаты",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "cream",
+      "name": "Сливки",
+      "amount": 100,
+      "unit": "ml",
+      "aisle": "dairy"
+    },
+    {
+      "key": "garam_masala",
+      "name": "Гарам масала",
+      "amount": 2,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Замаринуйте {chicken_fillet} куриного филе в {yogurt} йогурта с половиной {garam_masala} гарам масалы.",
+      "timerMinutes": 30
+    },
+    {
+      "text": "Обжарьте курицу до корочки.",
+      "timerMinutes": 8
+    },
+    {
+      "text": "Потушите {tomatoes} томатов с {garlic} чеснока и остальными специями.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Влейте {cream} сливок, верните курицу и прогрейте.",
+      "timerMinutes": 5
+    }
+  ]
+}

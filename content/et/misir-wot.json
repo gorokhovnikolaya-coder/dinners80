@@ -1,0 +1,85 @@
+{
+  "title": "Мисир вот",
+  "level": "weekday",
+  "minutes": 40,
+  "baseServings": 2,
+  "tags": ["spicy"],
+  "description": "Острое рагу из красной чечевицы со смесью специй бербере.",
+  "fact": "Мисир вот — обязательное блюдо постных дней Эфиопской церкви.",
+  "ingredients": [
+    {
+      "key": "red_lentils",
+      "name": "Красная чечевица",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "ginger",
+      "name": "Имбирь",
+      "amount": 15,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "berbere",
+      "name": "Смесь специй бербере",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "tomato_paste",
+      "name": "Томатная паста",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 3,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Мелко порубите {onion} лука и томите на сухой сковороде, помешивая.",
+      "timerMinutes": 7
+    },
+    {
+      "text": "Добавьте {oil} растительного масла, {garlic} чеснока, {ginger} имбиря и {berbere} бербере, жарьте 2 минуты.",
+      "timerMinutes": 2
+    },
+    {
+      "text": "Вмешайте {tomato_paste} томатной пасты, добавьте {red_lentils} красной чечевицы и 600 мл воды."
+    },
+    {
+      "text": "Варите, помешивая, пока чечевица не разварится в густое рагу.",
+      "timerMinutes": 25
+    }
+  ]
+}

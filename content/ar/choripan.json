@@ -1,0 +1,58 @@
+{
+  "title": "Чорипан",
+  "level": "weekday",
+  "minutes": 25,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Жареная колбаска в багете с соусом чимичурри.",
+  "fact": "Чорипан — главная еда на аргентинских футбольных матчах.",
+  "ingredients": [
+    {
+      "key": "chorizo",
+      "name": "Чоризо (свиная колбаска)",
+      "amount": 4,
+      "unit": "pcs",
+      "aisle": "meat"
+    },
+    {
+      "key": "baguette",
+      "name": "Багет",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "parsley",
+      "name": "Петрушка",
+      "amount": 20,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 2,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "olive_oil",
+      "name": "Оливковое масло",
+      "amount": 3,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {chorizo} чоризо на гриле или сковороде.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Смешайте {parsley} рубленой петрушки, {garlic} чеснока и {olive_oil} оливкового масла — это чимичурри."
+    },
+    {
+      "text": "Разрежьте {baguette} багета, положите колбаски и полейте соусом."
+    }
+  ]
+}

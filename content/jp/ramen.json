@@ -1,0 +1,72 @@
+{
+  "title": "Рамен с курицей",
+  "level": "weekend",
+  "minutes": 120,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Насыщенный бульон с лапшой, яйцом и курицей.",
+  "fact": "В Японии больше 20 тысяч раменных.",
+  "ingredients": [
+    {
+      "key": "noodles",
+      "product": "wheat_noodles",
+      "name": "Пшеничная лапша",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "chicken",
+      "name": "Курица",
+      "amount": 500,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "eggs",
+      "product": "egg",
+      "name": "Яйца",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "soy_sauce",
+      "name": "Соевый соус",
+      "amount": 4,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "ginger",
+      "name": "Имбирь",
+      "amount": 20,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "green_onion",
+      "name": "Зелёный лук",
+      "amount": 20,
+      "unit": "g",
+      "aisle": "veg"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Сварите бульон из {chicken} курицы с {ginger} имбиря.",
+      "timerMinutes": 90
+    },
+    {
+      "text": "Сварите {eggs} яиц всмятку и замаринуйте в {soy_sauce} соевого соуса.",
+      "timerMinutes": 7
+    },
+    {
+      "text": "Отварите {noodles} пшеничной лапши.",
+      "timerMinutes": 4
+    },
+    {
+      "text": "Разложите лапшу по мискам, залейте бульоном, добавьте яйцо и {green_onion} зелёного лука."
+    }
+  ]
+}

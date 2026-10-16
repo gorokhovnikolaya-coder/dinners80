@@ -1,0 +1,63 @@
+{
+  "title": "Зелёное карри с курицей",
+  "level": "weekend",
+  "minutes": 60,
+  "baseServings": 2,
+  "tags": ["meat", "spicy"],
+  "description": "Курица и овощи в кокосовом молоке с зелёной пастой карри.",
+  "fact": "Зелёный цвет пасте дают свежие зелёные перцы чили.",
+  "ingredients": [
+    {
+      "key": "chicken_fillet",
+      "name": "Куриное филе",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "coconut_milk",
+      "name": "Кокосовое молоко",
+      "amount": 400,
+      "unit": "ml",
+      "aisle": "grocery"
+    },
+    {
+      "key": "curry_paste",
+      "product": "green_curry_paste",
+      "name": "Зелёная паста карри",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "eggplant",
+      "name": "Баклажаны",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "thai_basil",
+      "name": "Тайский базилик",
+      "amount": 15,
+      "unit": "g",
+      "aisle": "veg"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {curry_paste} зелёной пасты карри в части из {coconut_milk} кокосового молока.",
+      "timerMinutes": 2
+    },
+    {
+      "text": "Добавьте {chicken_fillet} нарезанного куриного филе и {eggplant} баклажанов."
+    },
+    {
+      "text": "Влейте остальное молоко и тушите.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Перед подачей добавьте {thai_basil} тайского базилика."
+    }
+  ]
+}

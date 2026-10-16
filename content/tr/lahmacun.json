@@ -1,0 +1,110 @@
+{
+  "title": "Лахмаджун",
+  "level": "challenge",
+  "minutes": 120,
+  "baseServings": 2,
+  "tags": ["meat", "gluten", "spicy"],
+  "description": "Тонкие лепёшки с пряным мясным фаршем, запечённые до хруста.",
+  "fact": "Лахмаджун сворачивают рулетом вместе с зеленью и лимоном.",
+  "ingredients": [
+    {
+      "key": "flour",
+      "name": "Мука",
+      "amount": 250,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "yeast",
+      "name": "Сухие дрожжи",
+      "amount": 0.5,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "lamb",
+      "name": "Фарш из баранины",
+      "amount": 250,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "tomato",
+      "name": "Помидоры",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "bell_pepper",
+      "name": "Сладкий перец",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "tomato_paste",
+      "name": "Томатная паста",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "chili_flakes",
+      "name": "Хлопья острого перца",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "parsley",
+      "name": "Петрушка",
+      "amount": 20,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "lemon",
+      "name": "Лимон",
+      "amount": 0.5,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Замесите тесто из {flour} муки, {yeast} дрожжей, 150 мл тёплой воды и соли, оставьте подходить.",
+      "timerMinutes": 60
+    },
+    {
+      "text": "Измельчите {onion} лука, {tomato} помидоров, {bell_pepper} сладкого перца и половину петрушки в блендере."
+    },
+    {
+      "text": "Смешайте овощи с {lamb} бараньего фарша, {tomato_paste} томатной пасты и {chili_flakes} хлопьев перца."
+    },
+    {
+      "text": "Разделите тесто на 4 части, раскатайте очень тонко и тонким слоем распределите начинку."
+    },
+    {
+      "text": "Выпекайте на противне при максимальной температуре духовки.",
+      "timerMinutes": 8
+    },
+    {
+      "text": "Подавайте с остатком {parsley} петрушки и долькой {lemon} лимона."
+    }
+  ]
+}

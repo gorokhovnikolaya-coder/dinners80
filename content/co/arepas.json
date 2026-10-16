@@ -1,0 +1,52 @@
+{
+  "title": "Арепы с сыром",
+  "level": "weekday",
+  "minutes": 30,
+  "baseServings": 2,
+  "tags": [],
+  "description": "Кукурузные лепёшки с расплавленным сыром.",
+  "fact": "Колумбийцы едят арепы на завтрак, обед и ужин.",
+  "ingredients": [
+    {
+      "key": "corn_flour",
+      "name": "Кукурузная мука",
+      "amount": 250,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "cheese",
+      "name": "Сыр",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "butter",
+      "name": "Сливочное масло",
+      "amount": 20,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Замесите {corn_flour} кукурузной муки с тёплой водой и солью.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Слепите лепёшки и обжарьте на сухой сковороде.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Разрежьте, смажьте {butter} сливочного масла и положите {cheese} сыра."
+    }
+  ]
+}

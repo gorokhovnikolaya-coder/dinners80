@@ -1,0 +1,99 @@
+{
+  "title": "Хаваши",
+  "level": "challenge",
+  "minutes": 60,
+  "baseServings": 2,
+  "tags": ["meat", "gluten", "spicy"],
+  "description": "Пита с пряным мясным фаршем, запечённая до хрустящей корочки.",
+  "fact": "Хаваши придумал каирский мясник по фамилии Хавваш в 1970-х.",
+  "ingredients": [
+    {
+      "key": "pita",
+      "name": "Пита",
+      "amount": 3,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "beef_mince",
+      "name": "Фарш говяжий",
+      "amount": 350,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "bell_pepper",
+      "name": "Сладкий перец",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "chili",
+      "name": "Острый перчик",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "parsley",
+      "name": "Петрушка",
+      "amount": 15,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "cumin",
+      "name": "Молотый кумин",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "paprika",
+      "name": "Сладкая паприка",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "olive_oil",
+      "name": "Оливковое масло",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Мелко порубите {onion} лука, {bell_pepper} сладкого перца, {chili} острого перчика и {parsley} петрушки, отожмите лишний сок."
+    },
+    {
+      "text": "Смешайте овощи с {beef_mince} говяжьего фарша, {cumin} кумина, {paprika} паприки и солью."
+    },
+    {
+      "text": "Разрежьте {pita} пит кармашком и тонким слоем распределите фарш внутри."
+    },
+    {
+      "text": "Смажьте лепёшки {olive_oil} оливкового масла и запекайте при 220 °C, переворачивая один раз.",
+      "timerMinutes": 20
+    },
+    {
+      "text": "Дайте постоять 3 минуты и разрежьте на треугольники."
+    }
+  ]
+}

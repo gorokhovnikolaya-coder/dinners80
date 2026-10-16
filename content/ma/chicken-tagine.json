@@ -1,0 +1,109 @@
+{
+  "title": "Таджин из курицы с лимоном и оливками",
+  "level": "weekend",
+  "minutes": 90,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Курица, томлённая с солёным лимоном, оливками и шафраном.",
+  "fact": "Таджин — это и блюдо, и глиняная посуда с конической крышкой.",
+  "ingredients": [
+    {
+      "key": "chicken",
+      "product": "chicken_thigh",
+      "name": "Куриные бёдра",
+      "amount": 700,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "ginger",
+      "name": "Имбирь",
+      "amount": 15,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "turmeric",
+      "name": "Куркума",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "saffron",
+      "name": "Шафран",
+      "amount": 1,
+      "unit": "pinch",
+      "aisle": "grocery"
+    },
+    {
+      "key": "lemon",
+      "name": "Лимон",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "olives",
+      "name": "Зелёные оливки",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "cilantro",
+      "name": "Кинза",
+      "amount": 15,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "olive_oil",
+      "name": "Оливковое масло",
+      "amount": 3,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Натрите {chicken} куриных бёдер {garlic} чеснока, {ginger} имбиря, {turmeric} куркумы и солью."
+    },
+    {
+      "text": "Обжарьте курицу на {olive_oil} оливкового масла с {onion} лука.",
+      "timerMinutes": 8
+    },
+    {
+      "text": "Добавьте {saffron} шафрана и 250 мл воды, тушите под крышкой.",
+      "timerMinutes": 45
+    },
+    {
+      "text": "Добавьте {lemon} лимона дольками и {olives} оливок, тушите без крышки.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Посыпьте {cilantro} кинзы перед подачей."
+    }
+  ]
+}

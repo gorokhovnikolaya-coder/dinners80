@@ -1,0 +1,111 @@
+{
+  "title": "Тако аль пастор",
+  "level": "challenge",
+  "minutes": 120,
+  "baseServings": 2,
+  "tags": ["meat", "spicy"],
+  "description": "Свинина в маринаде из перцев и ананаса на кукурузных лепёшках.",
+  "fact": "Рецепт принесли в Мексику ливанские иммигранты вместе с вертикальным вертелом.",
+  "ingredients": [
+    {
+      "key": "pork_loin",
+      "name": "Свиная корейка",
+      "amount": 500,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "pineapple",
+      "name": "Ананас",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "chili",
+      "name": "Острый перчик",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "paprika",
+      "name": "Копчёная паприка",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "apple_vinegar",
+      "name": "Яблочный уксус",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "corn_tortillas",
+      "name": "Кукурузные тортильи",
+      "amount": 8,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "red_onion",
+      "name": "Красный лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "cilantro",
+      "name": "Кинза",
+      "amount": 15,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "lime",
+      "name": "Лайм",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Измельчите в блендере {chili} острого перчика, {paprika} паприки, {garlic} чеснока, {apple_vinegar} уксуса, половину ананаса и соль."
+    },
+    {
+      "text": "Нарежьте {pork_loin} свиной корейки тонкими пластинами и замаринуйте.",
+      "timerMinutes": 60
+    },
+    {
+      "text": "Обжарьте мясо на раскалённой сковороде порциями до карамельной корочки, затем нарежьте мелко.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Обжарьте оставшийся {pineapple} ананаса кубиками до румяности.",
+      "timerMinutes": 3
+    },
+    {
+      "text": "Прогрейте {corn_tortillas} кукурузных тортилий на сухой сковороде."
+    },
+    {
+      "text": "Выложите мясо и ананас на лепёшки, посыпьте {red_onion} красного лука и {cilantro} кинзы, сбрызните {lime} лайма."
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "title": "Чакалака",
+  "level": "weekday",
+  "minutes": 30,
+  "baseServings": 2,
+  "tags": ["spicy"],
+  "description": "Пряное овощное рагу с фасолью, морковью и перцем.",
+  "fact": "Чакалаку придумали шахтёры Йоханнесбурга из консервов и овощей.",
+  "ingredients": [
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "carrot",
+      "name": "Морковь",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "bell_pepper",
+      "name": "Сладкий перец",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "chili",
+      "name": "Острый перчик",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "curry_powder",
+      "name": "Карри",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "canned_tomatoes",
+      "name": "Томаты в собственном соку",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "white_beans",
+      "name": "Белая фасоль консервированная",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {onion} лука, {bell_pepper} сладкого перца и {chili} острого перчика на {oil} растительного масла.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Добавьте {carrot} тёртой моркови и {curry_powder} карри, жарьте 3 минуты.",
+      "timerMinutes": 3
+    },
+    {
+      "text": "Влейте {canned_tomatoes} томатов и тушите.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Добавьте {white_beans} белой фасоли, посолите и прогрейте.",
+      "timerMinutes": 5
+    }
+  ]
+}

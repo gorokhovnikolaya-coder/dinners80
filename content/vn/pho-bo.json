@@ -1,0 +1,112 @@
+{
+  "title": "Фо бо",
+  "level": "weekend",
+  "minutes": 180,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Прозрачный говяжий бульон с пряностями, рисовой лапшой и зеленью.",
+  "fact": "Во Вьетнаме фо едят на завтрак, а бульон варят всю ночь.",
+  "ingredients": [
+    {
+      "key": "beef_ribs",
+      "name": "Говяжьи рёбра",
+      "amount": 600,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "beef",
+      "product": "beef_tenderloin",
+      "name": "Говяжья вырезка",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "ginger",
+      "name": "Имбирь",
+      "amount": 30,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "star_anise",
+      "name": "Бадьян",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "cinnamon",
+      "name": "Палочка корицы",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "fish_sauce",
+      "name": "Рыбный соус",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "rice_noodles",
+      "name": "Рисовая лапша",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "bean_sprouts",
+      "name": "Ростки сои",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "cilantro",
+      "name": "Кинза",
+      "amount": 15,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "lime",
+      "name": "Лайм",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обожгите {onion} лука и {ginger} имбиря на сухой сковороде до черноты.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Залейте {beef_ribs} говяжьих рёбер 2 л воды, доведите до кипения и снимите пену."
+    },
+    {
+      "text": "Добавьте лук, имбирь, {star_anise} бадьяна и {cinnamon} корицы, варите на слабом огне.",
+      "timerMinutes": 150
+    },
+    {
+      "text": "Процедите бульон и добавьте {fish_sauce} рыбного соуса."
+    },
+    {
+      "text": "Отварите {rice_noodles} рисовой лапши и разложите по мискам.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Сверху положите {beef} сырой вырезки тонкими ломтиками и залейте кипящим бульоном; подавайте с {bean_sprouts} ростков сои, {cilantro} кинзы и {lime} лайма."
+    }
+  ]
+}

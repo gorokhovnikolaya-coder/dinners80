@@ -1,0 +1,84 @@
+{
+  "title": "Ханги по-домашнему",
+  "level": "weekend",
+  "minutes": 150,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Свинина и курица, томлённые с бататом и тыквой в плотно закрытой форме.",
+  "fact": "Маори готовят ханги в земляной яме на раскалённых камнях.",
+  "ingredients": [
+    {
+      "key": "pork_shoulder",
+      "name": "Свиная лопатка",
+      "amount": 500,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "chicken",
+      "product": "chicken_thigh",
+      "name": "Куриные бёдра",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "sweet_potato",
+      "name": "Батат",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "pumpkin",
+      "name": "Тыква",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "potato",
+      "name": "Картофель",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "cabbage",
+      "name": "Белокочанная капуста",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    },
+    {
+      "key": "pepper",
+      "product": "black_pepper",
+      "name": "Чёрный перец",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Нарежьте {pork_shoulder} свиной лопатки крупными кусками, посолите и поперчите вместе с {chicken} куриных бёдер."
+    },
+    {
+      "text": "Нарежьте {sweet_potato} батата, {pumpkin} тыквы и {potato} картофеля крупно."
+    },
+    {
+      "text": "Выстелите форму листьями {cabbage} капусты, выложите мясо, сверху овощи и накройте капустой."
+    },
+    {
+      "text": "Влейте 150 мл воды, плотно закройте фольгой и запекайте при 160 °C.",
+      "timerMinutes": 120
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "title": "Чашушули",
+  "level": "weekday",
+  "minutes": 40,
+  "baseServings": 2,
+  "tags": ["meat", "spicy"],
+  "description": "Острая говядина, тушённая с помидорами, перцем и кинзой.",
+  "fact": "Название значит «острое»: в Грузии его едят с горячим хлебом шоти.",
+  "ingredients": [
+    {
+      "key": "beef",
+      "name": "Говядина",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "tomato",
+      "name": "Помидоры",
+      "amount": 3,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "bell_pepper",
+      "name": "Сладкий перец",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "chili",
+      "name": "Острый перчик",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "cilantro",
+      "name": "Кинза",
+      "amount": 20,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Нарежьте {beef} говядины кубиками и обжарьте на сильном огне до корочки.",
+      "timerMinutes": 7
+    },
+    {
+      "text": "Добавьте {onion} лука полукольцами и {bell_pepper} сладкого перца полосками, жарьте 5 минут.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Добавьте {tomato} помидоров кубиками и {chili} острого перчика, тушите под крышкой.",
+      "timerMinutes": 20
+    },
+    {
+      "text": "Вмешайте {garlic} чеснока и {cilantro} рубленой кинзы, посолите и снимите с огня."
+    }
+  ]
+}

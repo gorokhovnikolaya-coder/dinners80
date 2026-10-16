@@ -1,0 +1,79 @@
+{
+  "title": "Лечо с яйцами",
+  "level": "weekday",
+  "minutes": 30,
+  "baseServings": 2,
+  "tags": [],
+  "description": "Тушёные перцы с помидорами и паприкой, в конце — яйца.",
+  "fact": "Для венгров лечо — горячее блюдо, а не заготовка на зиму.",
+  "ingredients": [
+    {
+      "key": "bell_pepper",
+      "name": "Сладкий перец",
+      "amount": 3,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "tomato",
+      "name": "Помидоры",
+      "amount": 3,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "paprika",
+      "name": "Сладкая паприка",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "egg",
+      "name": "Яйца",
+      "amount": 3,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {onion} лука на {oil} растительного масла до мягкости.",
+      "timerMinutes": 4
+    },
+    {
+      "text": "Добавьте {bell_pepper} сладкого перца полосками и тушите.",
+      "timerMinutes": 8
+    },
+    {
+      "text": "Всыпьте {paprika} паприки, добавьте {tomato} помидоров кубиками, посолите и тушите.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Вбейте {egg} яиц, перемешайте и готовьте, пока яйца не схватятся.",
+      "timerMinutes": 3
+    }
+  ]
+}

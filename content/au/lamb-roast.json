@@ -1,0 +1,88 @@
+{
+  "title": "Запечённая баранина с розмарином",
+  "level": "challenge",
+  "minutes": 150,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Баранья лопатка, запечённая с чесноком и розмарином, с картофелем.",
+  "fact": "Воскресная запечённая баранина — главная семейная традиция Австралии.",
+  "ingredients": [
+    {
+      "key": "lamb",
+      "name": "Баранья лопатка",
+      "amount": 1000,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 5,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "rosemary",
+      "name": "Розмарин",
+      "amount": 4,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "potato",
+      "name": "Картофель",
+      "amount": 600,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "pumpkin",
+      "name": "Тыква",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "olive_oil",
+      "name": "Оливковое масло",
+      "amount": 3,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    },
+    {
+      "key": "pepper",
+      "product": "black_pepper",
+      "name": "Чёрный перец",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Сделайте в {lamb} баранины надрезы и вставьте в них {garlic} чеснока и {rosemary} розмарина."
+    },
+    {
+      "text": "Натрите мясо {olive_oil} оливкового масла, солью и перцем."
+    },
+    {
+      "text": "Запекайте при 160 °C, накрыв фольгой.",
+      "timerMinutes": 90
+    },
+    {
+      "text": "Добавьте {potato} картофеля и {pumpkin} тыквы крупными кусками, снимите фольгу и запекайте при 200 °C.",
+      "timerMinutes": 40
+    },
+    {
+      "text": "Дайте мясу отдохнуть перед нарезкой.",
+      "timerMinutes": 15
+    }
+  ]
+}

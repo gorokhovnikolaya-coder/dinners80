@@ -1,0 +1,77 @@
+{
+  "title": "Рататуй",
+  "level": "weekend",
+  "minutes": 90,
+  "baseServings": 2,
+  "tags": [],
+  "description": "Запечённые кабачки, баклажаны и томаты с прованскими травами.",
+  "fact": "Рататуй родом из Ниццы и когда-то считался едой бедняков.",
+  "ingredients": [
+    {
+      "key": "zucchini",
+      "name": "Кабачки",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "eggplant",
+      "name": "Баклажаны",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "tomatoes",
+      "product": "tomato",
+      "name": "Томаты",
+      "amount": 4,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "herbs",
+      "product": "provence_herbs",
+      "name": "Прованские травы",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "olive_oil",
+      "name": "Оливковое масло",
+      "amount": 3,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 2,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Нарежьте {zucchini} кабачков, {eggplant} баклажанов и {tomatoes} томатов тонкими кружками."
+    },
+    {
+      "text": "Выложите овощи в форму внахлёст, добавьте {garlic} чеснока."
+    },
+    {
+      "text": "Сбрызните {olive_oil} оливкового масла, посыпьте {herbs} прованских трав и солью."
+    },
+    {
+      "text": "Запекайте при 180 °C под фольгой.",
+      "timerMinutes": 60
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "title": "Жареный рис с кимчи",
+  "level": "weekday",
+  "minutes": 20,
+  "baseServings": 2,
+  "tags": ["spicy", "meat"],
+  "description": "Рис, обжаренный с кимчи и беконом, с яйцом сверху.",
+  "fact": "Это любимый способ корейцев доесть вчерашний рис и перекисшее кимчи.",
+  "ingredients": [
+    {
+      "key": "rice",
+      "name": "Отварной рис",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "kimchi",
+      "name": "Кимчи",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "bacon",
+      "name": "Бекон из свинины",
+      "amount": 80,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "gochujang",
+      "name": "Паста кочхуджан",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "egg",
+      "name": "Яйца",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "green_onion",
+      "name": "Зелёный лук",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "sesame_oil",
+      "name": "Кунжутное масло",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {bacon} бекона на {oil} растительного масла.",
+      "timerMinutes": 3
+    },
+    {
+      "text": "Добавьте {kimchi} кимчи и {gochujang} кочхуджана, жарьте 3 минуты.",
+      "timerMinutes": 3
+    },
+    {
+      "text": "Добавьте {rice} отварного риса и жарьте, пока он не прогреется и не впитает соус.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Сбрызните {sesame_oil} кунжутного масла, посыпьте {green_onion} зелёного лука."
+    },
+    {
+      "text": "Пожарьте {egg} яиц глазуньей и выложите сверху на рис.",
+      "timerMinutes": 3
+    }
+  ]
+}

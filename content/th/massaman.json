@@ -1,0 +1,64 @@
+{
+  "title": "Массаман карри с говядиной",
+  "level": "challenge",
+  "minutes": 150,
+  "baseServings": 2,
+  "tags": ["meat", "spicy"],
+  "description": "Томлёная говядина с картофелем и арахисом.",
+  "fact": "Массаман не раз попадал в списки самых вкусных блюд мира.",
+  "ingredients": [
+    {
+      "key": "beef",
+      "name": "Говядина",
+      "amount": 600,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "potatoes",
+      "product": "potato",
+      "name": "Картофель",
+      "amount": 3,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "peanuts",
+      "name": "Арахис",
+      "amount": 50,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "massaman_paste",
+      "name": "Паста массаман",
+      "amount": 3,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "coconut_milk",
+      "name": "Кокосовое молоко",
+      "amount": 400,
+      "unit": "ml",
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {massaman_paste} пасты массаман в части из {coconut_milk} кокосового молока.",
+      "timerMinutes": 2
+    },
+    {
+      "text": "Добавьте {beef} нарезанной говядины и остальное молоко, тушите.",
+      "timerMinutes": 90
+    },
+    {
+      "text": "Положите {potatoes} картофеля и готовьте до мягкости.",
+      "timerMinutes": 25
+    },
+    {
+      "text": "Посыпьте {peanuts} арахиса перед подачей."
+    }
+  ]
+}

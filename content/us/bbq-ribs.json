@@ -1,0 +1,88 @@
+{
+  "title": "Свиные рёбрышки барбекю",
+  "level": "challenge",
+  "minutes": 240,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Рёбрышки, томлённые в духовке до мягкости и покрытые липкой глазурью.",
+  "fact": "Правильные рёбрышки «не падают с кости», а отходят от неё с лёгким усилием.",
+  "ingredients": [
+    {
+      "key": "pork_ribs",
+      "name": "Свиные рёбра",
+      "amount": 1000,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "paprika",
+      "name": "Копчёная паприка",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "sugar",
+      "name": "Сахар",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "ketchup",
+      "name": "Кетчуп",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "honey",
+      "name": "Мёд",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "apple_vinegar",
+      "name": "Яблочный уксус",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Снимите плёнку с {pork_ribs} свиных рёбер и натрите смесью {paprika} паприки, {sugar} сахара, соли и {garlic} чеснока."
+    },
+    {
+      "text": "Плотно заверните рёбра в фольгу и запекайте при 150 °C.",
+      "timerMinutes": 180
+    },
+    {
+      "text": "Смешайте {ketchup} кетчупа, {honey} мёда и {apple_vinegar} уксуса и уварите до густоты.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Разверните рёбра, обмажьте глазурью и запекайте при 220 °C, обмазывая ещё дважды.",
+      "timerMinutes": 20
+    },
+    {
+      "text": "Дайте рёбрам отдохнуть и разрежьте между костями.",
+      "timerMinutes": 10
+    }
+  ]
+}

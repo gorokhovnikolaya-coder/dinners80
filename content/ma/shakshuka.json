@@ -1,0 +1,102 @@
+{
+  "title": "Шакшука",
+  "level": "weekday",
+  "minutes": 25,
+  "baseServings": 2,
+  "tags": ["spicy"],
+  "description": "Яйца, запечённые в пряном соусе из томатов и перцев.",
+  "fact": "Шакшука пришла в Марокко из Туниса, а затем распространилась по всему Средиземноморью.",
+  "ingredients": [
+    {
+      "key": "canned_tomatoes",
+      "name": "Томаты в собственном соку",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "bell_pepper",
+      "name": "Сладкий перец",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 2,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "cumin",
+      "name": "Молотый кумин",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "chili_flakes",
+      "name": "Хлопья острого перца",
+      "amount": 0.5,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "egg",
+      "name": "Яйца",
+      "amount": 4,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "cilantro",
+      "name": "Кинза",
+      "amount": 10,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "olive_oil",
+      "name": "Оливковое масло",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {onion} лука и {bell_pepper} сладкого перца на {olive_oil} оливкового масла.",
+      "timerMinutes": 6
+    },
+    {
+      "text": "Добавьте {garlic} чеснока, {cumin} кумина и {chili_flakes} хлопьев перца, жарьте минуту.",
+      "timerMinutes": 1
+    },
+    {
+      "text": "Влейте {canned_tomatoes} томатов, посолите и уварите до густоты.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Сделайте углубления, вбейте {egg} яиц и готовьте под крышкой.",
+      "timerMinutes": 6
+    },
+    {
+      "text": "Посыпьте {cilantro} кинзы."
+    }
+  ]
+}

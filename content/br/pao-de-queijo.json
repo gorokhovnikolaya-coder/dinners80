@@ -1,0 +1,61 @@
+{
+  "title": "Пан-ди-кейжу",
+  "level": "weekend",
+  "minutes": 60,
+  "baseServings": 2,
+  "tags": [],
+  "description": "Сырные булочки из тапиоковой муки.",
+  "fact": "В тесте нет пшеничной муки, поэтому булочки без глютена.",
+  "ingredients": [
+    {
+      "key": "tapioca",
+      "product": "tapioca_flour",
+      "name": "Тапиоковая мука",
+      "amount": 250,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "cheese",
+      "name": "Сыр",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "eggs",
+      "product": "egg",
+      "name": "Яйца",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "milk",
+      "name": "Молоко",
+      "amount": 150,
+      "unit": "ml",
+      "aisle": "dairy"
+    },
+    {
+      "key": "butter",
+      "name": "Сливочное масло",
+      "amount": 50,
+      "unit": "g",
+      "aisle": "dairy"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Доведите {milk} молока с {butter} сливочного масла до кипения и заварите {tapioca} тапиоковой муки."
+    },
+    {
+      "text": "Остудите тесто, вмешайте {eggs} яиц и {cheese} тёртого сыра.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Скатайте шарики и выпекайте при 200 °C.",
+      "timerMinutes": 20
+    }
+  ]
+}

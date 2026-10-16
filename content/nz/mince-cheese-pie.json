@@ -1,0 +1,97 @@
+{
+  "title": "Пирог с фаршем и сыром",
+  "level": "challenge",
+  "minutes": 120,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Пирог из песочного и слоёного теста с мясом в подливе и сыром.",
+  "fact": "В Новой Зеландии ежегодно проходит конкурс на лучший мясной пирог страны.",
+  "ingredients": [
+    {
+      "key": "beef_mince",
+      "name": "Фарш говяжий",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "flour",
+      "name": "Мука",
+      "amount": 250,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "butter",
+      "name": "Сливочное масло",
+      "amount": 125,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "puff_pastry",
+      "name": "Слоёное тесто",
+      "amount": 250,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "cheese",
+      "name": "Твёрдый сыр",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "bouillon",
+      "name": "Бульонный кубик",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "egg",
+      "name": "Яйца",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Порубите {butter} холодного масла с {flour} муки и солью в крошку, добавьте 4 ложки ледяной воды и соберите тесто."
+    },
+    {
+      "text": "Уберите тесто в холодильник.",
+      "timerMinutes": 30
+    },
+    {
+      "text": "Обжарьте {onion} лука с {beef_mince} говяжьего фарша, добавьте {bouillon} кубика и 200 мл воды, уварите до густоты.",
+      "timerMinutes": 20
+    },
+    {
+      "text": "Выстелите форму песочным тестом, выложите остывшую начинку и посыпьте {cheese} тёртого сыра."
+    },
+    {
+      "text": "Накройте {puff_pastry} слоёного теста, смажьте взбитым {egg} яйца."
+    },
+    {
+      "text": "Выпекайте при 200 °C до золотистого цвета.",
+      "timerMinutes": 35
+    }
+  ]
+}

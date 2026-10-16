@@ -1,0 +1,83 @@
+{
+  "title": "Бургер по-австралийски",
+  "level": "weekday",
+  "minutes": 30,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Бургер с яйцом, ананасом и маринованной свёклой.",
+  "fact": "Без свёклы в Австралии бургер считается неполноценным.",
+  "ingredients": [
+    {
+      "key": "beef_mince",
+      "name": "Фарш говяжий",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "buns",
+      "name": "Булочки для бургеров",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "beetroot",
+      "name": "Свёкла отварная",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "pineapple",
+      "name": "Ананас",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "egg",
+      "name": "Яйца",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "cheese",
+      "name": "Сыр чеддер ломтиками",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "lettuce",
+      "name": "Салат ромэн",
+      "amount": 50,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Сформуйте из {beef_mince} говяжьего фарша 2 котлеты, посолите и обжарьте по 4 минуты с каждой стороны.",
+      "timerMinutes": 8
+    },
+    {
+      "text": "На той же сковороде обжарьте {pineapple} ананаса кольцами и пожарьте {egg} яиц глазуньей.",
+      "timerMinutes": 4
+    },
+    {
+      "text": "Нарежьте {beetroot} свёклы кружками."
+    },
+    {
+      "text": "Соберите бургер: {buns} булочки, {lettuce} салата, котлета с {cheese} сыра, свёкла, ананас и яйцо."
+    }
+  ]
+}

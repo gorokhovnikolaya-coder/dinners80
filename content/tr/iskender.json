@@ -1,0 +1,87 @@
+{
+  "title": "Искендер-кебаб",
+  "level": "weekend",
+  "minutes": 60,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Тонкое мясо на лепёшке с томатным соусом, йогуртом и растопленным маслом.",
+  "fact": "Блюдо придумал в XIX веке повар Искендер-эфенди из Бурсы.",
+  "ingredients": [
+    {
+      "key": "beef",
+      "name": "Говядина",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "yogurt",
+      "name": "Греческий йогурт",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "pita",
+      "name": "Пита",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "tomato_paste",
+      "name": "Томатная паста",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "tomato",
+      "name": "Помидоры",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "butter",
+      "name": "Сливочное масло",
+      "amount": 50,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "paprika",
+      "name": "Сладкая паприка",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Нарежьте {beef} говядины очень тонкими ломтиками, посолите и обжарьте порциями.",
+      "timerMinutes": 8
+    },
+    {
+      "text": "Обжарьте {tomato_paste} томатной пасты, добавьте {tomato} помидоров тёртыми и 100 мл воды, уварите соус.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Нарежьте {pita} питы кусочками и подсушите на сковороде.",
+      "timerMinutes": 3
+    },
+    {
+      "text": "Выложите хлеб, сверху мясо, полейте соусом, рядом положите {yogurt} йогурта."
+    },
+    {
+      "text": "Растопите {butter} сливочного масла с {paprika} паприки до шипения и полейте мясо."
+    }
+  ]
+}

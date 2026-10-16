@@ -1,0 +1,71 @@
+{
+  "title": "Паста карбонара",
+  "level": "weekday",
+  "minutes": 20,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Спагетти с беконом, желтками и пармезаном без сливок.",
+  "fact": "Настоящая карбонара готовится на гуанчале — вяленых свиных щёчках.",
+  "ingredients": [
+    {
+      "key": "spaghetti",
+      "name": "Спагетти",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "guanciale",
+      "name": "Гуанчале (свиные щёчки)",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "yolks",
+      "product": "egg",
+      "name": "Яичные желтки",
+      "amount": 3,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "parmesan",
+      "name": "Пармезан",
+      "amount": 50,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    },
+    {
+      "key": "pepper",
+      "product": "black_pepper",
+      "name": "Чёрный перец",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Отварите {spaghetti} спагетти в подсоленной воде до состояния аль денте.",
+      "timerMinutes": 9
+    },
+    {
+      "text": "Нарежьте {guanciale} гуанчале брусочками и обжарьте до хруста.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Взбейте {yolks} желтков с {parmesan} тёртого пармезана и перцем."
+    },
+    {
+      "text": "Смешайте пасту с гуанчале, снимите с огня и быстро вмешайте яичную смесь."
+    }
+  ]
+}

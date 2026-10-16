@@ -1,0 +1,107 @@
+{
+  "title": "Франсезинья",
+  "level": "challenge",
+  "minutes": 90,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Многослойный сэндвич с мясом под расплавленным сыром и пивным соусом.",
+  "fact": "Сэндвич придумал в Порту эмигрант, вернувшийся из Франции, — отсюда «француженка».",
+  "ingredients": [
+    {
+      "key": "bread",
+      "product": "white_bread",
+      "name": "Белый хлеб для тостов",
+      "amount": 4,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "beef",
+      "name": "Говяжий стейк",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "ham",
+      "name": "Ветчина",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "sausage",
+      "product": "smoked_sausage",
+      "name": "Копчёная колбаса",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "cheese",
+      "name": "Сыр ломтиками",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "beer",
+      "name": "Светлое пиво",
+      "amount": 250,
+      "unit": "ml",
+      "aisle": "other"
+    },
+    {
+      "key": "tomato_paste",
+      "name": "Томатная паста",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "butter",
+      "name": "Сливочное масло",
+      "amount": 20,
+      "unit": "g",
+      "aisle": "dairy"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {onion} лука на {butter} сливочного масла, добавьте {tomato_paste} томатной пасты и {beer} пива.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Уваривайте соус до густоты и пробейте блендером.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Обжарьте {beef} говяжьего стейка тонкими ломтиками и {sausage} копчёной колбасы.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Соберите сэндвичи: хлеб, мясо, {ham} ветчины, колбаса и снова хлеб."
+    },
+    {
+      "text": "Накройте сэндвичи {cheese} сыра и запекайте при 200 °C, пока сыр не расплавится.",
+      "timerMinutes": 7
+    },
+    {
+      "text": "Полейте горячим соусом и подавайте сразу."
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "title": "Перечный суп с курицей",
+  "level": "weekday",
+  "minutes": 45,
+  "baseServings": 2,
+  "tags": ["meat", "spicy"],
+  "description": "Острый ароматный бульон с курицей и пряностями.",
+  "fact": "В Нигерии перечный суп считают лучшим средством от простуды.",
+  "ingredients": [
+    {
+      "key": "chicken",
+      "product": "chicken_thigh",
+      "name": "Куриные бёдра",
+      "amount": 500,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "chili",
+      "name": "Острый перчик",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "ginger",
+      "name": "Имбирь",
+      "amount": 20,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "bouillon",
+      "name": "Бульонный кубик",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "basil",
+      "name": "Базилик",
+      "amount": 15,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Залейте {chicken} куриных бёдер 1 л воды, добавьте {onion} лука и доведите до кипения.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Добавьте {chili} острого перчика, {ginger} тёртого имбиря, {garlic} чеснока и {bouillon} бульонного кубика."
+    },
+    {
+      "text": "Варите на слабом огне.",
+      "timerMinutes": 25
+    },
+    {
+      "text": "Посолите и добавьте {basil} базилика за минуту до готовности.",
+      "timerMinutes": 1
+    }
+  ]
+}

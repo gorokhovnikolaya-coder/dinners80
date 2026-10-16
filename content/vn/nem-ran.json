@@ -1,0 +1,87 @@
+{
+  "title": "Нэм",
+  "level": "challenge",
+  "minutes": 90,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Хрустящие жареные роллы из рисовой бумаги со свининой и грибами.",
+  "fact": "На севере Вьетнама их называют нэм, на юге — ча зё.",
+  "ingredients": [
+    {
+      "key": "pork_mince",
+      "name": "Свиной фарш",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "rice_paper",
+      "name": "Рисовая бумага",
+      "amount": 12,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "rice_noodles",
+      "name": "Рисовая лапша",
+      "amount": 30,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "mushrooms",
+      "name": "Шампиньоны",
+      "amount": 100,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "carrot",
+      "name": "Морковь",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "egg",
+      "name": "Яйца",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "fish_sauce",
+      "name": "Рыбный соус",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло для жарки",
+      "amount": 300,
+      "unit": "ml",
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Замочите {rice_noodles} рисовой лапши в горячей воде и нарежьте ножницами.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Смешайте {pork_mince} свиного фарша, лапшу, {mushrooms} рубленых шампиньонов, {carrot} тёртой моркови, {egg} яйца и половину {fish_sauce} рыбного соуса."
+    },
+    {
+      "text": "Смочите {rice_paper} листов рисовой бумаги водой, выложите начинку и плотно сверните."
+    },
+    {
+      "text": "Жарьте роллы в {oil} растительного масла на среднем огне до золотистой корочки.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Разведите остаток рыбного соуса водой с соком лайма и сахаром — это соус для макания."
+    }
+  ]
+}

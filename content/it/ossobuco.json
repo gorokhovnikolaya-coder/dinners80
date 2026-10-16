@@ -1,0 +1,69 @@
+{
+  "title": "Оссобуко",
+  "level": "challenge",
+  "minutes": 150,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Тушёная телячья голяшка с овощами и цедрой.",
+  "fact": "Название значит «кость с дыркой» — главное в блюде костный мозг.",
+  "ingredients": [
+    {
+      "key": "veal_shank",
+      "name": "Телячья голяшка",
+      "amount": 800,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "carrot",
+      "name": "Морковь",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "celery",
+      "name": "Сельдерей",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "lemon_zest",
+      "name": "Лимонная цедра",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "veg"
+    },
+    {
+      "key": "flour",
+      "name": "Мука",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обваляйте {veal_shank} телячьей голяшки в {flour} муки и обжарьте со всех сторон.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Добавьте нарезанные {carrot} моркови и {celery} сельдерея, влейте стакан воды."
+    },
+    {
+      "text": "Тушите под крышкой на слабом огне.",
+      "timerMinutes": 120
+    },
+    {
+      "text": "Перед подачей посыпьте {lemon_zest} лимонной цедры."
+    }
+  ]
+}

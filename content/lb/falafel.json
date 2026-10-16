@@ -1,0 +1,101 @@
+{
+  "title": "Фалафель с тахини",
+  "level": "challenge",
+  "minutes": 90,
+  "baseServings": 2,
+  "tags": [],
+  "description": "Хрустящие шарики из замоченного нута с зеленью и соусом тахини.",
+  "fact": "Для настоящего фалафеля нут не варят — его только замачивают.",
+  "ingredients": [
+    {
+      "key": "chickpeas",
+      "name": "Сухой нут",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "parsley",
+      "name": "Петрушка",
+      "amount": 30,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "cilantro",
+      "name": "Кинза",
+      "amount": 20,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "cumin",
+      "name": "Молотый кумин",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "tahini",
+      "name": "Тахини",
+      "amount": 3,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "lemon",
+      "name": "Лимон",
+      "amount": 0.5,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло для фритюра",
+      "amount": 500,
+      "unit": "ml",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Замочите {chickpeas} сухого нута в холодной воде на ночь, затем откиньте и обсушите."
+    },
+    {
+      "text": "Измельчите нут в блендере с {onion} лука, {garlic} чеснока, {parsley} петрушки, {cilantro} кинзы, {cumin} кумина и солью до крупной крошки."
+    },
+    {
+      "text": "Уберите массу в холодильник.",
+      "timerMinutes": 30
+    },
+    {
+      "text": "Сформуйте шарики и жарьте в разогретом {oil} масла до тёмно-золотого цвета.",
+      "timerMinutes": 4
+    },
+    {
+      "text": "Разведите {tahini} тахини соком {lemon} лимона и водой до густоты сметаны."
+    }
+  ]
+}

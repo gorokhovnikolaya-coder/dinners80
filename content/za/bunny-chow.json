@@ -1,0 +1,110 @@
+{
+  "title": "Бани чау",
+  "level": "challenge",
+  "minutes": 90,
+  "baseServings": 2,
+  "tags": ["meat", "spicy", "gluten"],
+  "description": "Острое карри из баранины в выдолбленной буханке хлеба.",
+  "fact": "Бани чау появился в Дурбане, где хлеб служил и тарелкой, и ложкой.",
+  "ingredients": [
+    {
+      "key": "lamb",
+      "name": "Баранина",
+      "amount": 500,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "bread_loaf",
+      "name": "Буханка белого хлеба",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "ginger",
+      "name": "Имбирь",
+      "amount": 15,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "curry_powder",
+      "name": "Карри",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "chili",
+      "name": "Острый перчик",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "tomato",
+      "name": "Помидоры",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "potato",
+      "name": "Картофель",
+      "amount": 300,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {onion} лука на {oil} растительного масла, добавьте {garlic} чеснока, {ginger} имбиря и {curry_powder} карри.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Добавьте {lamb} баранины кубиками и обжарьте со всех сторон.",
+      "timerMinutes": 8
+    },
+    {
+      "text": "Добавьте {tomato} помидоров, {chili} острого перчика и 400 мл воды, тушите.",
+      "timerMinutes": 45
+    },
+    {
+      "text": "Добавьте {potato} картофеля кубиками и тушите до мягкости.",
+      "timerMinutes": 20
+    },
+    {
+      "text": "Разрежьте {bread_loaf} буханки пополам, выньте мякиш и наполните хлеб карри, сверху положите мякиш как крышку."
+    }
+  ]
+}

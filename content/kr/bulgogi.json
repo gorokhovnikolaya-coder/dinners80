@@ -1,0 +1,97 @@
+{
+  "title": "Пулькоги",
+  "level": "weekend",
+  "minutes": 60,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Тонкая говядина в сладком соевом маринаде с грушей.",
+  "fact": "Пулькоги переводится как «огненное мясо» — его жарят на открытом огне.",
+  "ingredients": [
+    {
+      "key": "beef",
+      "name": "Говядина",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "soy_sauce",
+      "name": "Соевый соус",
+      "amount": 4,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "pear",
+      "name": "Груша",
+      "amount": 0.5,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "sugar",
+      "name": "Сахар",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 3,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "sesame_oil",
+      "name": "Кунжутное масло",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "sesame",
+      "name": "Кунжут",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "rice",
+      "name": "Рис",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Нарежьте {beef} говядины как можно тоньше поперёк волокон."
+    },
+    {
+      "text": "Натрите {pear} груши, смешайте с {soy_sauce} соевого соуса, {sugar} сахара, {garlic} чеснока и {sesame_oil} кунжутного масла."
+    },
+    {
+      "text": "Залейте мясо маринадом вместе с {onion} лука и оставьте.",
+      "timerMinutes": 30
+    },
+    {
+      "text": "Отварите {rice} риса.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Обжарьте мясо небольшими порциями на очень горячей сковороде.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Посыпьте {sesame} кунжута и подавайте с рисом."
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "title": "Джоллоф",
+  "level": "weekend",
+  "minutes": 75,
+  "baseServings": 2,
+  "tags": ["spicy"],
+  "description": "Рис, томлённый в остром соусе из перцев и томатов.",
+  "fact": "Нигерия и Гана десятилетиями спорят, чей джоллоф лучше.",
+  "ingredients": [
+    {
+      "key": "rice",
+      "name": "Рис длиннозёрный",
+      "amount": 250,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "bell_pepper",
+      "name": "Сладкий перец",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "tomato",
+      "name": "Помидоры",
+      "amount": 3,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "chili",
+      "name": "Острый перчик",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "tomato_paste",
+      "name": "Томатная паста",
+      "amount": 2,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "curry_powder",
+      "name": "Карри",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "bay_leaf",
+      "name": "Лавровый лист",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "bouillon",
+      "name": "Бульонный кубик",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 4,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Пробейте в блендере {bell_pepper} сладкого перца, {tomato} помидоров, половину лука и {chili} острого перчика."
+    },
+    {
+      "text": "Обжарьте остальной {onion} лука на {oil} растительного масла, добавьте {tomato_paste} томатной пасты и жарьте 5 минут.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Влейте овощное пюре, добавьте {curry_powder} карри, {bay_leaf} лаврового листа и {bouillon} бульонного кубика, уварите.",
+      "timerMinutes": 20
+    },
+    {
+      "text": "Всыпьте промытый {rice} риса, долейте 400 мл воды, посолите."
+    },
+    {
+      "text": "Томите под плотной крышкой на очень слабом огне, не перемешивая.",
+      "timerMinutes": 30
+    }
+  ]
+}

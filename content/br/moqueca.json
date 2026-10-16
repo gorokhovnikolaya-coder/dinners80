@@ -1,0 +1,70 @@
+{
+  "title": "Мокека из рыбы",
+  "level": "weekday",
+  "minutes": 45,
+  "baseServings": 2,
+  "tags": [],
+  "description": "Рыба, тушённая в кокосовом молоке с перцем и томатами.",
+  "fact": "Мокеку традиционно готовят в глиняном горшке.",
+  "ingredients": [
+    {
+      "key": "white_fish",
+      "name": "Филе белой рыбы",
+      "amount": 500,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "coconut_milk",
+      "name": "Кокосовое молоко",
+      "amount": 400,
+      "unit": "ml",
+      "aisle": "grocery"
+    },
+    {
+      "key": "bell_pepper",
+      "name": "Сладкий перец",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "tomatoes",
+      "product": "tomato",
+      "name": "Томаты",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "lime",
+      "name": "Лайм",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "cilantro",
+      "name": "Кинза",
+      "amount": 15,
+      "unit": "g",
+      "aisle": "veg"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Замаринуйте {white_fish} филе белой рыбы в соке из {lime} лайма.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Выложите слоями {bell_pepper} сладкого перца, {tomatoes} томатов и рыбу."
+    },
+    {
+      "text": "Залейте {coconut_milk} кокосового молока и тушите на слабом огне.",
+      "timerMinutes": 20
+    },
+    {
+      "text": "Посыпьте {cilantro} кинзы."
+    }
+  ]
+}

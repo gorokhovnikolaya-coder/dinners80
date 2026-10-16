@@ -1,0 +1,70 @@
+{
+  "title": "Паэлья валенсийская",
+  "level": "challenge",
+  "minutes": 90,
+  "baseServings": 2,
+  "tags": ["meat"],
+  "description": "Рис с курицей, фасолью и шафраном на широкой сковороде.",
+  "fact": "Корочка риса на дне паэльи называется сокаррат.",
+  "ingredients": [
+    {
+      "key": "rice",
+      "name": "Рис",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "chicken",
+      "name": "Курица",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "green_beans",
+      "name": "Стручковая фасоль",
+      "amount": 150,
+      "unit": "g",
+      "aisle": "veg"
+    },
+    {
+      "key": "saffron",
+      "name": "Шафран",
+      "amount": 1,
+      "unit": "pinch",
+      "aisle": "grocery"
+    },
+    {
+      "key": "olive_oil",
+      "name": "Оливковое масло",
+      "amount": 3,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {chicken} курицы в {olive_oil} оливкового масла в широкой сковороде.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Добавьте {green_beans} стручковой фасоли, затем {rice} риса и залейте водой с {saffron} шафрана."
+    },
+    {
+      "text": "Готовьте не помешивая, пока рис не впитает воду.",
+      "timerMinutes": 20
+    },
+    {
+      "text": "Накройте полотенцем и дайте постоять.",
+      "timerMinutes": 5
+    }
+  ]
+}

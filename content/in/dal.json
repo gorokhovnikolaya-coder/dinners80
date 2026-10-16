@@ -1,0 +1,79 @@
+{
+  "title": "Дал из красной чечевицы",
+  "level": "weekday",
+  "minutes": 30,
+  "baseServings": 2,
+  "tags": ["spicy"],
+  "description": "Густая чечевичная похлёбка со специями.",
+  "fact": "Дал едят в Индии почти каждый день.",
+  "ingredients": [
+    {
+      "key": "lentils",
+      "product": "red_lentils",
+      "name": "Красная чечевица",
+      "amount": 200,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "tomatoes",
+      "product": "tomato",
+      "name": "Томаты",
+      "amount": 2,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "turmeric",
+      "name": "Куркума",
+      "amount": 1,
+      "unit": "tsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "chili",
+      "name": "Чили",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "garlic",
+      "name": "Чеснок",
+      "amount": 2,
+      "unit": "clove",
+      "aisle": "veg"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Промойте {lentils} красной чечевицы и варите с {turmeric} куркумы.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Обжарьте {onion} лука, {garlic} чеснока и {chili} чили.",
+      "timerMinutes": 5
+    },
+    {
+      "text": "Добавьте {tomatoes} нарезанных томатов и прогрейте.",
+      "timerMinutes": 3
+    },
+    {
+      "text": "Смешайте зажарку с чечевицей и посолите."
+    }
+  ]
+}

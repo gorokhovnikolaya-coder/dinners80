@@ -1,0 +1,96 @@
+{
+  "title": "Мясной пирог",
+  "level": "weekend",
+  "minutes": 90,
+  "baseServings": 2,
+  "tags": ["meat", "gluten"],
+  "description": "Порционные пироги из слоёного теста с говядиной в густой подливе.",
+  "fact": "Австралийцы съедают около 270 млн мясных пирогов в год.",
+  "ingredients": [
+    {
+      "key": "beef_mince",
+      "name": "Фарш говяжий",
+      "amount": 400,
+      "unit": "g",
+      "aisle": "meat"
+    },
+    {
+      "key": "puff_pastry",
+      "name": "Слоёное тесто",
+      "amount": 500,
+      "unit": "g",
+      "aisle": "grocery"
+    },
+    {
+      "key": "onion",
+      "name": "Репчатый лук",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "veg"
+    },
+    {
+      "key": "tomato_paste",
+      "name": "Томатная паста",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "flour",
+      "name": "Мука",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "bouillon",
+      "name": "Бульонный кубик",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "grocery"
+    },
+    {
+      "key": "egg",
+      "name": "Яйца",
+      "amount": 1,
+      "unit": "pcs",
+      "aisle": "dairy"
+    },
+    {
+      "key": "oil",
+      "product": "vegetable_oil",
+      "name": "Растительное масло",
+      "amount": 1,
+      "unit": "tbsp",
+      "aisle": "grocery"
+    },
+    {
+      "key": "salt",
+      "name": "Соль",
+      "amount": null,
+      "unit": null,
+      "aisle": "grocery"
+    }
+  ],
+  "steps": [
+    {
+      "text": "Обжарьте {onion} лука и {beef_mince} говяжьего фарша на {oil} растительного масла.",
+      "timerMinutes": 10
+    },
+    {
+      "text": "Посыпьте {flour} муки, добавьте {tomato_paste} томатной пасты, {bouillon} бульонного кубика и 250 мл воды, тушите до густоты.",
+      "timerMinutes": 20
+    },
+    {
+      "text": "Остудите начинку.",
+      "timerMinutes": 15
+    },
+    {
+      "text": "Выстелите формочки {puff_pastry} слоёного теста, наполните начинкой и накройте крышками из теста."
+    },
+    {
+      "text": "Смажьте взбитым {egg} яйца и выпекайте при 200 °C до золотистого цвета.",
+      "timerMinutes": 25
+    }
+  ]
+}
