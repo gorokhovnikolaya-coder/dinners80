@@ -387,6 +387,11 @@ export function DevUiPage() {
             <Skeleton shape="text" width="30%" className="text-xs" />
           </div>
         </div>
+        <Card tone="inverse" className="flex flex-col gap-2.5">
+          <Skeleton tone="dark" height={64} />
+          <Skeleton tone="dark" shape="text" width="70%" className="text-6xl" />
+          <Skeleton tone="dark" shape="text" width="50%" />
+        </Card>
       </Section>
 
       <Section id="ui-error" title={t.sections.errorState}>
@@ -400,6 +405,15 @@ export function DevUiPage() {
           <p aria-live="polite" className="text-center text-xs text-muted">
             {retries > 0 ? t.errorState.retried(retries) : ''}
           </p>
+        </Card>
+        <Card tone="inverse">
+          <ErrorState
+            tone="dark"
+            description={ru.common.errorHint}
+            onRetry={() => {
+              setRetries((count) => count + 1);
+            }}
+          />
         </Card>
       </Section>
     </main>

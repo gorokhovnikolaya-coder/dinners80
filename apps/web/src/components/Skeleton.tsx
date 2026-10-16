@@ -11,6 +11,8 @@ export interface SkeletonProps {
   height?: number | string;
   /** `rect` — a card/photo block; `text` — a line of text; `circle` — an avatar. */
   shape?: SkeletonShape;
+  /** `light` — on light screens; `dark` — on navy screens (the paywall). */
+  tone?: 'light' | 'dark';
   className?: string;
 }
 
@@ -21,7 +23,13 @@ const shapes: Record<SkeletonShape, string> = {
 };
 
 /** A decorative placeholder (`aria-hidden`); wrap a group of them in `SkeletonGroup`. */
-export function Skeleton({ width, height, shape = 'rect', className }: SkeletonProps) {
+export function Skeleton({
+  width,
+  height,
+  shape = 'rect',
+  tone = 'light',
+  className,
+}: SkeletonProps) {
   const style: CSSProperties = {
     width,
     height: height ?? (shape === 'circle' ? width : undefined),
@@ -29,7 +37,12 @@ export function Skeleton({ width, height, shape = 'rect', className }: SkeletonP
   return (
     <span
       aria-hidden="true"
-      className={cx('block bg-track motion-safe:animate-pulse', shapes[shape], className)}
+      className={cx(
+        'block motion-safe:animate-pulse',
+        tone === 'dark' ? 'bg-navy-2' : 'bg-track',
+        shapes[shape],
+        className,
+      )}
       style={style}
     />
   );

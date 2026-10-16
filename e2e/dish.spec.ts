@@ -126,9 +126,11 @@ test.describe('dish card', () => {
 
     await page.goto(`/dishes/${dishId ?? ''}`);
     await expect(page).toHaveURL(`/paywall?dish=${dishId ?? ''}`);
-    await expect(page.getByRole('heading', { name: 'Откроется с подпиской' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      '10 стран позади.Ещё 2 ждут вас',
+    );
+    await expect(page.getByText(/откроется с подпиской\./)).toBeVisible();
     await expect(page.getByRole('region', { name: 'Ингредиенты' })).toHaveCount(0);
-    await shot(page, '03-paywall-stub');
 
     // Opened directly: «Не сейчас» goes to the main screen, not out of the app.
     await page.getByRole('button', { name: 'Не сейчас' }).click();

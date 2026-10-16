@@ -7,6 +7,7 @@ import {
   shoppingResponseSchema,
   COOKS_PER_DAY_LIMIT,
   createCookResponseSchema,
+  createInvoiceResponseSchema,
   dishResponseSchema,
   feedResponseSchema,
   homeResponseSchema,
@@ -688,5 +689,79 @@ describe('POST /cooks (MSW)', () => {
     server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=cooks')));
     expect((await post(TEST_USER_IDS.eightCountries, { dishId: 'pe-ceviche' })).status).toBe(500);
     expect((await post(TEST_USER_IDS.eightCountries, { dishId: 'pe-ceviche' })).status).toBe(201);
+  });
+});
+
+describe('POST /payments/invoice (MSW) and the mock payment', () => {
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const post = (tgId: number, body: unknown) =>
+    fetch(`${API_BASE}/payments/invoice`, {
+      method: 'POST',
+      headers: { Authorization: `tma ${initDataOf(tgId)}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  const slugOf = (link: string) => link.replace('https://t.me/$', '');
+
+  it('creates an invoice link; its payment opens all countries', async () => {
+    const db = createMockDb();
+    server.use(...createHandlers(API_BASE, NO_MOCK_CONTROLS, db));
+    const tgId = TEST_USER_IDS.tenCountriesFree;
+    const response = await post(tgId, { plan: 'year' });
+    expect(response.status).toBe(201);
+    const { invoiceLink } = createInvoiceResponseSchema.parse(await response.json());
+    expect(invoiceLink).toMatch(/^https:\/\/t\.me\/\$mock-year-[0-9a-f-]{36}$/);
+
+    // Not paid yet: Таиланд is still closed.
+    expect(db.getUser(tgId)?.subscription.active).toBe(false);
+    const now = new Date('2026-10-16T12:00:00.000Z');
+    const subscription = db.completePayment(slugOf(invoiceLink), now);
+    expect(subscription).toEqual({
+      active: true,
+      plan: 'year',
+      expiresAt: new Date(now.getTime() + 365 * DAY_MS).toISOString(),
+    });
+    // The webhook is idempotent: the same invoice cannot be paid twice.
+    expect(db.completePayment(slugOf(invoiceLink), now)).toBeUndefined();
+    expect(db.getUser(tgId)?.subscription).toEqual(subscription);
+  });
+
+  it('extends an active subscription after its end', async () => {
+    const db = createMockDb();
+    server.use(...createHandlers(API_BASE, NO_MOCK_CONTROLS, db));
+    const tgId = TEST_USER_IDS.tenCountriesSubscribed;
+    const current = db.getUser(tgId)?.subscription.expiresAt ?? '';
+    const { invoiceLink } = createInvoiceResponseSchema.parse(
+      await (await post(tgId, { plan: 'month' })).json(),
+    );
+    expect(db.completePayment(slugOf(invoiceLink))?.expiresAt).toBe(
+      new Date(Date.parse(current) + 30 * DAY_MS).toISOString(),
+    );
+  });
+
+  it('keeps the paid subscription through the storage', () => {
+    let data: unknown;
+    const storage = {
+      load: () => data,
+      save: (value: unknown) => {
+        data = JSON.parse(JSON.stringify(value));
+      },
+    };
+    const db = createMockDb(storage);
+    const slug = db.createInvoice(TEST_USER_IDS.tenCountriesFree, 'month') ?? '';
+    db.completePayment(slug);
+    const restored = createMockDb(storage).getUser(TEST_USER_IDS.tenCountriesFree);
+    expect(restored?.subscription).toMatchObject({ active: true, plan: 'month' });
+  });
+
+  it('rejects an unknown plan; fails once with mock_error=invoice', async () => {
+    expect((await post(TEST_USER_IDS.tenCountriesFree, { plan: 'week' })).status).toBe(400);
+    const unauthenticated = await fetch(`${API_BASE}/payments/invoice`, {
+      method: 'POST',
+      body: JSON.stringify({ plan: 'year' }),
+    });
+    expect(unauthenticated.status).toBe(401);
+    server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=invoice')));
+    expect((await post(TEST_USER_IDS.tenCountriesFree, { plan: 'year' })).status).toBe(500);
+    expect((await post(TEST_USER_IDS.tenCountriesFree, { plan: 'year' })).status).toBe(201);
   });
 });

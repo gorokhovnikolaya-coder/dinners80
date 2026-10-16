@@ -2,6 +2,7 @@ import { emitEvent, mockTelegramEnv } from '@tma.js/sdk-react';
 
 import { setMockBackButtonVisible } from './backButton.ts';
 import { buildMockInitData } from './initData.ts';
+import { closeMockInvoice, parseMockInvoiceOutcome } from './invoice.ts';
 import { resolveTestUser } from './testUser.ts';
 
 declare global {
@@ -39,7 +40,8 @@ const contentSafeArea = { top: 0, bottom: 0, left: 0, right: 0 };
 
 /**
  * Imitates the Telegram client in a regular browser (`VITE_TG_MOCK=1`): launch parameters with
- * the test user from `?user=<id>`, light theme, viewport and safe area.
+ * the test user from `?user=<id>`, light theme, viewport and safe area; an opened invoice closes
+ * with the status from `?mock_invoice=` (`paid` by default).
  */
 export function mockTelegram(): void {
   const user = resolveTestUser(window.location.search);
@@ -47,6 +49,8 @@ export function mockTelegram(): void {
   const params: Record<string, unknown> = {};
   window.__tgMockCalls = calls;
   window.__tgMockParams = params;
+  // Read at start: navigation inside the app drops the query string.
+  const invoiceOutcome = parseMockInvoiceOutcome(window.location.search);
 
   mockTelegramEnv({
     launchParams: {
@@ -85,6 +89,16 @@ export function mockTelegram(): void {
               'is_visible' in event.params &&
               event.params.is_visible === true,
           );
+          return;
+        case 'web_app_open_invoice':
+          if (
+            typeof event.params === 'object' &&
+            event.params !== null &&
+            'slug' in event.params &&
+            typeof event.params.slug === 'string'
+          ) {
+            closeMockInvoice(event.params.slug, invoiceOutcome);
+          }
           return;
         default:
           // Other methods (ready, expand, colours…) have no visible effect in the browser.

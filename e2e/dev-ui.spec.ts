@@ -31,7 +31,11 @@ test.describe('/dev/ui component gallery', () => {
     await expect(page.getByRole('checkbox', { name: /Картофель/ })).toBeChecked();
     await expect(page.getByRole('checkbox', { name: /Говядина/ })).not.toBeChecked();
     await expect(page.getByRole('status').first()).toContainText('Загрузка карточки блюда');
-    await expect(page.getByRole('alert')).toHaveText('Не удалось загрузить данные.');
+    // ErrorState on a light card and on a navy one (`tone="dark"`).
+    await expect(page.getByRole('alert')).toHaveText([
+      'Не удалось загрузить данные.',
+      'Не удалось загрузить данные.',
+    ]);
   });
 
   test('components react to input', async ({ page }) => {
@@ -51,7 +55,7 @@ test.describe('/dev/ui component gallery', () => {
     await expect(tabs.getByRole('link', { name: 'Карта' })).toHaveAttribute('aria-current', 'page');
     await expect(tabs.getByRole('link', { name: 'Ужин' })).not.toHaveAttribute('aria-current');
 
-    await page.getByRole('button', { name: 'Повторить' }).click();
+    await page.getByRole('button', { name: 'Повторить' }).first().click();
     await expect(page.getByText('Нажато «Повторить»: 1')).toBeVisible();
   });
 

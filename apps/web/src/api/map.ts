@@ -8,7 +8,8 @@ export const mapApi = api.injectEndpoints({
     map: build.query<MapResponse, undefined>({
       query: () => '/map',
       responseSchema: mapResponseSchema,
-      providesTags: ['Cooks'],
+      // Locks and access change with a subscription (the paywall invalidates `Subscription`).
+      providesTags: ['Cooks', 'Subscription'],
     }),
   }),
 });

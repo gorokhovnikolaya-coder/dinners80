@@ -3,9 +3,12 @@ import {
   hasOnboardingAnswers,
   normalizeCustomExclusions,
   normalizeExclusions,
+  subscriptionPeriod,
+  subscriptionStatusSchema,
   updateMeRequestSchema,
   type AddShoppingRequest,
   type Cook,
+  type SubscriptionPlan,
   type SubscriptionStatus,
   type UpdateMeRequest,
   type UserProfile,
@@ -39,14 +42,22 @@ export interface MockShoppingItem {
 
 /**
  * A changed user as stored: only the applied `PATCH /me` fields, the onboarding flag, the
- * shopping list and the cooks recorded in the session. The profile is rebuilt from the current fixture, so later fixture edits are not
- * masked.
+ * shopping list, the cooks recorded in the session and the subscription paid in it. The profile
+ * is rebuilt from the current fixture, so later fixture edits are not masked.
  */
 interface StoredUser {
   patch: UpdateMeRequest;
   onboarded: boolean;
   shopping: MockShoppingItem[];
   cooks: Cook[];
+  /** Set by a payment in this session; the fixture subscription otherwise. */
+  subscription?: SubscriptionStatus;
+}
+
+/** An invoice created by `POST /payments/invoice`, waiting for the payment. */
+interface MockInvoice {
+  tgId: number;
+  plan: SubscriptionPlan;
 }
 
 const isShoppingItem = (value: unknown): value is MockShoppingItem => {
@@ -74,7 +85,7 @@ const restore = (data: unknown): Map<number, StoredUser> => {
   if (typeof data !== 'object' || data === null) return users;
   for (const [key, value] of Object.entries(data)) {
     if (typeof value !== 'object' || value === null) continue;
-    const { patch, onboarded, shopping, cooks } = value as Partial<StoredUser>;
+    const { patch, onboarded, shopping, cooks, subscription } = value as Partial<StoredUser>;
     // A user changed only by the shopping list or cooks has an empty patch, which the
     // `PATCH /me` schema (at least one field) rejects.
     const empty = JSON.stringify(patch) === '{}';
@@ -83,6 +94,7 @@ const restore = (data: unknown): Map<number, StoredUser> => {
       : updateMeRequestSchema.safeParse(patch);
     if (parsed.success && typeof onboarded === 'boolean') {
       const items: unknown[] = Array.isArray(shopping) ? shopping : [];
+      const paid = subscriptionStatusSchema.safeParse(subscription);
       users.set(Number(key), {
         patch: parsed.data,
         onboarded,
@@ -91,6 +103,7 @@ const restore = (data: unknown): Map<number, StoredUser> => {
           const restored = cookSchema.safeParse(cook);
           return restored.success ? [restored.data] : [];
         }),
+        ...(paid.success ? { subscription: paid.data } : {}),
       });
     }
   }
@@ -124,6 +137,8 @@ const mergePatches = (earlier: UpdateMeRequest, later: UpdateMeRequest): UpdateM
  */
 export function createMockDb(storage?: MockDbStorage) {
   const changed = restore(storage?.load());
+  /** Open invoices by slug; they live as long as the page (paid right after being opened). */
+  const invoices = new Map<string, MockInvoice>();
 
   const persist = () => {
     storage?.save(Object.fromEntries(changed));
@@ -136,7 +151,7 @@ export function createMockDb(storage?: MockDbStorage) {
     return {
       profile: stored ? applyPatch(fixture.profile, stored.patch) : fixture.profile,
       onboarded: stored?.onboarded ?? fixture.onboarded,
-      subscription: fixture.subscription,
+      subscription: stored?.subscription ?? fixture.subscription,
       cooks: [
         ...fixtureCooks.filter((cook) => cook.userId === fixture.profile.id),
         ...(stored?.cooks ?? []),
@@ -255,9 +270,45 @@ export function createMockDb(storage?: MockDbStorage) {
     return removed;
   };
 
+  /**
+   * `POST /payments/invoice`: an invoice for the plan (the server calls `createInvoiceLink`).
+   * @returns the invoice slug (`https://t.me/$<slug>`), or `undefined` for an unknown user.
+   */
+  const createInvoice = (tgId: number, plan: SubscriptionPlan): string | undefined => {
+    if (!getUser(tgId)) return undefined;
+    const slug = `mock-${plan}-${crypto.randomUUID()}`;
+    invoices.set(slug, { tgId, plan });
+    return slug;
+  };
+
+  /**
+   * A successful payment of the invoice, as the bot webhook records it (`successful_payment`):
+   * the paid period starts now or, while a subscription is active, when it ends. A repeated
+   * payment of the same invoice changes nothing (idempotent).
+   * @returns the user's subscription after the payment, or `undefined` for an unknown invoice.
+   */
+  const completePayment = (slug: string, now = new Date()): SubscriptionStatus | undefined => {
+    const invoice = invoices.get(slug);
+    const user = invoice && getUser(invoice.tgId);
+    if (!invoice || !user) return undefined;
+    invoices.delete(slug);
+    const current = user.subscription;
+    const period = subscriptionPeriod(invoice.plan, current.active ? current.expiresAt : null, now);
+    const subscription: SubscriptionStatus = {
+      active: true,
+      plan: invoice.plan,
+      expiresAt: period.expiresAt.toISOString(),
+    };
+    entryOf(invoice.tgId, user).subscription = subscription;
+    persist();
+    return subscription;
+  };
+
   return {
     getUser,
     updateUser,
+    createInvoice,
+    completePayment,
     getShopping,
     addShopping,
     setShoppingChecked,

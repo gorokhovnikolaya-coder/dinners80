@@ -9,6 +9,7 @@ import {
   updateShoppingItemRequestSchema,
   buildPassport,
   createCookRequestSchema,
+  createInvoiceRequestSchema,
   findOvertakenFriend,
   clampServings,
   defaultServings,
@@ -29,6 +30,7 @@ import {
   type ApiErrorCode,
   type AuthResponse,
   type CreateCookResponse,
+  type CreateInvoiceResponse,
   type UploadCookPhotoResponse,
   type DishPreview,
   type DishResponse,
@@ -537,6 +539,27 @@ export const createHandlers = (
       const added = db.addShopping(auth[0], body.data);
       if (added === undefined) return unauthorized();
       return HttpResponse.json<AddShoppingResponse>({ added }, { status: 201 });
+    },
+  ),
+
+  http.post<never, never, CreateInvoiceResponse | ApiError>(
+    `${apiBase}/payments/invoice`,
+    async ({ request }) => {
+      if (controls.delayMs > 0) await delay(controls.delayMs);
+      if (takeFailure(controls, 'invoice'))
+        return apiError(500, 'internal', 'Mock error (mock_error=invoice)');
+      const auth = authenticate(request, db);
+      if (!auth) return unauthorized();
+      const body = createInvoiceRequestSchema.safeParse(await readJson(request));
+      if (!body.success) return apiError(400, 'validation', 'Invalid plan');
+      // The server creates the link with `createInvoiceLink` (price from the shared constants);
+      // the mock Telegram client «pays» it by the slug (`?mock_invoice=`).
+      const slug = db.createInvoice(auth[0], body.data.plan);
+      if (slug === undefined) return unauthorized();
+      return HttpResponse.json<CreateInvoiceResponse>(
+        { invoiceLink: `https://t.me/$${slug}` },
+        { status: 201 },
+      );
     },
   ),
 

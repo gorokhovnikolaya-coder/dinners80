@@ -8,7 +8,7 @@
  *   `shopping_clear` (`DELETE /shopping/checked`), `upload`
  *   (`POST /uploads/cook-photo`), `cooks` (`POST /cooks`),
  *   `cooks_limit` (`POST /cooks` answers `429 rate_limited` — the daily cook limit),
- *   `chunk` (the first lazy screen chunk, browser only).
+ *   `invoice` (`POST /payments/invoice`), `chunk` (the first lazy screen chunk, browser only).
  * - `?mock_delay=<ms>` — delay of every mock response, to see loading states.
  */
 export interface MockControls {

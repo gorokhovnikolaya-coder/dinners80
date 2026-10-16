@@ -237,10 +237,72 @@ export const ru = {
       action: 'Выбрать ужин',
     },
   },
-  paywallStub: {
-    title: 'Откроется с подпиской',
-    description: 'Рецепт этого блюда откроется после оформления подписки.',
+  paywall: {
+    /** Accessible name of the mini-map of passed countries. */
+    map: (passed: number, total: number) =>
+      `Карта: пройдено ${String(passed)} из ${String(total)} стран`,
+    /**
+     * Lines of the title: «10 стран позади.» «Ещё 20 ждут вас»; no countries yet — «30 стран
+     * ждут вас»; all passed — «Все 30 стран позади». `total` — published countries.
+     */
+    title: (passed: number, total: number): readonly string[] => {
+      const countries = (count: number) =>
+        `${String(count)} ${plural(count, 'страна', 'страны', 'стран')}`;
+      const wait = (count: number) => plural(count, 'ждёт', 'ждут', 'ждут');
+      if (passed <= 0) return [`${countries(total)} ${wait(total)} вас`];
+      if (passed >= total) return [`Все ${countries(total)} позади`];
+      const left = total - passed;
+      return [`${countries(passed)} позади.`, `Ещё ${String(left)} ${wait(left)} вас`];
+    },
+    subtitle: {
+      /** Opened from a dish of a closed country (the name stays in the nominative). */
+      country: (country: string) =>
+        `${country} откроется с подпиской. Ваш паспорт и штампы останутся с вами.`,
+      /** Opened from the profile. */
+      all: 'С подпиской откроются все страны. Ваш паспорт и штампы останутся с вами.',
+      active: 'Подписка открыла все страны.',
+    },
+    benefits: {
+      label: 'Что даёт подписка',
+      all: (countries: number, dishes: number) =>
+        `Все ${String(countries)} ${plural(countries, 'страна', 'страны', 'стран')} и ${String(dishes)} ${plural(dishes, 'проверенный рецепт', 'проверенных рецепта', 'проверенных рецептов')}`,
+      suggestions: 'Новые страны в ежедневной подборке ужинов',
+      passport: (countries: number) =>
+        `Весь паспорт: штампы всех ${String(countries)} ${plural(countries, 'страны', 'стран', 'стран')}`,
+    },
+    plans: {
+      label: 'Тариф',
+      year: {
+        title: 'Год',
+        badge: 'Выгоднее',
+        perMonth: (stars: string) => `≈ ${stars} в месяц`,
+      },
+      month: {
+        title: 'Месяц',
+        renews: (days: number) =>
+          `Продлевается каждые ${String(days)} ${plural(days, 'день', 'дня', 'дней')}`,
+      },
+    },
+    /** «1 200 Stars». */
+    stars: (amount: number) => `${new Intl.NumberFormat('ru-RU').format(amount)} Stars`,
+    pay: 'Продолжить путешествие',
+    opening: 'Открываем оплату…',
+    confirming: 'Подтверждаем оплату…',
+    refresh: 'Обновить',
+    retry: 'Повторить',
     notNow: 'Не сейчас',
+    status: {
+      failed: 'Оплата не прошла. Попробуйте ещё раз',
+      pending: 'Платёж обрабатывается. Подписка включится, как только Telegram его подтвердит',
+      unconfirmed: 'Оплата прошла, подписка включится в течение минуты',
+      invoiceError: 'Не удалось открыть оплату',
+    },
+    /** Instead of the plans when the subscription is active; `date` — «5 ноября». */
+    active: (date: string) => `Подписка активна до ${date}`,
+    /** The server sent no end date (should not happen for an active subscription). */
+    activeNoDate: 'Подписка активна',
+    /** «Продолжить путешествие» of an active subscription closes the paywall. */
+    continue: 'Продолжить путешествие',
   },
   common: {
     loading: 'Загрузка…',

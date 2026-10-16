@@ -17,8 +17,10 @@ export const api = createApi({
   }),
   /**
    * `Cooks` — data that depends on the user's cooks (suggestions, counters, dish labels);
-   * `Shopping` — the shopping list (`GET /shopping`), changed by the dish card's cart.
+   * `Shopping` — the shopping list (`GET /shopping`), changed by the dish card's cart;
+   * `Subscription` — data with locks of closed countries (suggestions, map, dish access), changed
+   * by a payment on the paywall.
    */
-  tagTypes: ['Cooks', 'Shopping'],
+  tagTypes: ['Cooks', 'Shopping', 'Subscription'],
   endpoints: () => ({}),
 });

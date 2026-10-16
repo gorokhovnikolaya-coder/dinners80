@@ -64,10 +64,22 @@ const ShoppingScreen = lazyScreen(
   <ScreenSkeleton />,
 );
 
-/** Temporary paywall (task 6) until the real one (task 12). */
+/** Navy fallback of the paywall chunk, so the screen does not flash light before it. */
+function DarkScreenSkeleton() {
+  return (
+    <main className="min-h-dvh bg-ink px-5 pt-14 surface-dark">
+      <SkeletonGroup label={ru.common.loading} className="flex flex-col gap-4.5">
+        <Skeleton tone="dark" height={66} />
+        <Skeleton tone="dark" shape="text" width="80%" className="text-6xl" />
+        <Skeleton tone="dark" shape="text" width="60%" className="text-6xl" />
+      </SkeletonGroup>
+    </main>
+  );
+}
+
 const PaywallScreen = lazyScreen(
-  () => import('../screens/paywall/PaywallStubScreen.tsx'),
-  <ScreenSkeleton />,
+  () => import('../screens/paywall/PaywallScreen.tsx'),
+  <DarkScreenSkeleton />,
 );
 
 /**

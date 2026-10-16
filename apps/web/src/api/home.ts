@@ -8,7 +8,8 @@ export const homeApi = api.injectEndpoints({
     home: build.query<HomeResponse, HomeQuery>({
       query: ({ mode, page }) => ({ url: '/home', params: { mode, page } }),
       responseSchema: homeResponseSchema,
-      providesTags: ['Cooks'],
+      // Locks and access change with a subscription (the paywall invalidates `Subscription`).
+      providesTags: ['Cooks', 'Subscription'],
     }),
   }),
 });

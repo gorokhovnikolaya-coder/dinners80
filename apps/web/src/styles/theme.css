@@ -94,6 +94,7 @@
 
   /* Radii */
   --radius-*: initial;
+  --radius-dot: 6px; /* mini-map tiles of the paywall */
   --radius-chip: 8px; /* tags inside cards */
   --radius-segment: 11px; /* segmented control thumb */
   --radius-tile: 14px; /* small tiles, toggle chips, segmented track */
