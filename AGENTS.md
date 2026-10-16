@@ -38,13 +38,13 @@
 | `npm run check`                     | typecheck + lint + test + size                                                                                                                                                             | 1      |
 | `npm run format`                    | Prettier по всему репозиторию (кроме `docs/`, `.claude/`)                                                                                                                                  | 1      |
 | `npm run db:up` / `npm run db:down` | Локальный Postgres 17 в Docker Compose (`127.0.0.1:5433`, том `postgres-data`)                                                                                                             | 1      |
-| `npm run dev:server`                | Node-сервер локально (`node --watch`, порт 3080, `GET /api/health`); воркер — с задачи 21                                                                                                  | 1      |
+| `npm run dev:server`                | Node-сервер локально (`node --watch`, порт 3080, `GET /api/health`, `POST /api/auth`; нужны `DATABASE_URL` и `BOT_TOKEN`); воркер — с задачи 21                                            | 1      |
 | `npm run e2e`                       | Playwright (`e2e/`, Chromium 390 × 844) в mock-режиме; сам поднимает dev-сервер на порту 5179. Первый раз — `npx playwright install chromium`                                              | 2      |
 | `npm run db:migrate`                | Применить новые миграции из `apps/server/migrations`; все `db:*` и `test:db` берут `DATABASE_URL` из `.env` (образец — `.env.example`), без него падают                                    | 14     |
 | `npm run db:reset`                  | Пересоздать локальную базу (только localhost): проверка `content/` → удаление схем → миграции → seed; при ошибке в контенте база не трогается                                              | 14     |
 | `npm run db:seed`                   | Загрузить `content/` в базу без пересоздания (upsert, повторный запуск безопасен); `CONTENT_DIR=<папка>` — другая папка контента                                                           | 14     |
 | `npm run db:generate`               | Сгенерировать SQL-миграцию из `apps/server/src/db/schema.ts` (Drizzle Kit); функции и представления — вручную, `--custom`                                                                  | 14     |
-| `npm run test:db`                   | Тесты базы (`has_access`, `user_countries`) на локальной базе после `db:reset` (`TEST_DATABASE=1`); в `npm run check` пропускаются                                                         | 14     |
+| `npm run test:db`                   | Тесты сервера с базой (`has_access`, `user_countries`, `POST /api/auth`) на локальной базе после `db:reset` (`TEST_DATABASE=1`); в `npm run check` пропускаются                            | 14     |
 
 Скрипт отдельного пакета: `npm run <скрипт> -w @tma80/web` (`@tma80/server`, `@tma80/shared`).
 

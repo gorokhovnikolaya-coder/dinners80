@@ -16,7 +16,7 @@
     "typecheck": "tsc -b",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:db": "TEST_DATABASE=1 node --env-file-if-exists=.env node_modules/vitest/vitest.mjs run apps/server/src/db",
+    "test:db": "TEST_DATABASE=1 node --env-file-if-exists=.env node_modules/vitest/vitest.mjs run apps/server",
     "size": "npm run build -w @tma80/web && size-limit",
     "check": "npm run typecheck && npm run lint && npm run test && npm run size",
     "format": "prettier --write .",

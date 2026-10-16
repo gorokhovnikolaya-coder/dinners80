@@ -1,9 +1,13 @@
 import { buildApp } from './app.ts';
+import { botToken } from './config.ts';
+import { connect } from './db/client.ts';
 
 const port = Number(process.env.PORT ?? 3080);
 const host = process.env.HOST ?? '127.0.0.1';
 
-const app = buildApp({ logger: true });
+const { db, pool } = connect();
+const app = buildApp({ db, botToken: botToken() }, { logger: true });
+app.addHook('onClose', () => pool.end());
 
 try {
   await app.listen({ port, host });
