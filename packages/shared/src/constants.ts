@@ -37,6 +37,20 @@ export const FREE_COUNTRIES_LIMIT = 10;
 /** Default dinner reminder time (`users.reminder_time`). */
 export const DEFAULT_REMINDER_TIME = '18:00';
 
+/** The dinner reminder time is chosen with this step (ТЗ, экран 9). */
+export const REMINDER_TIME_STEP_MINUTES = 30;
+
+const twoDigits = (value: number) => String(value).padStart(2, '0');
+
+/** Every reminder time of a day, `00:00` to `23:30` with the step above (`reminderTimeSchema`). */
+export const REMINDER_TIMES: readonly string[] = Array.from(
+  { length: (24 * 60) / REMINDER_TIME_STEP_MINUTES },
+  (_, index) => {
+    const minutes = index * REMINDER_TIME_STEP_MINUTES;
+    return `${twoDigits(Math.floor(minutes / 60))}:${twoDigits(minutes % 60)}`;
+  },
+);
+
 /** Servings on the dish card: − / + from 1 to 8 (ТЗ, экран 2). */
 export const SERVINGS_MIN = 1;
 export const SERVINGS_MAX = 8;

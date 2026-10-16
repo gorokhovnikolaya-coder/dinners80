@@ -11,6 +11,10 @@ interface ImportMetaEnv {
   readonly VITE_BOT_USERNAME?: string;
   /** Short name of the mini app in BotFather for the invite link. */
   readonly VITE_APP_SHORT_NAME?: string;
+  /** Public page with the terms of use (profile); without it the link is hidden in production. */
+  readonly VITE_TERMS_URL?: string;
+  /** Public page with the privacy policy (profile); without it the link is hidden in production. */
+  readonly VITE_PRIVACY_URL?: string;
 }
 
 interface ImportMeta {

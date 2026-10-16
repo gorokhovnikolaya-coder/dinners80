@@ -55,6 +55,13 @@ test.describe('/dev/ui component gallery', () => {
     await expect(tabs.getByRole('link', { name: 'Карта' })).toHaveAttribute('aria-current', 'page');
     await expect(tabs.getByRole('link', { name: 'Ужин' })).not.toHaveAttribute('aria-current');
 
+    const reminder = page.getByRole('switch', { name: 'Напоминание об ужине' });
+    await expect(reminder).toBeChecked();
+    await expect(reminder).toHaveAccessibleDescription('Бот пришлёт идею ужина в выбранное время');
+    await reminder.click();
+    await expect(reminder).not.toBeChecked();
+    await expect(page.getByRole('switch', { name: 'Недоступный переключатель' })).toBeDisabled();
+
     await page.getByRole('button', { name: 'Повторить' }).first().click();
     await expect(page.getByText('Нажато «Повторить»: 1')).toBeVisible();
   });
@@ -64,7 +71,7 @@ test.describe('/dev/ui component gallery', () => {
     await expect(page.getByRole('heading', { level: 2, name: 'ErrorState' })).toBeVisible();
 
     const small = await page.evaluate(() =>
-      [...document.querySelectorAll('main button, main a, main label')]
+      [...document.querySelectorAll('main button, main a, main label, main [role="switch"]')]
         .map((el) => {
           const { width, height } = el.getBoundingClientRect();
           return { text: el.textContent || el.getAttribute('aria-label'), width, height };

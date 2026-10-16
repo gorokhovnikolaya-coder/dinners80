@@ -31,6 +31,12 @@ export const cookedPath = (id: string) => `${dishPath(id)}/done`;
 
 export const countryPath = (id: string) => `/map/countries/${encodeURIComponent(id)}`;
 
+/** Id of the «Что не едите» block of the profile: `#exclusions` scrolls to it. */
+export const PROFILE_EXCLUSIONS_ID = 'exclusions';
+
+/** The profile scrolled to «Что не едите» (from the empty suggestions of the main screen). */
+export const profileExclusionsPath = `${ROUTES.profile}#${PROFILE_EXCLUSIONS_ID}`;
+
 export const paywallPath = (dishId?: string) =>
   dishId === undefined
     ? ROUTES.paywall

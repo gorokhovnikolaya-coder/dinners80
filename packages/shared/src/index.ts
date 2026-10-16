@@ -11,6 +11,8 @@ export {
 export { API_ERROR_CODES, apiErrorSchema, type ApiError, type ApiErrorCode } from './errors.ts';
 export { healthResponseSchema, type HealthResponse } from './health.ts';
 export {
+  applyProfilePatch,
+  changesPreferences,
   meResponseSchema,
   updateMeRequestSchema,
   type MeResponse,

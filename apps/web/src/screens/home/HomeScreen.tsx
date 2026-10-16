@@ -12,7 +12,7 @@ import { Link, useNavigate } from 'react-router';
 import { useHomeQuery } from '../../api/home.ts';
 import { useShoppingQuery } from '../../api/shopping.ts';
 import { MainTabBar } from '../../app/MainTabBar.tsx';
-import { ROUTES } from '../../app/routes.ts';
+import { profileExclusionsPath, ROUTES } from '../../app/routes.ts';
 import { Button } from '../../components/Button.tsx';
 import { ErrorState } from '../../components/ErrorState.tsx';
 import { IconCart, IconRefresh } from '../../components/icons.tsx';
@@ -174,7 +174,7 @@ function EmptySuggestions() {
       <Button
         variant="secondary"
         onClick={() => {
-          void navigate(ROUTES.profile);
+          void navigate(profileExclusionsPath);
         }}
       >
         {t.empty.action}

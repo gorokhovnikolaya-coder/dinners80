@@ -1,8 +1,7 @@
 import {
+  applyProfilePatch,
   cookSchema,
   hasOnboardingAnswers,
-  normalizeCustomExclusions,
-  normalizeExclusions,
   subscriptionPeriod,
   subscriptionStatusSchema,
   updateMeRequestSchema,
@@ -52,6 +51,11 @@ interface StoredUser {
   cooks: Cook[];
   /** Set by a payment in this session; the fixture subscription otherwise. */
   subscription?: SubscriptionStatus;
+  /**
+   * Set when the user allowed the bot to write in this session (`requestWriteAccess`; the bot
+   * learns it from the `write_access_allowed` service message); the fixture value otherwise.
+   */
+  botCanWrite?: boolean;
 }
 
 /** An invoice created by `POST /payments/invoice`, waiting for the payment. */
@@ -85,7 +89,8 @@ const restore = (data: unknown): Map<number, StoredUser> => {
   if (typeof data !== 'object' || data === null) return users;
   for (const [key, value] of Object.entries(data)) {
     if (typeof value !== 'object' || value === null) continue;
-    const { patch, onboarded, shopping, cooks, subscription } = value as Partial<StoredUser>;
+    const { patch, onboarded, shopping, cooks, subscription, botCanWrite } =
+      value as Partial<StoredUser>;
     // A user changed only by the shopping list or cooks has an empty patch, which the
     // `PATCH /me` schema (at least one field) rejects.
     const empty = JSON.stringify(patch) === '{}';
@@ -104,25 +109,12 @@ const restore = (data: unknown): Map<number, StoredUser> => {
           return restored.success ? [restored.data] : [];
         }),
         ...(paid.success ? { subscription: paid.data } : {}),
+        ...(typeof botCanWrite === 'boolean' ? { botCanWrite } : {}),
       });
     }
   }
   return users;
 };
-
-/** Profile with the patch applied; exclusions are stored normalised, as the server does. */
-const applyPatch = (profile: UserProfile, patch: UpdateMeRequest): UserProfile => ({
-  ...profile,
-  household: patch.household ?? profile.household,
-  weekdayMinutes: patch.weekdayMinutes ?? profile.weekdayMinutes,
-  exclusions: patch.exclusions ? normalizeExclusions(patch.exclusions) : profile.exclusions,
-  customExclusions: patch.customExclusions
-    ? normalizeCustomExclusions(patch.customExclusions)
-    : profile.customExclusions,
-  timezone: patch.timezone ?? profile.timezone,
-  reminderEnabled: patch.reminderEnabled ?? profile.reminderEnabled,
-  reminderTime: patch.reminderTime ?? profile.reminderTime,
-});
 
 /** Later fields win; undefined fields do not erase earlier ones. */
 const mergePatches = (earlier: UpdateMeRequest, later: UpdateMeRequest): UpdateMeRequest => ({
@@ -148,8 +140,10 @@ export function createMockDb(storage?: MockDbStorage) {
     const fixture = findUserByTgId(tgId);
     if (!fixture) return undefined;
     const stored = changed.get(tgId);
+    const profile = stored ? applyProfilePatch(fixture.profile, stored.patch) : fixture.profile;
     return {
-      profile: stored ? applyPatch(fixture.profile, stored.patch) : fixture.profile,
+      profile:
+        stored?.botCanWrite === undefined ? profile : { ...profile, botCanWrite: stored.botCanWrite },
       onboarded: stored?.onboarded ?? fixture.onboarded,
       subscription: stored?.subscription ?? fixture.subscription,
       cooks: [
@@ -179,12 +173,25 @@ export function createMockDb(storage?: MockDbStorage) {
     const user = getUser(tgId);
     if (!user) return undefined;
     const entry = entryOf(tgId, user);
-    const profile = applyPatch(user.profile, patch);
+    const profile = applyProfilePatch(user.profile, patch);
     const onboarded = user.onboarded || hasOnboardingAnswers(profile);
     entry.patch = mergePatches(entry.patch, patch);
     entry.onboarded = onboarded;
     persist();
     return { ...user, profile, onboarded };
+  };
+
+  /**
+   * The user allowed the bot to write (`requestWriteAccess` → «allowed»): the bot webhook gets the
+   * `write_access_allowed` service message and sets `bot_can_write`.
+   * @returns `false` for an unknown user.
+   */
+  const allowWriteAccess = (tgId: number): boolean => {
+    const user = getUser(tgId);
+    if (!user) return false;
+    entryOf(tgId, user).botCanWrite = true;
+    persist();
+    return true;
   };
 
   /** The user's shopping list: the fixture one until it is changed in this session. */
@@ -307,6 +314,7 @@ export function createMockDb(storage?: MockDbStorage) {
   return {
     getUser,
     updateUser,
+    allowWriteAccess,
     createInvoice,
     completePayment,
     getShopping,

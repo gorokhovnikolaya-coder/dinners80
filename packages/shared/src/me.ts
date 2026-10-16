@@ -1,12 +1,14 @@
 import { z } from 'zod/mini';
 
 import { HOUSEHOLDS, WEEKDAY_MINUTES } from './constants.ts';
+import { normalizeCustomExclusions, normalizeExclusions } from './preferences.ts';
 import {
   customExclusionsSchema,
   exclusionsSchema,
   reminderTimeSchema,
   timezoneSchema,
   userProfileSchema,
+  type UserProfile,
 } from './user.ts';
 
 /**
@@ -40,3 +42,35 @@ export const meResponseSchema = z.object({
   needsOnboarding: z.boolean(),
 });
 export type MeResponse = z.infer<typeof meResponseSchema>;
+
+/**
+ * The profile after `PATCH /me` as the server applies it: sent fields replace the stored ones,
+ * missing fields stay; both kinds of exclusions are stored normalised. The client uses it to show
+ * changes that are still being saved (the profile autosaves).
+ */
+export function applyProfilePatch(profile: UserProfile, patch: UpdateMeRequest): UserProfile {
+  return {
+    ...profile,
+    household: patch.household ?? profile.household,
+    weekdayMinutes: patch.weekdayMinutes ?? profile.weekdayMinutes,
+    exclusions: patch.exclusions ? normalizeExclusions(patch.exclusions) : profile.exclusions,
+    customExclusions: patch.customExclusions
+      ? normalizeCustomExclusions(patch.customExclusions)
+      : profile.customExclusions,
+    timezone: patch.timezone ?? profile.timezone,
+    reminderEnabled: patch.reminderEnabled ?? profile.reminderEnabled,
+    reminderTime: patch.reminderTime ?? profile.reminderTime,
+  };
+}
+
+/**
+ * Onboarding answers among the `PATCH /me` fields: they change what the server sends back for
+ * suggestions (`GET /home`: time on weekdays, exclusions) and dish cards (`GET /dishes/:id`
+ * without `servings`: the default servings by «who eats»).
+ */
+const PREFERENCE_FIELDS = ['household', 'weekdayMinutes', 'exclusions', 'customExclusions'] as const;
+
+/** True if the update changes an onboarding answer (see `PREFERENCE_FIELDS`). */
+export function changesPreferences(patch: UpdateMeRequest): boolean {
+  return PREFERENCE_FIELDS.some((field) => patch[field] !== undefined);
+}

@@ -4,6 +4,7 @@ import { setMockBackButtonVisible } from './backButton.ts';
 import { buildMockInitData } from './initData.ts';
 import { closeMockInvoice, parseMockInvoiceOutcome } from './invoice.ts';
 import { resolveTestUser } from './testUser.ts';
+import { answerMockWriteAccess, parseMockWriteAccessOutcome } from './writeAccess.ts';
 
 declare global {
   interface Window {
@@ -41,7 +42,8 @@ const contentSafeArea = { top: 0, bottom: 0, left: 0, right: 0 };
 /**
  * Imitates the Telegram client in a regular browser (`VITE_TG_MOCK=1`): launch parameters with
  * the test user from `?user=<id>`, light theme, viewport and safe area; an opened invoice closes
- * with the status from `?mock_invoice=` (`paid` by default).
+ * with the status from `?mock_invoice=` (`paid` by default); a request to let the bot write is
+ * answered from `?mock_write_access=` (`allowed` by default).
  */
 export function mockTelegram(): void {
   const user = resolveTestUser(window.location.search);
@@ -51,6 +53,7 @@ export function mockTelegram(): void {
   window.__tgMockParams = params;
   // Read at start: navigation inside the app drops the query string.
   const invoiceOutcome = parseMockInvoiceOutcome(window.location.search);
+  const writeAccessOutcome = parseMockWriteAccessOutcome(window.location.search);
 
   mockTelegramEnv({
     launchParams: {
@@ -99,6 +102,9 @@ export function mockTelegram(): void {
           ) {
             closeMockInvoice(event.params.slug, invoiceOutcome);
           }
+          return;
+        case 'web_app_request_write_access':
+          answerMockWriteAccess(user.tg.id, writeAccessOutcome);
           return;
         default:
           // Other methods (ready, expand, colours…) have no visible effect in the browser.

@@ -153,7 +153,18 @@ test.describe('dinner today', () => {
     await expect(page.getByRole('button', { name: 'Показать другие' })).toHaveCount(0);
     await shot(page, '07-empty');
     await page.getByRole('button', { name: 'Изменить исключения' }).click();
-    // The profile (task 13) does not exist yet: the router sends unknown paths home.
-    await expect(page).toHaveURL(/\/$/);
+    // The profile opens at «Что не едите».
+    await expect(page).toHaveURL(/\/profile#exclusions$/);
+    const heading = page.getByRole('heading', { name: 'Что не едите' });
+    await expect(heading).toBeFocused();
+    await expect(heading).toBeInViewport();
+
+    // Fewer exclusions are saved at once; back on the main screen the suggestions are refetched.
+    await page.getByText('Мясо', { exact: true }).click();
+    await page.getByRole('button', { name: 'Удалить «сыр»' }).click();
+    await expect(page.getByRole('checkbox', { name: /Мясо/ })).not.toBeChecked();
+    await page.getByRole('button', { name: 'Назад (кнопка Telegram)' }).click();
+    await expect(page.getByText('Под ваши ограничения блюд не нашлось')).toHaveCount(0);
+    await expect(cards(page).first()).toBeVisible();
   });
 });

@@ -304,6 +304,45 @@ export const ru = {
     /** «Продолжить путешествие» of an active subscription closes the paywall. */
     continue: 'Продолжить путешествие',
   },
+  profile: {
+    title: 'Профиль',
+    username: (username: string) => `@${username}`,
+    /** «8 из 30 стран»: passed of the published countries. */
+    countries: (count: number, total: number) =>
+      `${String(count)} из ${String(total)} ${plural(total, 'страны', 'стран', 'стран')}`,
+    /** «13 блюд»: all cooks of the user, repeats included. */
+    dishes: (count: number) => `${String(count)} ${plural(count, 'блюдо', 'блюда', 'блюд')}`,
+    reminder: {
+      title: 'Напоминание об ужине',
+      description: 'Бот пришлёт идею ужина в выбранное время',
+      time: 'Время',
+      /** The client cannot ask to let the bot write (`requestWriteAccess`, Mini Apps < 6.9). */
+      updateTelegram: 'Обновите Telegram, чтобы включить напоминания',
+    },
+    subscription: {
+      title: 'Подписка',
+      /** `date` — «5 ноября». */
+      active: (date: string) => `Подписка активна до ${date}`,
+      /** The server sent no end date (should not happen for an active subscription). */
+      activeNoDate: 'Подписка активна',
+      expired: (date: string) => `Подписка закончилась ${date}`,
+      free: (count: number) =>
+        `Бесплатно — ${String(count)} ${plural(count, 'страна', 'страны', 'стран')} на выбор`,
+      open: 'Открыть все страны',
+    },
+    preferences: {
+      household: 'Кто ест',
+      weekdayMinutes: 'Время на ужин в будни',
+      exclusions: 'Что не едите',
+    },
+    documents: {
+      title: 'Документы',
+      terms: 'Условия использования',
+      privacy: 'Политика конфиденциальности',
+    },
+    saveError: 'Не удалось сохранить. Проверьте интернет и попробуйте ещё раз.',
+    retry: 'Повторить',
+  },
   common: {
     loading: 'Загрузка…',
     error: 'Не удалось загрузить данные.',
@@ -395,6 +434,13 @@ export const ruDevUi = {
     optionCard: 'OptionCard',
     spinner: 'Spinner',
     segmentedControl: 'SegmentedControl',
+    switch: 'Switch',
+  },
+  switches: {
+    on: 'Напоминание об ужине',
+    onDescription: 'Бот пришлёт идею ужина в выбранное время',
+    off: 'Звук таймера',
+    disabled: 'Недоступный переключатель',
   },
   segmented: {
     label: 'Период',

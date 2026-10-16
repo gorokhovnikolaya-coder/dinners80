@@ -209,6 +209,48 @@ describe('PATCH /me (MSW)', () => {
     expect((await patchMe(answers, {})).status).toBe(401);
   });
 
+  it('saves the reminder settings of the profile and turns them off again', async () => {
+    const db = createMockDb();
+    server.use(...createHandlers(API_BASE, NO_MOCK_CONTROLS, db));
+    const headers = { Authorization: `tma ${initDataOf(TEST_USER_IDS.eightCountries)}` };
+
+    const on = await patchMe({ reminderEnabled: true, reminderTime: '19:30' }, headers);
+    expect(meResponseSchema.parse(await on.json()).user).toMatchObject({
+      reminderEnabled: true,
+      reminderTime: '19:30',
+    });
+    const off = await patchMe({ reminderEnabled: false }, headers);
+    expect(meResponseSchema.parse(await off.json()).user).toMatchObject({
+      reminderEnabled: false,
+      reminderTime: '19:30',
+    });
+    expect((await patchMe({ reminderTime: '19:15' }, headers)).status).toBe(400);
+  });
+
+  it('lets the bot write after the user allowed it, kept through the storage', () => {
+    let saved: unknown;
+    const storage = {
+      load: () => saved,
+      save: (data: unknown) => {
+        saved = JSON.parse(JSON.stringify(data));
+      },
+    };
+    const tgId = TEST_USER_IDS.botCannotWrite;
+    const db = createMockDb(storage);
+    expect(db.getUser(tgId)?.profile.botCanWrite).toBe(false);
+    expect(db.allowWriteAccess(tgId)).toBe(true);
+    expect(db.getUser(tgId)?.profile.botCanWrite).toBe(true);
+    // A later PATCH /me keeps it.
+    expect(db.updateUser(tgId, { reminderEnabled: true })?.profile).toMatchObject({
+      botCanWrite: true,
+      reminderEnabled: true,
+    });
+    expect(createMockDb(storage).getUser(tgId)?.profile.botCanWrite).toBe(true);
+    expect(db.allowWriteAccess(999)).toBe(false);
+    // Fixtures stay untouched.
+    expect(createMockDb().getUser(tgId)?.profile.botCanWrite).toBe(false);
+  });
+
   it('fails once with 500 when mock_error=me is set, then saves', async () => {
     server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=me')));
     const headers = { Authorization: `tma ${initDataOf(TEST_USER_IDS.newbie)}` };

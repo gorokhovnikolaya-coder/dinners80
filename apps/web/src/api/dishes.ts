@@ -27,8 +27,12 @@ export const dishesApi = api.injectEndpoints({
         params: servings === undefined ? {} : { servings },
       }),
       responseSchema: dishResponseSchema,
-      // Locks and access change with a subscription (the paywall invalidates `Subscription`).
-      providesTags: ['Cooks', 'Subscription'],
+      // Locks and access change with a subscription (the paywall invalidates `Subscription`);
+      // without `servings` the server picks them by «who eats», which the profile can change.
+      providesTags: (_result, _error, { servings }) =>
+        servings === undefined
+          ? ['Cooks', 'Subscription', 'Preferences']
+          : ['Cooks', 'Subscription'],
     }),
     /** `POST /shopping`: the dish's ingredients to buy (replaces its unchecked items). */
     addToShopping: build.mutation<AddShoppingResponse, AddShoppingRequest>({

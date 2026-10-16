@@ -12,6 +12,7 @@ import { ProgressBar } from './ProgressBar.tsx';
 import { SegmentedControl } from './SegmentedControl.tsx';
 import { Skeleton, SkeletonGroup } from './Skeleton.tsx';
 import { Spinner } from './Spinner.tsx';
+import { Switch } from './Switch.tsx';
 import { TabBar, type TabBarItem } from './TabBar.tsx';
 
 describe('Button', () => {
@@ -247,5 +248,49 @@ describe('SegmentedControl', () => {
     await userEvent.click(all);
     expect(all).toHaveAttribute('aria-pressed', 'true');
     expect(week).toHaveAttribute('aria-pressed', 'false');
+  });
+});
+
+describe('Switch', () => {
+  function Controlled({ busy = false }: { busy?: boolean }) {
+    const [on, setOn] = useState(false);
+    return (
+      <Switch
+        checked={on}
+        onChange={setOn}
+        label="Напоминание об ужине"
+        description="Бот пришлёт идею ужина"
+        busy={busy}
+      />
+    );
+  }
+
+  it('is a native switch named by its label, toggled by the whole row', async () => {
+    render(<Controlled />);
+    const toggle = screen.getByRole('switch', { name: 'Напоминание об ужине' });
+    expect(toggle).toHaveAccessibleDescription('Бот пришлёт идею ужина');
+    expect(toggle).not.toBeChecked();
+    await userEvent.click(screen.getByText('Напоминание об ужине'));
+    expect(toggle).toBeChecked();
+    await userEvent.keyboard(' ');
+    expect(toggle).not.toBeChecked();
+  });
+
+  it('ignores presses while busy and when disabled', async () => {
+    const onChange = vi.fn();
+    render(
+      <>
+        <Controlled busy />
+        <Switch checked={false} onChange={onChange} label="Недоступно" disabled />
+      </>,
+    );
+    const busy = screen.getByRole('switch', { name: 'Напоминание об ужине' });
+    expect(busy).toHaveAttribute('aria-busy', 'true');
+    await userEvent.click(busy);
+    expect(busy).not.toBeChecked();
+    const disabled = screen.getByRole('switch', { name: 'Недоступно' });
+    expect(disabled).toBeDisabled();
+    await userEvent.click(disabled);
+    expect(onChange).not.toHaveBeenCalled();
   });
 });

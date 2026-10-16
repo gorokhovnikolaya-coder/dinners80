@@ -3,6 +3,10 @@ import { setupWorker } from 'msw/browser';
 
 import { API_URL } from '../api/config.ts';
 import { MOCK_PAYMENT_EVENT, type MockPaymentDetail } from '../telegram/mock/invoice.ts';
+import {
+  MOCK_WRITE_ACCESS_EVENT,
+  type MockWriteAccessDetail,
+} from '../telegram/mock/writeAccess.ts';
 import { parseMockControls, takeFailure } from './controls.ts';
 import { createMockDb, sessionMockDbStorage } from './db.ts';
 import { createHandlers } from './handlers.ts';
@@ -13,7 +17,8 @@ const DB_STORAGE_KEY = 'tma80:mock-db';
 /**
  * Starts MSW in the browser (`VITE_API=mock`). Only API requests are expected to be handled.
  * Changes made through the mock API survive reloads in the same tab; `?mock_reset=1` forgets them.
- * Invoices «paid» by the mock Telegram client (`MOCK_PAYMENT_EVENT`) become subscriptions.
+ * Invoices «paid» by the mock Telegram client (`MOCK_PAYMENT_EVENT`) become subscriptions; a
+ * write access it «allowed» (`MOCK_WRITE_ACCESS_EVENT`) sets `botCanWrite`.
  */
 export async function startMockApi(): Promise<void> {
   const apiBase = new URL(API_URL, window.location.origin).href.replace(/\/$/, '');
@@ -30,6 +35,10 @@ export async function startMockApi(): Promise<void> {
   window.addEventListener(MOCK_PAYMENT_EVENT, (event) => {
     const { slug } = (event as CustomEvent<MockPaymentDetail>).detail;
     db.completePayment(slug);
+  });
+  // The user let the bot write: the webhook's `write_access_allowed` sets `bot_can_write`.
+  window.addEventListener(MOCK_WRITE_ACCESS_EVENT, (event) => {
+    db.allowWriteAccess((event as CustomEvent<MockWriteAccessDetail>).detail.tgId);
   });
   const controls = parseMockControls(search);
   const worker = setupWorker(

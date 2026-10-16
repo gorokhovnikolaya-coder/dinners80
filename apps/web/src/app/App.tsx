@@ -64,6 +64,11 @@ const ShoppingScreen = lazyScreen(
   <ScreenSkeleton />,
 );
 
+const ProfileScreen = lazyScreen(
+  () => import('../screens/profile/ProfileScreen.tsx'),
+  <ScreenSkeleton />,
+);
+
 /** Navy fallback of the paywall chunk, so the screen does not flash light before it. */
 function DarkScreenSkeleton() {
   return (
@@ -151,6 +156,10 @@ function AuthenticatedApp() {
       <Route
         path={ROUTES.shopping}
         element={needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <ShoppingScreen />}
+      />
+      <Route
+        path={ROUTES.profile}
+        element={needsOnboarding ? <Navigate to={ROUTES.onboarding} replace /> : <ProfileScreen />}
       />
       <Route
         path={ROUTES.paywall}

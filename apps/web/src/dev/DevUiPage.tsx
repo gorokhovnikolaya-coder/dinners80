@@ -24,6 +24,7 @@ import { ExclusionsField, HouseholdField } from '../components/preferences/Prefe
 import { Skeleton, SkeletonGroup } from '../components/Skeleton.tsx';
 import { SegmentedControl } from '../components/SegmentedControl.tsx';
 import { Spinner } from '../components/Spinner.tsx';
+import { Switch } from '../components/Switch.tsx';
 import { TabBar, type TabBarItem } from '../components/TabBar.tsx';
 import { ru, ruDevUi as t } from '../i18n/ru.ts';
 
@@ -77,6 +78,7 @@ export function DevUiPage() {
   });
   const [tab, setTab] = useState('dinner');
   const [segment, setSegment] = useState<'week' | 'all'>('week');
+  const [switches, setSwitches] = useState({ on: true, off: false });
   const [retries, setRetries] = useState(0);
   const [household, setHousehold] = useState<Household | null>('couple');
   const [exclusions, setExclusions] = useState<ExclusionsValue>({
@@ -354,6 +356,27 @@ export function DevUiPage() {
           value={segment}
           onChange={setSegment}
         />
+      </Section>
+
+      <Section id="ui-switch" title={t.sections.switch}>
+        <div className="flex flex-col gap-3 rounded-card bg-surface p-4">
+          <Switch
+            checked={switches.on}
+            onChange={(on) => {
+              setSwitches((current) => ({ ...current, on }));
+            }}
+            label={t.switches.on}
+            description={t.switches.onDescription}
+          />
+          <Switch
+            checked={switches.off}
+            onChange={(off) => {
+              setSwitches((current) => ({ ...current, off }));
+            }}
+            label={t.switches.off}
+          />
+          <Switch checked={false} onChange={() => undefined} label={t.switches.disabled} disabled />
+        </div>
       </Section>
 
       <Section id="ui-spinner" title={t.sections.spinner}>

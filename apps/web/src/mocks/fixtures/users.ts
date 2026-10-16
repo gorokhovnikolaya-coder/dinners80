@@ -80,6 +80,13 @@ const subscribed = (days: number, plan: 'month' | 'year'): SubscriptionStatus =>
   expiresAt: new Date(Date.now() + days * DAY_MS).toISOString(),
 });
 
+/** A subscription that ended `days` ago: no access, but the profile shows when it ended. */
+const expired = (days: number, plan: 'month' | 'year'): SubscriptionStatus => ({
+  active: false,
+  plan,
+  expiresAt: new Date(Date.now() - days * DAY_MS).toISOString(),
+});
+
 export const users: UserFixture[] = [
   makeUser(
     'новичок',
@@ -113,7 +120,7 @@ export const users: UserFixture[] = [
     },
   ),
   makeUser(
-    '10 стран без подписки',
+    '10 стран без подписки (месячная закончилась)',
     { id: TEST_USER_IDS.tenCountriesFree, first_name: 'Вера', allows_write_to_pm: true },
     {
       household: 'family',
@@ -123,6 +130,7 @@ export const users: UserFixture[] = [
       reminderEnabled: true,
       botCanWrite: true,
     },
+    { subscription: expired(10, 'month') },
   ),
   makeUser(
     '10 стран с подпиской',
