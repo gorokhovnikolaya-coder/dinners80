@@ -29,7 +29,64 @@ describe('storyCaption', () => {
   });
 });
 
+/**
+ * Reference captions of the share message: the server caption (`shareMessageCaption`) and the
+ * client fallback text (`ru.cooked.share.messageText`) must stay the same, so both tests check
+ * this same table (keep the copies in apps/server/src/bot/texts.test.ts and
+ * apps/web/src/screens/cooked/share.test.ts in sync).
+ */
+const SHARE_CAPTION_CASES = [
+  {
+    newCountry: true,
+    countryName: 'Перу',
+    dishTitle: 'Ломо сальтадо',
+    countriesCount: 8,
+    countriesTotal: 30,
+    caption:
+      'Перу в паспорте — уже 8 из 30 стран! Готовлю ужины из кухонь разных стран и собираю штампы. Присоединяйся — посоревнуемся!',
+  },
+  {
+    newCountry: true,
+    countryName: 'Новая Зеландия',
+    dishTitle: 'Павлова',
+    countriesCount: 1,
+    countriesTotal: 12,
+    caption:
+      'Новая Зеландия в паспорте — уже 1 из 12 стран! Готовлю ужины из кухонь разных стран и собираю штампы. Присоединяйся — посоревнуемся!',
+  },
+  {
+    newCountry: false,
+    countryName: 'Перу',
+    dishTitle: 'Ломо сальтадо',
+    countriesCount: 8,
+    countriesTotal: 30,
+    caption:
+      'Ломо сальтадо — блюдо засчитано, уже 8 из 30 стран! Готовлю ужины из кухонь разных стран и собираю штампы. Присоединяйся — посоревнуемся!',
+  },
+  {
+    newCountry: false,
+    countryName: 'Индия',
+    dishTitle: 'Дал из красной чечевицы',
+    countriesCount: 30,
+    countriesTotal: 30,
+    caption:
+      'Дал из красной чечевицы — блюдо засчитано, уже 30 из 30 стран! Готовлю ужины из кухонь разных стран и собираю штампы. Присоединяйся — посоревнуемся!',
+  },
+] as const;
+
 describe('shareFallbackText', () => {
+  it.each(SHARE_CAPTION_CASES)(
+    'matches the server caption: $caption',
+    ({ caption, newCountry, countryName, dishTitle, countriesCount, countriesTotal }) => {
+      expect(
+        shareFallbackText({
+          dish: { title: dishTitle, countryName },
+          result: { newCountry, countriesCount, countriesTotal },
+        }),
+      ).toBe(caption);
+    },
+  );
+
   it('says the same as the server share message', () => {
     expect(shareFallbackText(subject(true))).toBe(
       'Перу в паспорте — уже 8 из 30 стран! Готовлю ужины из кухонь разных стран и собираю ' +
