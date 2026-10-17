@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { mkdtemp, readFile, rm, utimes } from 'node:fs/promises';
+import { mkdtemp, readdir, readFile, rm, utimes, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -72,5 +72,22 @@ describe('MediaStorage', () => {
     expect(await storage.shareCardExists(name)).toBe(false);
     // Deleting a missing card is fine.
     await storage.deleteShareCard(name);
+  });
+
+  it('deletes share cards older than the date and keeps the rest', async () => {
+    expect(await storage.deleteShareCardsBefore(new Date())).toEqual([]);
+    const old = await storage.saveShareCard(JPEG);
+    const fresh = await storage.saveShareCard(JPEG);
+    await writeFile(join(root, 'share', 'notes.txt'), 'x');
+    const longAgo = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000);
+    await utimes(join(root, 'share', old), longAgo, longAgo);
+    await utimes(join(root, 'share', 'notes.txt'), longAgo, longAgo);
+    const deleted = await storage.deleteShareCardsBefore(
+      new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+    );
+    expect(deleted).toEqual([old]);
+    expect(await storage.shareCardExists(old)).toBe(false);
+    expect(await storage.shareCardExists(fresh)).toBe(true);
+    expect((await readdir(join(root, 'share'))).sort()).toEqual([fresh, 'notes.txt'].sort());
   });
 });

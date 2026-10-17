@@ -4,9 +4,21 @@ import { SHARE_MESSAGE_CAPTION_MAX } from '@tma80/shared';
 
 import { startPayload } from './bot.ts';
 import { webhookSecret } from './secret.ts';
-import { inviteText, paySupportText, shareMessageCaption, termsText } from './texts.ts';
+import {
+  inviteText,
+  paySupportText,
+  reminderDishText,
+  shareMessageCaption,
+  termsText,
+} from './texts.ts';
 
 describe('bot texts', () => {
+  it('describes the dish of the day in the reminder', () => {
+    expect(reminderDishText({ title: 'Карбонара', countryName: 'Италия', minutes: 25 })).toBe(
+      'Идея ужина на сегодня — Карбонара (Италия), 25 мин. Рецепт по шагам — в приложении.',
+    );
+  });
+
   it('names the inviter', () => {
     expect(inviteText('Маша')).toBe(
       'Маша зовёт вас в «Вокруг света за 80 ужинов». Вы уже друзья в рейтинге — готовьте и соревнуйтесь!',

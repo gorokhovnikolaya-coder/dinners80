@@ -83,3 +83,20 @@ export function shareMessageCaption(share: {
     : `${share.dishTitle} — блюдо засчитано, уже ${counter}!`;
   return `${headline} Готовлю ужины из кухонь разных стран и собираю штампы. Присоединяйся — посоревнуемся!`;
 }
+
+/** Dinner reminder of the dish of the day (decision 0023): the photo caption or the text. */
+export function reminderDishText(dish: {
+  title: string;
+  countryName: string;
+  minutes: number;
+}): string {
+  return `Идея ужина на сегодня — ${dish.title} (${dish.countryName}), ${String(dish.minutes)} мин. Рецепт по шагам — в приложении.`;
+}
+
+/** Dinner reminder of a user without onboarding answers: no dish yet. */
+export const REMINDER_ONBOARDING_TEXT =
+  'Пора выбрать ужин! Ответьте на три коротких вопроса — подберём блюдо под вас.';
+
+/** Dinner reminder when no dish fits the user's exclusions. */
+export const REMINDER_NO_DISH_TEXT =
+  'Пора выбрать ужин! Откройте приложение — подберём блюдо на сегодня.';

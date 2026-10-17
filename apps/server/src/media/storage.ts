@@ -60,6 +60,34 @@ export class MediaStorage {
     await rm(join(this.root, SHARE_DIR, name), { force: true });
   }
 
+  /**
+   * Deletes share cards changed before `before` (the worker, ТЗ: older than 30 days); returns
+   * their names. Files with other names are left alone.
+   */
+  async deleteShareCardsBefore(before: Date): Promise<string[]> {
+    const dir = join(this.root, SHARE_DIR);
+    let names: string[];
+    try {
+      names = await readdir(dir);
+    } catch {
+      return [];
+    }
+    const deleted: string[] = [];
+    for (const name of names) {
+      if (!PHOTO_FILE_RE.test(name)) continue;
+      const path = join(dir, name);
+      try {
+        const info = await stat(path);
+        if (!info.isFile() || info.mtimeMs >= before.getTime()) continue;
+        await rm(path, { force: true });
+        deleted.push(name);
+      } catch {
+        // Deleted meanwhile: nothing to do.
+      }
+    }
+    return deleted;
+  }
+
   /** Whether the cook photo `{user_id}/{uuid}.jpg` exists. */
   async cookPhotoExists(photoPath: string): Promise<boolean> {
     const [userId, name, ...rest] = photoPath.split('/');

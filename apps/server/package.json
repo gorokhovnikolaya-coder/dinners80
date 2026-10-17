@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "node --watch --env-file-if-exists=../../.env src/index.ts",
     "start": "node src/index.ts",
+    "worker": "node src/worker/index.ts",
+    "dev:worker": "node --watch --env-file-if-exists=../../.env src/worker/index.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node --env-file-if-exists=../../.env src/db/migrate.ts",
     "db:seed": "node --env-file-if-exists=../../.env seed/seed.ts",

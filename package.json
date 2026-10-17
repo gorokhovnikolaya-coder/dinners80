@@ -12,6 +12,7 @@
   "scripts": {
     "dev": "npm run dev -w @tma80/web",
     "dev:server": "npm run dev -w @tma80/server",
+    "dev:worker": "npm run dev:worker -w @tma80/server",
     "build": "tsc -b && npm run build -w @tma80/web",
     "typecheck": "tsc -b",
     "lint": "eslint .",

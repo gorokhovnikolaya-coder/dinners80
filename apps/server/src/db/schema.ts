@@ -3,6 +3,7 @@ import {
   bigint,
   boolean,
   check,
+  date,
   foreignKey,
   index,
   integer,
@@ -92,6 +93,8 @@ export const users = pgTable(
     reminderEnabled: boolean('reminder_enabled').notNull().default(false),
     reminderTime: time('reminder_time').notNull().default(`${DEFAULT_REMINDER_TIME}:00`),
     botCanWrite: boolean('bot_can_write').notNull().default(false),
+    /** Local date (`users.timezone`) of the last dinner reminder: one a day (decision 0023). */
+    reminderSentOn: date('reminder_sent_on', { mode: 'string' }),
     /** First `/start` in the bot: reminders are switched on by default only then (decision 0020). */
     botStartedAt: timestamp('bot_started_at', { withTimezone: true }),
     inviteCode: text('invite_code').notNull().unique(),
