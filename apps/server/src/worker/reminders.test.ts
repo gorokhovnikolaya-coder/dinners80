@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { eq, inArray } from 'drizzle-orm';
-import { Api, type Transformer } from 'grammy';
+import { Api, HttpError, type Transformer } from 'grammy';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { REMINDER_NO_DISH_TEXT, REMINDER_ONBOARDING_TEXT } from '../bot/texts.ts';
@@ -33,12 +33,16 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('worker', () => {
   let calls: { method: string; payload: Record<string, unknown> }[] = [];
   /** Error code per method (e.g. `sendPhoto: 400`). */
   let errors: Record<string, number> = {};
+  /** Every call fails on the network, as grammY reports it (`HttpError`). */
+  let network = false;
   const userIds: string[] = [];
   const base = 8_200_000_000 + Math.floor(Math.random() * 1_000_000) * 100;
   let next = 0;
 
   const transformer: Transformer = (_prev, method, payload) => {
     calls.push({ method, payload: payload });
+    if (network)
+      return Promise.reject(new HttpError('Network request failed', new Error('socket hang up')));
     const code = errors[method];
     if (code !== undefined)
       return Promise.resolve({
@@ -100,6 +104,7 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('worker', () => {
   beforeEach(async () => {
     calls = [];
     errors = {};
+    network = false;
     if (userIds.length > 0) await database.db.delete(users).where(inArray(users.id, userIds));
     userIds.length = 0;
   });
@@ -176,14 +181,40 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('worker', () => {
     expect((await userRow(user.id))?.botCanWrite).toBe(false);
   });
 
-  it('waits on 429 and releases the day after another error', async () => {
+  it('waits on 429 and releases the day when the retries are used up', async () => {
     const user = await newUser({ reminderSentOn: '2026-10-15' });
-    errors = { sendPhoto: 429, sendMessage: 500 };
+    errors = { sendPhoto: 429 };
     expect(await sendDueReminders(deps())).toEqual({ sent: 0, blocked: 0, failed: 1 });
     // The photo and 3 retries after `retry_after`; 429 is not a refused photo, so no text fallback.
     expect(calls.every((call) => call.method === 'sendPhoto')).toBe(true);
     expect(calls).toHaveLength(4);
     expect((await userRow(user.id))?.reminderSentOn).toBe('2026-10-15');
+  });
+
+  it('releases the day after a Telegram server error', async () => {
+    const user = await newUser({ reminderSentOn: '2026-10-15' });
+    errors = { sendPhoto: 400, sendMessage: 502 };
+    expect(await sendDueReminders(deps())).toEqual({ sent: 0, blocked: 0, failed: 1 });
+    expect((await userRow(user.id))?.reminderSentOn).toBe('2026-10-15');
+    errors = {};
+    expect((await sendDueReminders(deps())).sent).toBe(1);
+  });
+
+  it('keeps the day after another 4xx: no retry every minute', async () => {
+    const user = await newUser();
+    errors = { sendPhoto: 400, sendMessage: 400 };
+    expect(await sendDueReminders(deps())).toEqual({ sent: 0, blocked: 0, failed: 1 });
+    expect((await userRow(user.id))?.reminderSentOn).toBe('2026-10-16');
+    calls = [];
+    await sendDueReminders(deps());
+    expect(calls).toHaveLength(0);
+  });
+
+  it('keeps the day after a network error: the message may have been sent', async () => {
+    const user = await newUser();
+    network = true;
+    expect(await sendDueReminders(deps())).toEqual({ sent: 0, blocked: 0, failed: 1 });
+    expect((await userRow(user.id))?.reminderSentOn).toBe('2026-10-16');
   });
 
   it('skips users who are not due, switched off or unreachable', async () => {

@@ -1,5 +1,5 @@
 import { and, eq, inArray, isNull, ne, or } from 'drizzle-orm';
-import { GrammyError, InlineKeyboard, type Api } from 'grammy';
+import { GrammyError, HttpError, InlineKeyboard, type Api } from 'grammy';
 
 import { absoluteMediaUrl, dueReminderDate, suggestDishes } from '@tma80/shared';
 
@@ -133,11 +133,22 @@ async function sendReminder(
 }
 
 /**
+ * Whether a failed reminder is retried on the next tick (decision 0023): after `429` (retries are
+ * used up) and `5xx` Telegram surely did not send it, and an error before any Bot API call (e.g.
+ * the database) sent nothing. Another `4xx` would repeat every minute, and a network error
+ * (`HttpError`) may come after Telegram has sent the message: better miss the day than repeat it.
+ */
+function shouldRetry(error: unknown): boolean {
+  if (error instanceof GrammyError) return error.error_code === 429 || error.error_code >= 500;
+  return !(error instanceof HttpError);
+}
+
+/**
  * Sends the due dinner reminders (ТЗ, «Бот»): one a day at `reminder_time` of the user's time
  * zone, only with `reminder_enabled` and `bot_can_write`; a missed one goes out up to two hours
  * late on the same local day (decision 0023). The day is claimed in the database before sending,
- * so two workers or ticks never send it twice; a failed send releases the claim. `403` (the bot
- * is blocked) resets `bot_can_write`.
+ * so two workers or ticks never send it twice; a send that surely failed (`shouldRetry`) releases
+ * the claim. `403` (the bot is blocked) resets `bot_can_write`.
  */
 export async function sendDueReminders(deps: ReminderDeps): Promise<ReminderResult> {
   const result: ReminderResult = { sent: 0, blocked: 0, failed: 0 };
@@ -188,12 +199,15 @@ export async function sendDueReminders(deps: ReminderDeps): Promise<ReminderResu
         continue;
       }
       result.failed += 1;
-      await deps.db
-        .update(users)
-        .set({ reminderSentOn: item.previous })
-        .where(and(eq(users.id, user.id), eq(users.reminderSentOn, item.date)));
+      const retry = shouldRetry(error);
+      if (retry)
+        await deps.db
+          .update(users)
+          .set({ reminderSentOn: item.previous })
+          .where(and(eq(users.id, user.id), eq(users.reminderSentOn, item.date)));
       deps.log.error('reminder not sent', {
         userId: user.id,
+        retry,
         error: error instanceof Error ? error.message : String(error),
       });
     }
