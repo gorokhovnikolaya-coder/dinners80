@@ -1,7 +1,15 @@
+import { randomUUID } from 'node:crypto';
+import { mkdtemp, rm, stat } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
 import { asc, eq, inArray } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import {
+  COOK_PHOTO_FIELD,
+  COOK_PHOTO_MAX_BYTES,
+  COOK_PHOTO_UPLOADS_PER_DAY_LIMIT,
   COOKS_PER_DAY_LIMIT,
   FREE_COUNTRIES_LIMIT,
   addShoppingResponseSchema,
@@ -15,9 +23,14 @@ import {
   leaderboardResponseSchema,
   mapResponseSchema,
   meResponseSchema,
+  SHARE_CARD_FIELD,
+  SHARE_CARD_MAX_BYTES,
+  addCookPhotoResponseSchema,
   paywallErrorSchema,
   shoppingItemSchema,
   shoppingResponseSchema,
+  uploadCookPhotoResponseSchema,
+  uploadShareCardResponseSchema,
   type UserProfile,
 } from '@tma80/shared';
 
@@ -25,6 +38,7 @@ import { buildApp } from '../app.ts';
 import { signInitData } from '../auth/initData.ts';
 import { connect, type Database } from '../db/client.ts';
 import { cooks, countries, dishes, friendships, subscriptions, users } from '../db/schema.ts';
+import { secureLinkHash } from '../media/signedLink.ts';
 
 /**
  * The API endpoints against the local database with the seeded content: `npm run test:db` after
@@ -33,6 +47,8 @@ import { cooks, countries, dishes, friendships, subscriptions, users } from '../
  */
 describe.skipIf(process.env.TEST_DATABASE !== '1')('API endpoints', () => {
   const TOKEN = '42:test-api-token';
+  const MEDIA_KEY = 'test-media-key-0123456789abcdefghijklmnop';
+  let mediaDir = '';
   const DAY_MS = 24 * 60 * 60 * 1000;
   let database: Database;
   let app: ReturnType<typeof buildApp>;
@@ -77,6 +93,48 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('API endpoints', () => {
       ...(payload === undefined ? {} : { payload }),
     });
 
+  /** A JPEG-looking file of `size` bytes. */
+  const jpeg = (size = 1000) => {
+    const data = Buffer.alloc(size, 7);
+    data.set([0xff, 0xd8, 0xff, 0xe0]);
+    return data;
+  };
+
+  /** `multipart/form-data` with one file, as the client's `FormData` sends it. */
+  const upload = (
+    user: TestUser | null,
+    url: string,
+    field: string,
+    data: Buffer,
+    type = 'image/jpeg',
+  ) => {
+    const boundary = `----tma80${randomUUID()}`;
+    const payload = Buffer.concat([
+      Buffer.from(
+        `--${boundary}\r\nContent-Disposition: form-data; name="${field}"; filename="photo.jpg"\r\n` +
+          `Content-Type: ${type}\r\n\r\n`,
+      ),
+      data,
+      Buffer.from(`\r\n--${boundary}--\r\n`),
+    ]);
+    return app.inject({
+      method: 'POST',
+      url: `/api${url}`,
+      headers: {
+        ...(user?.headers ?? {}),
+        'content-type': `multipart/form-data; boundary=${boundary}`,
+      },
+      payload,
+    });
+  };
+
+  /** Uploads a cook photo of the user; returns its `photoPath`. */
+  const uploadPhoto = async (user: TestUser) => {
+    const response = await upload(user, '/uploads/cook-photo', COOK_PHOTO_FIELD, jpeg());
+    expect(response.statusCode).toBe(201);
+    return uploadCookPhotoResponseSchema.parse(response.json()).photoPath;
+  };
+
   const errorCode = (response: { json: () => unknown }) =>
     apiErrorSchema.parse(response.json()).error.code;
 
@@ -100,7 +158,14 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('API endpoints', () => {
 
   beforeAll(async () => {
     database = connect();
-    app = buildApp({ db: database.db, botToken: TOKEN, mediaUrl: '/media' });
+    mediaDir = await mkdtemp(join(tmpdir(), 'tma80-api-media-'));
+    app = buildApp({
+      db: database.db,
+      botToken: TOKEN,
+      mediaUrl: '/media',
+      mediaDir,
+      mediaSigningKey: MEDIA_KEY,
+    });
     const rows = await database.db
       .select({ countryId: dishes.countryId, dishId: dishes.id })
       .from(dishes)
@@ -124,6 +189,7 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('API endpoints', () => {
     dishesByCountry = [];
     await app.close();
     await database.pool.end();
+    await rm(mediaDir, { recursive: true, force: true });
   });
 
   describe('PATCH /me', () => {
@@ -301,24 +367,29 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('API endpoints', () => {
       expect(card.label).toEqual({ kind: 'cookedBefore' });
     });
 
-    it('accepts a photo only from the own folder and stores it without the folder name', async () => {
+    it('accepts only an uploaded photo from the own folder and stores it without the folder name', async () => {
       const user = await newUser();
       const other = await newUser();
       const dishId = dishesByCountry[0]?.dishIds[0] ?? '';
-      const photo = (owner: TestUser) =>
-        `cooks/${owner.profile.id}/0b9d9c1e-1f0a-4c8e-9a51-6d1a2b3c4d5e.jpg`;
-
-      const foreign = await call(user, 'POST', '/cooks', { dishId, photoPath: photo(other) });
+      const foreignPhoto = await uploadPhoto(other);
+      const foreign = await call(user, 'POST', '/cooks', { dishId, photoPath: foreignPhoto });
       expect(foreign.statusCode).toBe(400);
       expect(errorCode(foreign)).toBe('validation');
+      // The own folder, but nothing was uploaded.
+      const missing = await call(user, 'POST', '/cooks', {
+        dishId,
+        photoPath: `cooks/${user.profile.id}/${randomUUID()}.jpg`,
+      });
+      expect(missing.statusCode).toBe(400);
 
-      const own = await call(user, 'POST', '/cooks', { dishId, photoPath: photo(user) });
+      const photoPath = await uploadPhoto(user);
+      const own = await call(user, 'POST', '/cooks', { dishId, photoPath });
       expect(own.statusCode).toBe(201);
       const [row] = await database.db
         .select({ photoPath: cooks.photoPath })
         .from(cooks)
         .where(eq(cooks.userId, user.profile.id));
-      expect(row?.photoPath).toBe(photo(user).slice('cooks/'.length));
+      expect(row?.photoPath).toBe(photoPath.slice('cooks/'.length));
     });
 
     it('checks the access and the daily limit on the server', async () => {
@@ -383,6 +454,133 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('API endpoints', () => {
       expect(feed.items).toHaveLength(3);
       expect(feed.items.every((item) => item.firstName === 'Маша')).toBe(true);
       expect(feed.items.every((item) => item.photoUrl === null)).toBe(true);
+    });
+
+    it('signs links to the photos of friends for an hour, never to the photos of strangers', async () => {
+      const user = await newUser('Я');
+      const friend = await newUser('Маша');
+      const stranger = await newUser('Чужой');
+      await befriend(user, friend);
+      const dishId = dishesByCountry[0]?.dishIds[0] ?? '';
+      const friendPhoto = await uploadPhoto(friend);
+      const strangerPhoto = await uploadPhoto(stranger);
+      expect(
+        (await call(friend, 'POST', '/cooks', { dishId, photoPath: friendPhoto })).statusCode,
+      ).toBe(201);
+      expect(
+        (await call(stranger, 'POST', '/cooks', { dishId, photoPath: strangerPhoto })).statusCode,
+      ).toBe(201);
+
+      const before = Math.floor(Date.now() / 1000);
+      const feed = feedResponseSchema.parse((await call(user, 'GET', '/friends/feed')).json());
+      expect(feed.items.map((item) => item.firstName)).toEqual(['Маша']);
+      const url = new URL(feed.items[0]?.photoUrl ?? '', 'https://app.example');
+      expect(url.pathname).toBe(`/media/${friendPhoto}`);
+      const expires = Number(url.searchParams.get('expires'));
+      expect(expires - before).toBeGreaterThanOrEqual(3600);
+      expect(expires - before).toBeLessThanOrEqual(3601);
+      expect(url.searchParams.get('md5')).toBe(secureLinkHash(url.pathname, expires, MEDIA_KEY));
+      expect(JSON.stringify(feed)).not.toContain(strangerPhoto);
+    });
+  });
+
+  describe('uploads', () => {
+    it('stores a cook photo in the private folder of the user', async () => {
+      const user = await newUser();
+      const photoPath = await uploadPhoto(user);
+      expect(photoPath).toMatch(new RegExp(`^cooks/${user.profile.id}/[0-9a-f-]{36}\\.jpg$`));
+      expect((await stat(join(mediaDir, photoPath))).size).toBe(1000);
+    });
+
+    it('accepts only one JPEG of at most 500 KB in the «photo» field from a known user', async () => {
+      const user = await newUser();
+      const url = '/uploads/cook-photo';
+      const max = await upload(user, url, COOK_PHOTO_FIELD, jpeg(COOK_PHOTO_MAX_BYTES));
+      expect(max.statusCode).toBe(201);
+      const large = await upload(user, url, COOK_PHOTO_FIELD, jpeg(COOK_PHOTO_MAX_BYTES + 1));
+      expect(large.statusCode).toBe(413);
+      expect(errorCode(large)).toBe('validation');
+      const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+      expect((await upload(user, url, COOK_PHOTO_FIELD, png, 'image/jpeg')).statusCode).toBe(400);
+      expect((await upload(user, url, 'file', jpeg())).statusCode).toBe(400);
+      expect((await call(user, 'POST', url, { photo: 'x' })).statusCode).toBe(400);
+      expect((await upload(null, url, COOK_PHOTO_FIELD, jpeg())).statusCode).toBe(401);
+    });
+
+    it('limits cook photos of a user per day, parallel uploads included', async () => {
+      const user = await newUser();
+      const other = await newUser();
+      const responses = await Promise.all(
+        Array.from({ length: COOK_PHOTO_UPLOADS_PER_DAY_LIMIT + 2 }, () =>
+          upload(user, '/uploads/cook-photo', COOK_PHOTO_FIELD, jpeg()),
+        ),
+      );
+      const codes = responses.map((response) => response.statusCode);
+      expect(codes.filter((code) => code === 201)).toHaveLength(COOK_PHOTO_UPLOADS_PER_DAY_LIMIT);
+      const limited = responses.filter((response) => response.statusCode === 429);
+      expect(limited).toHaveLength(2);
+      expect(limited.map(errorCode)).toEqual(['rate_limited', 'rate_limited']);
+      // Another user is not limited.
+      await uploadPhoto(other);
+    });
+
+    it('stores a share card in the public folder and returns its public URL', async () => {
+      const user = await newUser();
+      const url = '/uploads/share-card';
+      const response = await upload(user, url, SHARE_CARD_FIELD, jpeg(SHARE_CARD_MAX_BYTES));
+      expect(response.statusCode).toBe(201);
+      const card = uploadShareCardResponseSchema.parse(response.json()).url;
+      expect(card).toMatch(/^\/media\/share\/[0-9a-f-]{36}\.jpg$/);
+      expect((await stat(join(mediaDir, card.slice('/media/'.length)))).size).toBe(
+        SHARE_CARD_MAX_BYTES,
+      );
+      const large = await upload(user, url, SHARE_CARD_FIELD, jpeg(SHARE_CARD_MAX_BYTES + 1));
+      expect(large.statusCode).toBe(413);
+      expect((await upload(user, url, COOK_PHOTO_FIELD, jpeg())).statusCode).toBe(400);
+      expect((await upload(null, url, SHARE_CARD_FIELD, jpeg())).statusCode).toBe(401);
+    });
+  });
+
+  describe('PATCH /cooks/:id', () => {
+    it('adds an uploaded photo to the own cook without a photo, once', async () => {
+      const user = await newUser();
+      const other = await newUser();
+      const dishId = dishesByCountry[0]?.dishIds[0] ?? '';
+      const cook = createCookResponseSchema.parse(
+        (await call(user, 'POST', '/cooks', { dishId })).json(),
+      );
+      const photoPath = await uploadPhoto(user);
+
+      const foreignCook = await call(other, 'PATCH', `/cooks/${cook.cookId}`, {
+        photoPath: await uploadPhoto(other),
+      });
+      expect(foreignCook.statusCode).toBe(404);
+      const foreignPhoto = await call(user, 'PATCH', `/cooks/${cook.cookId}`, {
+        photoPath: await uploadPhoto(other),
+      });
+      expect(foreignPhoto.statusCode).toBe(400);
+      expect((await call(user, 'PATCH', '/cooks/not-a-uuid', { photoPath })).statusCode).toBe(404);
+      expect((await call(user, 'PATCH', `/cooks/${randomUUID()}`, { photoPath })).statusCode).toBe(
+        404,
+      );
+      expect((await call(user, 'PATCH', `/cooks/${cook.cookId}`, {})).statusCode).toBe(400);
+
+      const added = await call(user, 'PATCH', `/cooks/${cook.cookId}`, { photoPath });
+      expect(added.statusCode).toBe(200);
+      expect(addCookPhotoResponseSchema.parse(added.json())).toEqual({
+        cookId: cook.cookId,
+        photoPath,
+      });
+      const [row] = await database.db
+        .select({ photoPath: cooks.photoPath })
+        .from(cooks)
+        .where(eq(cooks.id, cook.cookId));
+      expect(row?.photoPath).toBe(photoPath.slice('cooks/'.length));
+
+      const again = await call(user, 'PATCH', `/cooks/${cook.cookId}`, {
+        photoPath: await uploadPhoto(user),
+      });
+      expect(again.statusCode).toBe(400);
     });
   });
 

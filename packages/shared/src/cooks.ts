@@ -26,6 +26,12 @@ export const cookPhotoPathSchema = z
   .string()
   .check(z.regex(/^cooks\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.jpg$/));
 
+/**
+ * At most this many cook photos a user may upload per 24 hours (decision 0019): uploads that never
+ * become a cook must not fill the disk. Above it `POST /uploads/cook-photo` answers `429 rate_limited`.
+ */
+export const COOK_PHOTO_UPLOADS_PER_DAY_LIMIT = 40;
+
 /** Response of `POST /api/uploads/cook-photo`. */
 export const uploadCookPhotoResponseSchema = z.object({
   photoPath: cookPhotoPathSchema,
@@ -38,6 +44,34 @@ export const createCookRequestSchema = z.object({
   photoPath: z.optional(z.nullable(cookPhotoPathSchema)),
 });
 export type CreateCookRequest = z.infer<typeof createCookRequestSchema>;
+
+/** Body of `PATCH /api/cooks/:id`: a photo for a cook recorded without one (uploaded later). */
+export const addCookPhotoRequestSchema = z.object({
+  photoPath: cookPhotoPathSchema,
+});
+export type AddCookPhotoRequest = z.infer<typeof addCookPhotoRequestSchema>;
+
+/** Response of `PATCH /api/cooks/:id`. */
+export const addCookPhotoResponseSchema = z.object({
+  cookId: z.string().check(z.minLength(1)),
+  photoPath: cookPhotoPathSchema,
+});
+export type AddCookPhotoResponse = z.infer<typeof addCookPhotoResponseSchema>;
+
+/** Upload limit of a share card (ТЗ, «Фото»: 2 MB). */
+export const SHARE_CARD_MAX_BYTES = 2 * 1024 * 1024;
+
+/** Media type of a share card. */
+export const SHARE_CARD_TYPE = 'image/jpeg';
+
+/** Multipart field name of the picture in `POST /uploads/share-card`. */
+export const SHARE_CARD_FIELD = 'card';
+
+/** Response of `POST /api/uploads/share-card`: the public URL of the card (`share/{uuid}.jpg`). */
+export const uploadShareCardResponseSchema = z.object({
+  url: z.string().check(z.regex(/\/share\/[0-9a-f-]{36}\.jpg$/)),
+});
+export type UploadShareCardResponse = z.infer<typeof uploadShareCardResponseSchema>;
 
 /**
  * Response of `POST /api/cooks`: whether the cook brought a new country (a stamp), the counters

@@ -1,3 +1,6 @@
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
 import { afterAll, describe, expect, it } from 'vitest';
 
 import { apiErrorSchema, healthResponseSchema } from '@tma80/shared';
@@ -9,7 +12,7 @@ import { connect } from './db/client.ts';
 // pg connects lazily: these requests never reach the database.
 const { db, pool } = connect('postgres://nobody@127.0.0.1:1/none');
 const TOKEN = '1:test-token';
-const app = buildApp({ db, botToken: TOKEN });
+const app = buildApp({ db, botToken: TOKEN , mediaDir: join(tmpdir(), 'tma80-unused-media'), mediaSigningKey: 'k'.repeat(32) });
 
 afterAll(async () => {
   await app.close();

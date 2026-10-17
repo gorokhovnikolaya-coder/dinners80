@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  addCookPhotoRequestSchema,
   createCookRequestSchema,
   createCookResponseSchema,
   findOvertakenFriend,
   uploadCookPhotoResponseSchema,
+  uploadShareCardResponseSchema,
 } from './cooks.ts';
 
 const path = 'cooks/00000000-0000-4000-8000-000000001002/0b6f7c1e-3d0a-4c55-9a7e-2f1d3c4b5a69.jpg';
@@ -65,7 +67,17 @@ describe('cook schemas', () => {
     for (const photoPath of ['share/x.jpg', '../etc/passwd', `${path}.png`, 'cooks/a/b.jpg']) {
       expect(createCookRequestSchema.safeParse({ dishId: 'x', photoPath }).success).toBe(false);
       expect(uploadCookPhotoResponseSchema.safeParse({ photoPath }).success).toBe(false);
+      expect(addCookPhotoRequestSchema.safeParse({ photoPath }).success).toBe(false);
     }
+    expect(addCookPhotoRequestSchema.parse({ photoPath: path }).photoPath).toBe(path);
+  });
+
+  it('accepts a share card URL in the public folder only', () => {
+    const name = '0b6f7c1e-3d0a-4c55-9a7e-2f1d3c4b5a69.jpg';
+    for (const url of [`/media/share/${name}`, `https://example.com/media/share/${name}`])
+      expect(uploadShareCardResponseSchema.parse({ url }).url).toBe(url);
+    for (const url of [`/media/cooks/${name}`, '/media/share/x.jpg', `/media/share/${name}?a`])
+      expect(uploadShareCardResponseSchema.safeParse({ url }).success).toBe(false);
   });
 
   it('parses the cook result', () => {

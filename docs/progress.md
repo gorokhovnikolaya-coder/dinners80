@@ -6,7 +6,9 @@
 
 - e2e: если в окружении заданы `HTTPS_PROXY`/`all_proxy` (так было в песочнице агента 2026-10-16), проверка готовности dev-сервера Playwright (`webServer.url`) уходит в прокси, получает 503 и падает по таймауту 60 с; помогает `NO_PROXY=localhost,127.0.0.1,::1 npm run e2e`. Можно прописать `NO_PROXY` в `webServer.env`/скрипте `e2e` или проверять готовность по `port`.
 - e2e: под высокой нагрузкой машины (load average > 15) сценарии изредка падали по таймауту `page.goto` на холодном dev-сервере; на свободной машине стабильно зелёные. Если повторится в CI — поднять `timeout`/`navigationTimeout` в `playwright.config.ts`.
-- `.env.example`: добавить `MEDIA_URL=/media` (базовый URL фото контента, решение 0018); агенту правка `.env*` закрыта хуком.
+- `.env.example`: добавить `MEDIA_URL=/media` (базовый URL фото контента, решение 0018), `MEDIA_SIGNING_KEY=` с комментарием «секрет подписи ссылок на фото, ≥ 32 символов [A-Za-z0-9_-], `openssl rand -hex 32`» и закомментированный `# MEDIA_DIR=/abs/path` (по умолчанию `apps/server/media`) — решение 0019; агенту правка `.env*` закрыта хуком.
+- Осиротевшие фото готовок (загружены, но `POST /cooks` не последовал) не удаляются; по решению пользователя (2026-10-17) пока оставляем. Если понадобится — удалять в воркере (задача 21) файлы `cooks/` старше суток, на которые нет ссылки в `cooks.photo_path`.
+- Задача 20: `POST /uploads/share-card` отвечает `${MEDIA_URL}/share/…`; с `MEDIA_URL=/media` URL относительный, а `shareToStory` нужен абсолютный — дополнять `location.origin` на клиенте или задать абсолютный `MEDIA_URL` на проде (решение 0019).
 
 ## Журнал
 
@@ -19,6 +21,12 @@
 - Решения: docs/decisions/NNNN-… (если были)
 - Осталось / сомнения: …
 ```
+
+### Задача 17 — Фото (2026-10-17, ветка task/17-photo-storage)
+- Сделано: `POST /uploads/cook-photo` (multipart через `@fastify/multipart`, JPEG по сигнатуре, ≤ 500 КБ, 40 загрузок за 24 ч → `429`), `POST /uploads/share-card` (≤ 2 МБ, публичный URL), `PATCH /cooks/:id` (фото к своей готовке без фото), `POST /cooks` проверяет, что файл фото загружен; хранилище `MEDIA_DIR` (`cooks/{user}/{uuid}.jpg`, `share/{uuid}.jpg`); подписанные ссылки `secure_link` на час (`MEDIA_SIGNING_KEY`) в `GET /friends/feed`; nginx-шаблон `deploy/nginx/templates/media.conf.template` (`/media/cooks/` — 403/410, `/media/share/` — публично); режим `VITE_API=local` отдаёт `/media/cooks/*` по подписи и `/media/share/*`; shared — схемы `PATCH /cooks/:id` и `share-card`, константы лимитов; MSW — `POST /uploads/share-card`. AGENTS.md: `MEDIA_SIGNING_KEY`, `MEDIA_DIR`, `npm run test:nginx`.
+- Проверено: npm run check ✓, npm run test:db ✓, npm run test:nginx ✓ (фото по подписи открывается, без подписи / с подписью другого файла / с чужим ключом — 403, просроченное — 410); UI не менялся, e2e не требуется
+- Решения: docs/decisions/0019-photo-storage.md
+- Осталось / сомнения: `MEDIA_SIGNING_KEY` нужно добавить в `.env` и `.env.example` (человек) — без него `dev:server` и `VITE_API=local` не стартуют; осиротевшие фото не удаляются (Заметки); очередь лимита загрузок — в памяти одного процесса; полный `nginx.conf` и монтирование `MEDIA_DIR` — задача 23.
 
 ### Задача 16 — API (2026-10-16, ветка task/16-api-endpoints)
 - Сделано: эндпоинты ядра на Fastify + Drizzle — `PATCH /me`, `GET /home`, `GET /dishes/:id` (`403 paywall` с превью), `GET /map`, `POST /cooks` (лимит 20 за 24 ч под advisory lock, `has_access`, «обогнал»), `GET /friends/leaderboard`, `GET /friends/feed`, `GET/POST /shopping`, `PATCH /shopping/:id`, `DELETE /shopping/checked`; логика — те же функции `packages/shared`, что в моке. Режим `VITE_API=local`: dev-прокси Vite `/api` → локальный сервер с переподписью initData токеном из `.env` (в Node), фото контента `/media/content/*` из `content/`. `npm run db:seed:dev` — тестовые пользователи mock-режима в локальной базе (только localhost). AGENTS.md: команда, режим local.

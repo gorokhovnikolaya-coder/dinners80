@@ -16,6 +16,7 @@ import {
   meResponseSchema,
   paywallErrorSchema,
   uploadCookPhotoResponseSchema,
+  uploadShareCardResponseSchema,
 } from '@tma80/shared';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
@@ -640,6 +641,33 @@ describe('POST /uploads/cook-photo (MSW)', () => {
     server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=upload')));
     expect((await upload(TEST_USER_IDS.eightCountries, jpeg(10))).status).toBe(500);
     expect((await upload(TEST_USER_IDS.eightCountries, jpeg(10))).status).toBe(201);
+  });
+});
+
+describe('POST /uploads/share-card (MSW)', () => {
+  const upload = (blob: Blob, field = 'card') => {
+    const form = new FormData();
+    form.append(field, blob, 'card.jpg');
+    return fetch(`${API_BASE}/uploads/share-card`, {
+      method: 'POST',
+      headers: { Authorization: `tma ${initDataOf(TEST_USER_IDS.eightCountries)}` },
+      body: form,
+    });
+  };
+  const jpeg = (size: number) => new Blob([new Uint8Array(size)], { type: 'image/jpeg' });
+
+  it('returns a public URL of a JPEG card up to 2 MB', async () => {
+    const response = await upload(jpeg(2 * 1024 * 1024));
+    expect(response.status).toBe(201);
+    expect(uploadShareCardResponseSchema.parse(await response.json()).url).toMatch(
+      /^\/media\/share\//,
+    );
+  });
+
+  it('rejects a large, non-JPEG or misnamed file', async () => {
+    expect((await upload(jpeg(2 * 1024 * 1024 + 1))).status).toBe(413);
+    expect((await upload(new Blob([new Uint8Array(10)], { type: 'image/png' }))).status).toBe(400);
+    expect((await upload(jpeg(10), 'photo')).status).toBe(400);
   });
 });
 

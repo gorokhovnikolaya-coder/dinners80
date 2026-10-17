@@ -62,11 +62,22 @@ export default defineConfig(({ command, mode }) => {
     if (botToken === '') {
       throw new Error('VITE_API=local needs BOT_TOKEN in .env: the same test token as the server');
     }
+    const mediaDirOf = (dir: string | undefined) =>
+      dir === undefined || dir.trim() === ''
+        ? fileURLToPath(new URL('../server/media', import.meta.url))
+        : dir.trim();
+    const mediaSigningKey = serverEnv.MEDIA_SIGNING_KEY?.trim() ?? '';
+    if (mediaSigningKey === '') {
+      throw new Error('VITE_API=local needs MEDIA_SIGNING_KEY in .env: the same key as the server');
+    }
     plugins.push(
       localApi({
         target: `http://127.0.0.1:${serverEnv.PORT ?? '3080'}`,
         botToken,
         contentDir: fileURLToPath(new URL('../../content', import.meta.url)),
+        // The server's default MEDIA_DIR (apps/server/src/config.ts).
+        mediaDir: mediaDirOf(serverEnv.MEDIA_DIR),
+        mediaSigningKey,
       }),
     );
   }

@@ -3,6 +3,9 @@ import {
   COOK_PHOTO_FIELD,
   COOK_PHOTO_MAX_BYTES,
   COOK_PHOTO_TYPE,
+  SHARE_CARD_FIELD,
+  SHARE_CARD_MAX_BYTES,
+  SHARE_CARD_TYPE,
   COOKS_PER_DAY_LIMIT,
   addShoppingRequestSchema,
   buildLeaderboard,
@@ -32,6 +35,7 @@ import {
   type CreateCookResponse,
   type CreateInvoiceResponse,
   type UploadCookPhotoResponse,
+  type UploadShareCardResponse,
   type DishPreview,
   type DishResponse,
   type FeedResponse,
@@ -583,6 +587,29 @@ export const createHandlers = (
         return apiError(413, 'validation', 'The photo is too large');
       return HttpResponse.json<UploadCookPhotoResponse>(
         { photoPath: `cooks/${auth[1].profile.id}/${crypto.randomUUID()}.jpg` },
+        { status: 201 },
+      );
+    },
+  ),
+
+  // The share card (task 20 draws it): the server puts it into the public `share` folder.
+  http.post<never, never, UploadShareCardResponse | ApiError>(
+    `${apiBase}/uploads/share-card`,
+    async ({ request }) => {
+      if (controls.delayMs > 0) await delay(controls.delayMs);
+      if (!authenticate(request, db)) return unauthorized();
+      let card: FormDataEntryValue | null = null;
+      try {
+        card = (await request.formData()).get(SHARE_CARD_FIELD);
+      } catch {
+        card = null;
+      }
+      if (!(card instanceof Blob) || card.type !== SHARE_CARD_TYPE)
+        return apiError(400, 'validation', 'A JPEG card is expected');
+      if (card.size === 0 || card.size > SHARE_CARD_MAX_BYTES)
+        return apiError(413, 'validation', 'The card is too large');
+      return HttpResponse.json<UploadShareCardResponse>(
+        { url: `/media/share/${crypto.randomUUID()}.jpg` },
         { status: 201 },
       );
     },

@@ -12,6 +12,7 @@ import {
 import { requireUser } from '../auth/plugin.ts';
 import { cooksOf, friendsOf } from '../db/cooks.ts';
 import { countries, dishes } from '../db/schema.ts';
+import { signCookPhotoUrl } from '../media/signedLink.ts';
 import { parseOr400, type RouteDeps } from './deps.ts';
 
 /** `GET /friends/leaderboard` and `GET /friends/feed` with the shared ranking and feed rules. */
@@ -56,6 +57,7 @@ export function friendsRoutes(app: FastifyInstance, deps: RouteDeps): void {
       ),
     );
     if (stamps.length === 0) return { items: [] };
+    const now = deps.now();
     // Titles and names of the stamps, unpublished content included: a stamp stays a stamp.
     const [dishRows, countryRows] = await Promise.all([
       deps.db
@@ -93,8 +95,11 @@ export function friendsRoutes(app: FastifyInstance, deps: RouteDeps): void {
             countryName,
             dishId: stamp.dishId,
             dishTitle,
-            // Signed links to private photos come with task 17 (nginx `secure_link`).
-            photoUrl: null,
+            // Only friends' cooks get here: a link to a stranger's photo is never signed.
+            photoUrl:
+              stamp.photoPath === null
+                ? null
+                : signCookPhotoUrl(deps.mediaUrl, stamp.photoPath, deps.mediaSigningKey, now),
             createdAt: stamp.createdAt,
           },
         ];

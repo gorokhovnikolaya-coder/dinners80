@@ -2,6 +2,7 @@ import { z } from 'zod/mini';
 
 import type { Db } from '../db/client.ts';
 import { ApiHttpError } from '../http/errors.ts';
+import type { MediaStorage } from '../media/storage.ts';
 
 /** What the API routes need. */
 export interface RouteDeps {
@@ -9,6 +10,10 @@ export interface RouteDeps {
   now: () => Date;
   /** Public base URL of media files without a trailing slash, e.g. `/media`. */
   mediaUrl: string;
+  /** Uploaded files in `MEDIA_DIR`. */
+  media: MediaStorage;
+  /** `MEDIA_SIGNING_KEY`: signs the links to private photos (nginx `secure_link`). */
+  mediaSigningKey: string;
 }
 
 /**

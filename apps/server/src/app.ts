@@ -3,6 +3,7 @@ import Fastify, { type FastifyInstance, type FastifyServerOptions } from 'fastif
 import { registerAuth } from './auth/plugin.ts';
 import type { Db } from './db/client.ts';
 import { registerErrorHandlers } from './http/errors.ts';
+import { MediaStorage } from './media/storage.ts';
 import { authRoutes } from './routes/auth.ts';
 import { cookRoutes } from './routes/cooks.ts';
 import type { RouteDeps } from './routes/deps.ts';
@@ -12,6 +13,7 @@ import { healthRoutes } from './routes/health.ts';
 import { homeRoutes } from './routes/home.ts';
 import { meRoutes } from './routes/me.ts';
 import { shoppingRoutes } from './routes/shopping.ts';
+import { uploadRoutes } from './routes/uploads.ts';
 
 export interface AppDeps {
   db: Db;
@@ -19,6 +21,10 @@ export interface AppDeps {
   botToken: string;
   /** Public base URL of media files (`MEDIA_URL`); `/media` by default. */
   mediaUrl?: string;
+  /** Folder of uploaded files (`MEDIA_DIR`) with `cooks/` and `share/` inside. */
+  mediaDir: string;
+  /** Secret of the signed links to private photos (`MEDIA_SIGNING_KEY`). */
+  mediaSigningKey: string;
   /** Current time; injected in tests. */
   now?: () => Date;
 }
@@ -26,7 +32,13 @@ export interface AppDeps {
 export function buildApp(deps: AppDeps, options: FastifyServerOptions = {}): FastifyInstance {
   const app = Fastify(options);
   const now = deps.now ?? (() => new Date());
-  const routeDeps: RouteDeps = { db: deps.db, now, mediaUrl: deps.mediaUrl ?? '/media' };
+  const routeDeps: RouteDeps = {
+    db: deps.db,
+    now,
+    mediaUrl: deps.mediaUrl ?? '/media',
+    media: new MediaStorage(deps.mediaDir),
+    mediaSigningKey: deps.mediaSigningKey,
+  };
   registerErrorHandlers(app);
   // The auth hook goes first: every route below is authenticated unless it opts out.
   registerAuth(app, { db: deps.db, botToken: deps.botToken, now });
@@ -38,5 +50,6 @@ export function buildApp(deps: AppDeps, options: FastifyServerOptions = {}): Fas
   cookRoutes(app, routeDeps);
   friendsRoutes(app, routeDeps);
   shoppingRoutes(app, routeDeps);
+  uploadRoutes(app, routeDeps);
   return app;
 }
