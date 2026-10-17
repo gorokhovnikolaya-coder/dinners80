@@ -15,6 +15,13 @@
       "when": 1792148966785,
       "tag": "0001_access",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792218525006,
+      "tag": "0002_bot_started",
+      "breakpoints": true
     }
   ]
 }

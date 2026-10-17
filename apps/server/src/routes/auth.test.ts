@@ -182,10 +182,14 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('POST /api/auth', () => {
     ]);
   });
 
-  it('befriends an existing user without invited_by and invite_joined', async () => {
+  it('befriends an onboarded user without invited_by and invite_joined', async () => {
     const inviter = await signIn(initData(newTgId()));
     const existingTgId = newTgId();
     const existing = await signIn(initData(existingTgId));
+    await database.db
+      .update(users)
+      .set({ onboardedAt: new Date() })
+      .where(inArray(users.id, [existing.user.id]));
 
     const again = await signIn(initData(existingTgId, { startParam: inviter.user.inviteCode }));
     expect(again.user.id).toBe(existing.user.id);
@@ -197,6 +201,24 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('POST /api/auth', () => {
     // Opening the same link again changes nothing.
     await signIn(initData(existingTgId, { startParam: inviter.user.inviteCode }));
     expect(await friendsOf(existing.user.id)).toEqual([inviter.user.id]);
+  });
+
+  it('invites an existing user who has not finished the onboarding yet', async () => {
+    const inviter = await signIn(initData(newTgId()));
+    const tgId = newTgId();
+    const existing = await signIn(initData(tgId));
+    await signIn(initData(tgId, { startParam: inviter.user.inviteCode }));
+    expect((await userRow(existing.user.id)).invitedBy).toBe(inviter.user.id);
+    expect(await inviteEvents(existing.user.id)).toHaveLength(1);
+
+    // A later invitation from someone else befriends but keeps the first inviter.
+    const other = await signIn(initData(newTgId()));
+    await signIn(initData(tgId, { startParam: other.user.inviteCode }));
+    expect((await friendsOf(existing.user.id)).sort()).toEqual(
+      [inviter.user.id, other.user.id].sort(),
+    );
+    expect((await userRow(existing.user.id)).invitedBy).toBe(inviter.user.id);
+    expect(await inviteEvents(existing.user.id)).toHaveLength(1);
   });
 
   it('ignores the own code and an unknown code', async () => {

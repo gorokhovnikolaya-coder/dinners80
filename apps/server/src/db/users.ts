@@ -1,4 +1,4 @@
-import { and, desc, eq, getTableColumns, ne, sql } from 'drizzle-orm';
+import { and, desc, eq, getTableColumns, isNull, ne, sql } from 'drizzle-orm';
 
 import { WEEKDAY_MINUTES, type SubscriptionStatus, type UserProfile } from '@tma80/shared';
 
@@ -109,24 +109,31 @@ async function upsertUser(
   return { row, isNew };
 }
 
+/** The inviter of an applied invitation. */
+export interface Inviter {
+  id: string;
+  firstName: string;
+}
+
 /**
- * Invitation by `start_param` (ТЗ, «Запуск и приглашения»): friendship both ways unless it exists
- * or the code is the user's own; `invited_by` and the `invite_joined` event only for a new user.
- * An unknown code is ignored.
+ * Invitation by an invite code (`start_param` of the mini app or `/start <code>` in the bot; ТЗ,
+ * «Запуск и приглашения»): friendship both ways unless it exists or the code is the user's own.
+ * `invited_by` and the `invite_joined` event go to a user who has neither an inviter nor a finished
+ * onboarding yet — e.g. one created by `/start` a moment ago (decision 0020). An unknown code is
+ * ignored (`inviter: null`).
  */
 async function applyInvite(
   tx: Tx,
   user: UserRow,
-  isNew: boolean,
   code: string,
   now: Date,
-): Promise<UserRow> {
+): Promise<{ user: UserRow; inviter: Inviter | null }> {
   const [inviter] = await tx
-    .select({ id: users.id })
+    .select({ id: users.id, firstName: users.firstName })
     .from(users)
     .where(and(eq(users.inviteCode, code), ne(users.id, user.id)))
     .limit(1);
-  if (!inviter) return user;
+  if (!inviter) return { user, inviter: null };
 
   await tx
     .insert(friendships)
@@ -135,20 +142,21 @@ async function applyInvite(
       { userId: inviter.id, friendId: user.id, createdAt: now },
     ])
     .onConflictDoNothing();
-  if (!isNew) return user;
 
+  // Conditional update: of parallel sign-ins only one sets `invited_by` and writes the event.
   const [updated] = await tx
     .update(users)
     .set({ invitedBy: inviter.id })
-    .where(eq(users.id, user.id))
+    .where(and(eq(users.id, user.id), isNull(users.invitedBy), isNull(users.onboardedAt)))
     .returning();
+  if (!updated) return { user, inviter };
   await tx.insert(events).values({
     userId: user.id,
     name: 'invite_joined',
     props: { inviter_id: inviter.id },
     createdAt: now,
   });
-  return updated ?? user;
+  return { user: updated, inviter };
 }
 
 const UNIQUE_VIOLATION = '23505';
@@ -168,26 +176,89 @@ const isInviteCodeCollision = (error: unknown): boolean => {
   return false;
 };
 
+/**
+ * Runs `attempt` in a transaction, retrying when a new random invite code clashed with an
+ * existing one.
+ */
+async function withInviteCodeRetry<T>(db: Db, attempt: (tx: Tx) => Promise<T>): Promise<T> {
+  for (let tries = 1; ; tries += 1) {
+    try {
+      return await db.transaction(attempt);
+    } catch (error) {
+      if (tries < 3 && isInviteCodeCollision(error)) continue;
+      throw error;
+    }
+  }
+}
+
 /** `POST /auth` in one transaction: upsert the user, then the invitation. */
 export async function signIn(
   db: Db,
   initData: InitData,
   now = new Date(),
 ): Promise<{ user: UserRow; isNew: boolean }> {
-  for (let attempt = 1; ; attempt += 1) {
-    try {
-      return await db.transaction(async (tx) => {
-        const { row, isNew } = await upsertUser(tx, initData.user, now);
-        const user =
-          initData.startParam === null
-            ? row
-            : await applyInvite(tx, row, isNew, initData.startParam, now);
-        return { user, isNew };
-      });
-    } catch (error) {
-      // A new random invite code clashed with an existing one: retry with another.
-      if (attempt < 3 && isInviteCodeCollision(error)) continue;
-      throw error;
-    }
-  }
+  return withInviteCodeRetry(db, async (tx) => {
+    const { row, isNew } = await upsertUser(tx, initData.user, now);
+    const user =
+      initData.startParam === null
+        ? row
+        : (await applyInvite(tx, row, initData.startParam, now)).user;
+    return { user, isNew };
+  });
+}
+
+/** Telegram user of a bot update (`from`): the bot sees no photo. */
+export interface BotUser {
+  tgId: number;
+  firstName: string;
+  username: string | null;
+}
+
+/**
+ * `/start` (with an optional invite code) in one transaction: creates the user or refreshes the
+ * name and username; the bot can write from now on. The first `/start` ever (`bot_started_at` is
+ * empty) switches the reminders on (ТЗ, «Бот»); later ones keep the user's choice.
+ */
+export async function startBot(
+  db: Db,
+  from: BotUser,
+  code: string | null,
+  now = new Date(),
+): Promise<{ user: UserRow; inviter: Inviter | null }> {
+  return withInviteCodeRetry(db, async (tx) => {
+    const [row] = await tx
+      .insert(users)
+      .values({
+        tgId: from.tgId,
+        firstName: from.firstName,
+        username: from.username,
+        botCanWrite: true,
+        botStartedAt: now,
+        reminderEnabled: true,
+        inviteCode: generateInviteCode(),
+        createdAt: now,
+        lastSeenAt: now,
+      })
+      .onConflictDoUpdate({
+        target: users.tgId,
+        set: {
+          firstName: sql`excluded.first_name`,
+          username: sql`excluded.username`,
+          botCanWrite: true,
+          reminderEnabled: sql`${users.reminderEnabled} or ${users.botStartedAt} is null`,
+          botStartedAt: sql`coalesce(${users.botStartedAt}, excluded.bot_started_at)`,
+        },
+      })
+      .returning();
+    if (!row) throw new Error('user upsert returned no row');
+    return code === null ? { user: row, inviter: null } : applyInvite(tx, row, code, now);
+  });
+}
+
+/**
+ * Sets `bot_can_write` of a known user (`write_access_allowed`, the bot blocked or unblocked).
+ * An unknown user is ignored: the flag comes with the first `/start` or `POST /auth`.
+ */
+export async function setBotCanWrite(db: Executor, tgId: number, value: boolean): Promise<void> {
+  await db.update(users).set({ botCanWrite: value }).where(eq(users.tgId, tgId));
 }

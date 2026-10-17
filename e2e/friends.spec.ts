@@ -18,6 +18,16 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('friends', () => {
+  test('a friend who opened the invitation link appears in the ranking', async ({ page }) => {
+    // Аня (1001) opens t.me/<bot>/<app>?startapp=<code of Борис (1002)>.
+    await page.goto('/?user=1001&mock_reset=1&startapp=inv1002');
+    await expect(page).toHaveURL(/\/onboarding$/);
+
+    await page.goto('/friends?user=1002');
+    await expect(ranking(page)).toHaveCount(5);
+    await expect(ranking(page).filter({ hasText: 'Аня' })).toHaveCount(1);
+  });
+
   test('ranking for the week and all time, the stamps feed and the invite', async ({ page }) => {
     await page.goto('/?user=1002&mock_reset=1');
     await page

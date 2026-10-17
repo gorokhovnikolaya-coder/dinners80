@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "bot_started_at" timestamp with time zone;

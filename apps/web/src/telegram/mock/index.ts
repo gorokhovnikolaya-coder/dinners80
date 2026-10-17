@@ -1,7 +1,7 @@
 import { emitEvent, mockTelegramEnv } from '@tma.js/sdk-react';
 
 import { setMockBackButtonVisible } from './backButton.ts';
-import { buildMockInitData } from './initData.ts';
+import { buildMockInitData, parseMockStartParam } from './initData.ts';
 import { closeMockInvoice, parseMockInvoiceOutcome } from './invoice.ts';
 import { resolveTestUser } from './testUser.ts';
 import { answerMockWriteAccess, parseMockWriteAccessOutcome } from './writeAccess.ts';
@@ -43,7 +43,8 @@ const contentSafeArea = { top: 0, bottom: 0, left: 0, right: 0 };
  * Imitates the Telegram client in a regular browser (`VITE_TG_MOCK=1`): launch parameters with
  * the test user from `?user=<id>`, light theme, viewport and safe area; an opened invoice closes
  * with the status from `?mock_invoice=` (`paid` by default); a request to let the bot write is
- * answered from `?mock_write_access=` (`allowed` by default).
+ * answered from `?mock_write_access=` (`allowed` by default); `?startapp=<code>` launches the app
+ * by an invitation link (`start_param`).
  */
 export function mockTelegram(): void {
   const user = resolveTestUser(window.location.search);
@@ -54,11 +55,14 @@ export function mockTelegram(): void {
   // Read at start: navigation inside the app drops the query string.
   const invoiceOutcome = parseMockInvoiceOutcome(window.location.search);
   const writeAccessOutcome = parseMockWriteAccessOutcome(window.location.search);
+  // `?startapp=<code>` — a launch by an invitation link; not remembered, like in Telegram.
+  const startParam = parseMockStartParam(window.location.search);
 
   mockTelegramEnv({
     launchParams: {
       tgWebAppThemeParams: themeParams,
-      tgWebAppData: buildMockInitData(user.tg),
+      tgWebAppData: buildMockInitData(user.tg, new Date(), startParam),
+      ...(startParam === null ? {} : { tgWebAppStartParam: startParam }),
       // `?mock_tg_version=6.0` imitates an old client (e.g. without BackButton, added in 6.1).
       tgWebAppVersion:
         new URLSearchParams(window.location.search).get('mock_tg_version') ?? MOCK_VERSION,

@@ -1,11 +1,20 @@
 import { buildApp } from './app.ts';
-import { botToken, mediaDir, mediaSigningKey, mediaUrl } from './config.ts';
+import {
+  botToken,
+  documentLinks,
+  mediaDir,
+  mediaSigningKey,
+  mediaUrl,
+  supportContact,
+  webAppUrl,
+} from './config.ts';
 import { connect } from './db/client.ts';
 
 const port = Number(process.env.PORT ?? 3080);
 const host = process.env.HOST ?? '127.0.0.1';
 
 const { db, pool } = connect();
+const appUrl = webAppUrl();
 const app = buildApp(
   {
     db,
@@ -13,10 +22,16 @@ const app = buildApp(
     mediaUrl: mediaUrl(),
     mediaDir: mediaDir(),
     mediaSigningKey: mediaSigningKey(),
+    ...(appUrl === null
+      ? {}
+      : {
+          bot: { webAppUrl: appUrl, ...documentLinks(), supportContact: supportContact() },
+        }),
   },
   { logger: true },
 );
 app.addHook('onClose', () => pool.end());
+if (appUrl === null) app.log.warn('WEBAPP_URL is not set: the bot webhook is disabled');
 
 try {
   await app.listen({ port, host });

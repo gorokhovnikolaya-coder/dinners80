@@ -15,7 +15,7 @@ import {
 
 import { cooks as fixtureCooks } from './fixtures/cooks.ts';
 import { shoppingFixtures } from './fixtures/shopping.ts';
-import { findUserByTgId } from './fixtures/users.ts';
+import { findUserByTgId, users as fixtureUsers } from './fixtures/users.ts';
 
 /** What the mock backend knows about a user now: the fixture plus changes made in this session. */
 export interface MockUser {
@@ -56,6 +56,8 @@ interface StoredUser {
    * learns it from the `write_access_allowed` service message); the fixture value otherwise.
    */
   botCanWrite?: boolean;
+  /** Friends (Telegram ids) added in this session by an invitation, on top of the fixtures. */
+  friends?: number[];
 }
 
 /** An invoice created by `POST /payments/invoice`, waiting for the payment. */
@@ -89,7 +91,7 @@ const restore = (data: unknown): Map<number, StoredUser> => {
   if (typeof data !== 'object' || data === null) return users;
   for (const [key, value] of Object.entries(data)) {
     if (typeof value !== 'object' || value === null) continue;
-    const { patch, onboarded, shopping, cooks, subscription, botCanWrite } =
+    const { patch, onboarded, shopping, cooks, subscription, botCanWrite, friends } =
       value as Partial<StoredUser>;
     // A user changed only by the shopping list or cooks has an empty patch, which the
     // `PATCH /me` schema (at least one field) rejects.
@@ -110,6 +112,9 @@ const restore = (data: unknown): Map<number, StoredUser> => {
         }),
         ...(paid.success ? { subscription: paid.data } : {}),
         ...(typeof botCanWrite === 'boolean' ? { botCanWrite } : {}),
+        ...(Array.isArray(friends)
+          ? { friends: (friends as unknown[]).filter((id) => typeof id === 'number') }
+          : {}),
       });
     }
   }
@@ -193,6 +198,31 @@ export function createMockDb(storage?: MockDbStorage) {
     persist();
     return true;
   };
+
+  /**
+   * Invitation by `start_param` (`POST /auth` with `?startapp=<code>` in mock mode): friendship
+   * both ways with the owner of the code, unless it is the user's own or unknown.
+   * @returns the inviter's Telegram id, or `undefined` if the code was ignored.
+   */
+  const acceptInvite = (tgId: number, code: string): number | undefined => {
+    const user = getUser(tgId);
+    const inviter = fixtureUsers.find((fixture) => fixture.profile.inviteCode === code);
+    if (!user || !inviter || inviter.tg.id === tgId) return undefined;
+    const inviterUser = getUser(inviter.tg.id);
+    if (!inviterUser) return undefined;
+    for (const [id, owner, friendId] of [
+      [tgId, user, inviter.tg.id],
+      [inviter.tg.id, inviterUser, tgId],
+    ] as const) {
+      const entry = entryOf(id, owner);
+      if (!entry.friends?.includes(friendId)) entry.friends = [...(entry.friends ?? []), friendId];
+    }
+    persist();
+    return inviter.tg.id;
+  };
+
+  /** Friends added in this session by invitations (Telegram ids). */
+  const invitedFriends = (tgId: number): readonly number[] => changed.get(tgId)?.friends ?? [];
 
   /** The user's shopping list: the fixture one until it is changed in this session. */
   const getShopping = (tgId: number): readonly MockShoppingItem[] =>
@@ -315,6 +345,8 @@ export function createMockDb(storage?: MockDbStorage) {
     getUser,
     updateUser,
     allowWriteAccess,
+    acceptInvite,
+    invitedFriends,
     createInvoice,
     completePayment,
     getShopping,

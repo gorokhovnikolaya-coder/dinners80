@@ -50,7 +50,7 @@ import {
 } from '@tma80/shared';
 import { HttpResponse, delay, http } from 'msw';
 
-import { parseInitDataUserId } from '../telegram/mock/initData.ts';
+import { parseInitDataStartParam, parseInitDataUserId } from '../telegram/mock/initData.ts';
 import { NO_MOCK_CONTROLS, takeFailure, type MockControls } from './controls.ts';
 import { createMockDb, type MockDb, type MockShoppingItem, type MockUser } from './db.ts';
 import { countries } from './fixtures/countries.ts';
@@ -62,12 +62,18 @@ import { friendships } from './fixtures/users.ts';
 const apiError = (status: number, code: ApiErrorCode, message: string) =>
   HttpResponse.json<ApiError>({ error: { code, message } }, { status });
 
-/** Telegram id from `Authorization: tma <initData>`; the signature is not checked in mock mode. */
-const authenticate = (request: Request, db: MockDb): [number, MockUser] | undefined => {
+/** Raw initData of `Authorization: tma <initData>`, or `undefined` without it. */
+const authorizationInitData = (request: Request): string | undefined => {
   const header = request.headers.get('Authorization') ?? '';
   const prefix = `${AUTH_SCHEME} `;
-  if (!header.startsWith(prefix)) return undefined;
-  const tgId = parseInitDataUserId(header.slice(prefix.length));
+  return header.startsWith(prefix) ? header.slice(prefix.length) : undefined;
+};
+
+/** Telegram id from `Authorization: tma <initData>`; the signature is not checked in mock mode. */
+const authenticate = (request: Request, db: MockDb): [number, MockUser] | undefined => {
+  const initData = authorizationInitData(request);
+  if (initData === undefined) return undefined;
+  const tgId = parseInitDataUserId(initData);
   const user = tgId === undefined ? undefined : db.getUser(tgId);
   return tgId === undefined || !user ? undefined : [tgId, user];
 };
@@ -197,9 +203,11 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const countryCount = (cooks: readonly { countryId: string }[]) =>
   new Set(cooks.map((cook) => cook.countryId)).size;
 
-/** Friends of the user (Telegram ids), from the two-way friendships. */
-const friendIdsOf = (tgId: number): number[] =>
-  friendships.flatMap(([a, b]) => (a === tgId ? [b] : b === tgId ? [a] : []));
+/** Friends of the user (Telegram ids): the fixture friendships plus invitations of the session. */
+const friendIdsOf = (db: MockDb, tgId: number): number[] => {
+  const fixed = friendships.flatMap(([a, b]) => (a === tgId ? [b] : b === tgId ? [a] : []));
+  return [...fixed, ...db.invitedFriends(tgId).filter((id) => !fixed.includes(id))];
+};
 
 const participantOf = (user: MockUser): LeaderboardParticipant => ({
   userId: user.profile.id,
@@ -209,7 +217,7 @@ const participantOf = (user: MockUser): LeaderboardParticipant => ({
 });
 
 const friendsOf = (db: MockDb, tgId: number): MockUser[] =>
-  friendIdsOf(tgId).flatMap((friendId) => {
+  friendIdsOf(db, tgId).flatMap((friendId) => {
     const friend = db.getUser(friendId);
     return friend ? [friend] : [];
   });
@@ -375,7 +383,12 @@ export const createHandlers = (
       return apiError(500, 'internal', 'Mock error (mock_error=auth)');
     const auth = authenticate(request, db);
     if (!auth) return unauthorized();
-    const [, user] = auth;
+    const [tgId] = auth;
+    // `?startapp=<code>` of the mock client: the invitation, as `POST /auth` handles it.
+    const startParam = parseInitDataStartParam(authorizationInitData(request) ?? '');
+    if (startParam !== undefined) db.acceptInvite(tgId, startParam);
+    const user = db.getUser(tgId);
+    if (!user) return unauthorized();
     return HttpResponse.json<AuthResponse>({
       user: user.profile,
       subscription: user.subscription,

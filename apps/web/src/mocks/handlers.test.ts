@@ -22,7 +22,12 @@ import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import { API_URL } from '../api/config.ts';
-import { buildMockInitData, parseInitDataUserId } from '../telegram/mock/initData.ts';
+import {
+  buildMockInitData,
+  parseInitDataStartParam,
+  parseInitDataUserId,
+  parseMockStartParam,
+} from '../telegram/mock/initData.ts';
 import { cooks } from './fixtures/cooks.ts';
 import { dishes, dishIngredientNames } from './fixtures/dishes.ts';
 import { TEST_USER_IDS, findUserByTgId } from './fixtures/users.ts';
@@ -56,6 +61,50 @@ describe('mock initData', () => {
     expect(parseInitDataUserId(initDataOf(TEST_USER_IDS.newbie))).toBe(TEST_USER_IDS.newbie);
     expect(parseInitDataUserId('user=%7Bbroken')).toBeUndefined();
     expect(parseInitDataUserId('auth_date=1')).toBeUndefined();
+  });
+});
+
+describe('mock invitation link', () => {
+  it('reads ?startapp=<code> and passes it as start_param', () => {
+    expect(parseMockStartParam('?user=1001&startapp=inv1002')).toBe('inv1002');
+    expect(parseMockStartParam('?user=1001')).toBeNull();
+    expect(parseMockStartParam('?startapp=bad%20code')).toBeNull();
+    const user = findUserByTgId(TEST_USER_IDS.newbie);
+    if (!user) throw new Error('missing fixture');
+    expect(parseInitDataStartParam(buildMockInitData(user.tg, new Date(), 'inv1002'))).toBe(
+      'inv1002',
+    );
+    expect(parseInitDataStartParam(buildMockInitData(user.tg))).toBeUndefined();
+  });
+
+  it('befriends the invitee with the inviter both ways, once', async () => {
+    server.use(...createHandlers(API_BASE, NO_MOCK_CONTROLS, createMockDb()));
+    const newbie = findUserByTgId(TEST_USER_IDS.newbie);
+    if (!newbie) throw new Error('missing fixture');
+    const signIn = (startParam: string) =>
+      auth({ Authorization: `tma ${buildMockInitData(newbie.tg, new Date(), startParam)}` });
+    const ranking = async (tgId: number) =>
+      leaderboardResponseSchema
+        .parse(
+          await (
+            await fetch(`${API_BASE}/friends/leaderboard?period=all`, {
+              headers: { Authorization: `tma ${initDataOf(tgId)}` },
+            })
+          ).json(),
+        )
+        .entries.map((row) => row.firstName);
+
+    expect(await ranking(TEST_USER_IDS.newbie)).toEqual(['Аня']);
+    expect((await signIn('inv1001')).status).toBe(200); // own code — ignored
+    expect((await signIn('NoSuchCode')).status).toBe(200);
+    expect(await ranking(TEST_USER_IDS.newbie)).toEqual(['Аня']);
+
+    await signIn('inv1002');
+    await signIn('inv1002');
+    expect(await ranking(TEST_USER_IDS.eightCountries)).toHaveLength(5);
+    expect(await ranking(TEST_USER_IDS.eightCountries)).toContain('Аня');
+    expect(await ranking(TEST_USER_IDS.newbie)).toEqual(expect.arrayContaining(['Аня', 'Борис']));
+    expect(await ranking(TEST_USER_IDS.newbie)).toHaveLength(2);
   });
 });
 

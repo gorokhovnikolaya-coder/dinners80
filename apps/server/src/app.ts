@@ -1,10 +1,12 @@
 import Fastify, { type FastifyInstance, type FastifyServerOptions } from 'fastify';
 
 import { registerAuth } from './auth/plugin.ts';
+import { createBot, type BotSettings } from './bot/bot.ts';
 import type { Db } from './db/client.ts';
 import { registerErrorHandlers } from './http/errors.ts';
 import { MediaStorage } from './media/storage.ts';
 import { authRoutes } from './routes/auth.ts';
+import { botWebhookRoutes } from './routes/botWebhook.ts';
 import { cookRoutes } from './routes/cooks.ts';
 import type { RouteDeps } from './routes/deps.ts';
 import { dishRoutes } from './routes/dishes.ts';
@@ -25,6 +27,11 @@ export interface AppDeps {
   mediaDir: string;
   /** Secret of the signed links to private photos (`MEDIA_SIGNING_KEY`). */
   mediaSigningKey: string;
+  /**
+   * The bot behind `POST /api/bot/webhook`; without it (no `WEBAPP_URL`) the webhook is not
+   * registered.
+   */
+  bot?: BotSettings;
   /** Current time; injected in tests. */
   now?: () => Date;
 }
@@ -51,5 +58,9 @@ export function buildApp(deps: AppDeps, options: FastifyServerOptions = {}): Fas
   friendsRoutes(app, routeDeps);
   shoppingRoutes(app, routeDeps);
   uploadRoutes(app, routeDeps);
+  if (deps.bot) {
+    const bot = createBot({ ...deps.bot, db: deps.db, token: deps.botToken, now });
+    botWebhookRoutes(app, { bot, botToken: deps.botToken });
+  }
   return app;
 }
