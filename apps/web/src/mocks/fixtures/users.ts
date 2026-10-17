@@ -9,6 +9,8 @@ export interface TelegramUserFixture {
   language_code: string;
   allows_write_to_pm: boolean;
   photo_url?: string;
+  /** Telegram Premium (`?mock_premium=1`): stories may carry a link widget. */
+  is_premium?: boolean;
 }
 
 /** A user of the mock backend: what Telegram sends and what the server stores. */

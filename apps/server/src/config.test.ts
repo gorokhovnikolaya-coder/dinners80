@@ -5,6 +5,7 @@ import {
   documentLinks,
   mediaDir,
   mediaSigningKey,
+  miniAppLink,
   publicUrl,
   supportContact,
   webAppUrl,
@@ -65,5 +66,22 @@ describe('bot settings', () => {
     expect(() => documentLinks({ PRIVACY_URL: 'ftp://x' })).toThrow(/http\(s\)/);
     expect(supportContact({})).toBeNull();
     expect(supportContact({ SUPPORT_CONTACT: ' @help ' })).toBe('@help');
+  });
+});
+
+describe('miniAppLink', () => {
+  it('is optional and must be https://t.me/<bot>/<app>', () => {
+    expect(miniAppLink({})).toBeNull();
+    expect(miniAppLink({ MINI_APP_LINK: ' https://t.me/tma80_bot/app/ ' })).toBe(
+      'https://t.me/tma80_bot/app',
+    );
+    expect(() => miniAppLink({ MINI_APP_LINK: 'http://t.me/tma80_bot/app' })).toThrow(/https/);
+    expect(() => miniAppLink({ MINI_APP_LINK: 'https://example.com/tma80_bot/app' })).toThrow(
+      /t\.me/,
+    );
+    expect(() => miniAppLink({ MINI_APP_LINK: 'https://t.me/tma80_bot' })).toThrow(/t\.me/);
+    expect(() => miniAppLink({ MINI_APP_LINK: 'https://t.me/tma80_bot/app?startapp=x' })).toThrow(
+      /t\.me/,
+    );
   });
 });

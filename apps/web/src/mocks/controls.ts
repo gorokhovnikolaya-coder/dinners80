@@ -8,7 +8,10 @@
  *   `shopping_clear` (`DELETE /shopping/checked`), `upload`
  *   (`POST /uploads/cook-photo`), `cooks` (`POST /cooks`),
  *   `cooks_limit` (`POST /cooks` answers `429 rate_limited` — the daily cook limit),
- *   `invoice` (`POST /payments/invoice`), `chunk` (the first lazy screen chunk, browser only).
+ *   `invoice` (`POST /payments/invoice`), `share_card` (`POST /uploads/share-card`),
+ *   `share_stamp` (`POST /share/stamp/:cookId`), `share_unavailable` (`POST /share/stamp/:cookId`
+ *   answers `503 unavailable` — the server cannot prepare the message), `chunk` (the first lazy
+ *   screen chunk, browser only).
  * - `?mock_delay=<ms>` — delay of every mock response, to see loading states.
  */
 export interface MockControls {

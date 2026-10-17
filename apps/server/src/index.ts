@@ -5,6 +5,7 @@ import {
   mediaDir,
   mediaSigningKey,
   mediaUrl,
+  miniAppLink,
   supportContact,
   webAppUrl,
 } from './config.ts';
@@ -15,6 +16,7 @@ const host = process.env.HOST ?? '127.0.0.1';
 
 const { db, pool } = connect();
 const appUrl = webAppUrl();
+const appLink = miniAppLink();
 const app = buildApp(
   {
     db,
@@ -22,6 +24,7 @@ const app = buildApp(
     mediaUrl: mediaUrl(),
     mediaDir: mediaDir(),
     mediaSigningKey: mediaSigningKey(),
+    shareLinks: appUrl === null || appLink === null ? null : { webAppUrl: appUrl, miniAppLink: appLink },
     ...(appUrl === null
       ? {}
       : {
@@ -32,6 +35,8 @@ const app = buildApp(
 );
 app.addHook('onClose', () => pool.end());
 if (appUrl === null) app.log.warn('WEBAPP_URL is not set: the bot webhook is disabled');
+if (appUrl === null || appLink === null)
+  app.log.warn('WEBAPP_URL or MINI_APP_LINK is not set: stamps are shared by t.me/share/url');
 
 try {
   await app.listen({ port, host });

@@ -87,7 +87,7 @@ test.describe('photo and stamp', () => {
     });
     // The navy screen paints the Telegram header navy.
     expect(params.web_app_set_header_color).toEqual({ color: '#14213d' });
-    await expect(page.getByRole('button', { name: 'Поделиться карточкой' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Поделиться карточкой' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Открыть карту' })).toBeVisible();
     await shot(page, '02-stamp-new-country');
 

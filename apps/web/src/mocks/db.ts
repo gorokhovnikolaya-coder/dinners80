@@ -136,6 +136,10 @@ export function createMockDb(storage?: MockDbStorage) {
   const changed = restore(storage?.load());
   /** Open invoices by slug; they live as long as the page (paid right after being opened). */
   const invoices = new Map<string, MockInvoice>();
+  /** Share cards by cook id (`cooks.share_card`); they live as long as the page. */
+  const shareCards = new Map<string, string>();
+  /** The pictures of the share cards by URL, served as the public `share` folder. */
+  const shareCardFiles = new Map<string, Blob>();
 
   const persist = () => {
     storage?.save(Object.fromEntries(changed));
@@ -341,9 +345,41 @@ export function createMockDb(storage?: MockDbStorage) {
     return subscription;
   };
 
+  /**
+   * `POST /uploads/share-card?cookId=`: one card per own cook — the stored URL, or `url` attached.
+   * @returns the card URL and whether it is new, or `undefined` for a cook of someone else.
+   */
+  const attachShareCard = (
+    tgId: number,
+    cookId: string,
+    url: string,
+    picture: Blob,
+  ): { url: string; created: boolean } | undefined => {
+    const user = getUser(tgId);
+    if (!user?.cooks.some((cook) => cook.id === cookId)) return undefined;
+    const stored = shareCards.get(cookId);
+    if (stored !== undefined) return { url: stored, created: false };
+    shareCards.set(cookId, url);
+    shareCardFiles.set(url, picture);
+    return { url, created: true };
+  };
+
+  /** The picture of a share card by its public URL (`/media/share/{uuid}.jpg`). */
+  const shareCardFile = (url: string): Blob | undefined => shareCardFiles.get(url);
+
+  /** The card of the user's own cook: a URL, `null` before the upload, `undefined` if not own. */
+  const shareCardOf = (tgId: number, cookId: string): string | null | undefined => {
+    const user = getUser(tgId);
+    if (!user?.cooks.some((cook) => cook.id === cookId)) return undefined;
+    return shareCards.get(cookId) ?? null;
+  };
+
   return {
     getUser,
     updateUser,
+    attachShareCard,
+    shareCardFile,
+    shareCardOf,
     allowWriteAccess,
     acceptInvite,
     invitedFriends,

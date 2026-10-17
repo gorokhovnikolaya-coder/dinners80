@@ -17,10 +17,11 @@ import {
   meResponseSchema,
   paywallErrorSchema,
   uploadCookPhotoResponseSchema,
+  shareStampResponseSchema,
   uploadShareCardResponseSchema,
 } from '@tma80/shared';
 import { setupServer } from 'msw/node';
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { API_URL } from '../api/config.ts';
 import {
@@ -694,30 +695,68 @@ describe('POST /uploads/cook-photo (MSW)', () => {
   });
 });
 
-describe('POST /uploads/share-card (MSW)', () => {
-  const upload = (blob: Blob, field = 'card') => {
+describe('share card and message (MSW)', () => {
+  const tgId = TEST_USER_IDS.eightCountries;
+  const db = createMockDb();
+  const [dish] = dishes;
+  const record = (id: number) =>
+    db.addCook(id, { dishId: dish?.id ?? '', countryId: dish?.countryId ?? '', photoPath: null })
+      ?.id ?? '';
+  const cookId = record(tgId);
+  const otherCookId = record(TEST_USER_IDS.tenCountriesFree);
+  beforeAll(() => {
+    expect(cookId).not.toBe('');
+  });
+  beforeEach(() => {
+    server.use(...createHandlers(API_BASE, NO_MOCK_CONTROLS, db));
+  });
+  const headers = { Authorization: `tma ${initDataOf(tgId)}` };
+  const upload = (blob: Blob, id = cookId, field = 'card') => {
     const form = new FormData();
     form.append(field, blob, 'card.jpg');
-    return fetch(`${API_BASE}/uploads/share-card`, {
+    return fetch(`${API_BASE}/uploads/share-card?cookId=${id}`, {
       method: 'POST',
-      headers: { Authorization: `tma ${initDataOf(TEST_USER_IDS.eightCountries)}` },
+      headers,
       body: form,
     });
   };
+  const stamp = (id: string) =>
+    fetch(`${API_BASE}/share/stamp/${id}`, { method: 'POST', headers });
   const jpeg = (size: number) => new Blob([new Uint8Array(size)], { type: 'image/jpeg' });
 
-  it('returns a public URL of a JPEG card up to 2 MB', async () => {
+  it('needs an upload before the message, then keeps one card per cook', async () => {
+    expect((await stamp(cookId)).status).toBe(400);
     const response = await upload(jpeg(2 * 1024 * 1024));
     expect(response.status).toBe(201);
-    expect(uploadShareCardResponseSchema.parse(await response.json()).url).toMatch(
-      /^\/media\/share\//,
+    const url = uploadShareCardResponseSchema.parse(await response.json()).url;
+    expect(url).toMatch(/^\/media\/share\//);
+    const again = await upload(jpeg(10));
+    expect(again.status).toBe(200);
+    expect(uploadShareCardResponseSchema.parse(await again.json()).url).toBe(url);
+    const message = await stamp(cookId);
+    expect(message.status).toBe(200);
+    expect(shareStampResponseSchema.parse(await message.json()).preparedMessageId).toContain(
+      cookId,
     );
   });
 
-  it('rejects a large, non-JPEG or misnamed file', async () => {
+  it('rejects a foreign cook, a large, non-JPEG or misnamed file', async () => {
+    expect((await upload(jpeg(10), otherCookId)).status).toBe(404);
+    expect((await stamp(otherCookId)).status).toBe(404);
+    expect((await upload(jpeg(10), 'x')).status).toBe(400);
     expect((await upload(jpeg(2 * 1024 * 1024 + 1))).status).toBe(413);
     expect((await upload(new Blob([new Uint8Array(10)], { type: 'image/png' }))).status).toBe(400);
-    expect((await upload(jpeg(10), 'photo')).status).toBe(400);
+    expect((await upload(jpeg(10), cookId, 'photo')).status).toBe(400);
+  });
+
+  it('answers 503 unavailable with mock_error=share_unavailable', async () => {
+    server.use(
+      ...createHandlers(API_BASE, parseMockControls('?mock_error=share_unavailable'), db),
+    );
+    expect((await upload(jpeg(10))).status).toBeLessThan(300);
+    const response = await stamp(cookId);
+    expect(response.status).toBe(503);
+    expect(apiErrorSchema.parse(await response.json()).error.code).toBe('unavailable');
   });
 });
 

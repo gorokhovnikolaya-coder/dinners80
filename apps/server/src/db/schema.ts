@@ -228,6 +228,11 @@ export const cooks = pgTable(
     countryId: text('country_id').notNull(),
     /** `{user_id}/{uuid}.jpg` in the private `cooks` folder; the photo is optional. */
     photoPath: text('photo_path'),
+    /**
+     * `{uuid}.jpg` in the public `share` folder: the share card of this cook, one per cook
+     * (decision 0022); `null` until the user shares it.
+     */
+    shareCard: text('share_card'),
     createdAt: createdAt(),
   },
   (table) => [

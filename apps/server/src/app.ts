@@ -16,6 +16,7 @@ import { healthRoutes } from './routes/health.ts';
 import { homeRoutes } from './routes/home.ts';
 import { meRoutes } from './routes/me.ts';
 import { paymentRoutes } from './routes/payments.ts';
+import { shareRoutes, type ShareLinks } from './routes/share.ts';
 import { shoppingRoutes } from './routes/shopping.ts';
 import { uploadRoutes } from './routes/uploads.ts';
 
@@ -34,7 +35,13 @@ export interface AppDeps {
    * registered.
    */
   bot?: BotSettings;
-  /** Bot API call transformer of the invoice API: tests intercept `createInvoiceLink` with it. */
+  /**
+   * `WEBAPP_URL` and `MINI_APP_LINK` for the share message of a stamp; without them
+   * `POST /api/share/stamp/:cookId` answers `503 unavailable` (decision 0022).
+   */
+  shareLinks?: ShareLinks | null;
+  /** Bot API call transformer of the API routes: tests intercept `createInvoiceLink` and
+   * `savePreparedInlineMessage` with it. */
   apiTransformer?: Transformer;
   /** Current time; injected in tests. */
   now?: () => Date;
@@ -65,6 +72,7 @@ export function buildApp(deps: AppDeps, options: FastifyServerOptions = {}): Fas
   const botApi = new Api(deps.botToken);
   if (deps.apiTransformer) botApi.config.use(deps.apiTransformer);
   paymentRoutes(app, { ...routeDeps, botApi });
+  shareRoutes(app, { ...routeDeps, botApi, shareLinks: deps.shareLinks ?? null });
   if (deps.bot) {
     const bot = createBot({
       ...deps.bot,

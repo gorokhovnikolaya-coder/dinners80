@@ -141,6 +141,37 @@ export const ru = {
     yourPhoto: (title: string) => `Ваше фото: ${title}`,
     dishPhoto: (title: string) => `Фото: ${title}`,
     openMap: 'Открыть карту',
+    share: {
+      button: 'Поделиться карточкой',
+      title: 'Поделиться карточкой',
+      story: 'В историю',
+      chat: 'Отправить в чат',
+      cancel: 'Отмена',
+      preparing: 'Готовим карточку…',
+      error: 'Не удалось подготовить карточку',
+      retry: 'Повторить',
+      /** Texts drawn on the 1080 × 1920 card. */
+      card: {
+        brand: 'Вокруг света за 80 ужинов',
+        cta: 'Присоединяйся — посоревнуемся!',
+      },
+      /** Story caption (≤ 200 characters): the headline, the counter and the invite link. */
+      storyText: (headline: string, counter: string, link: string) =>
+        `${headline}! ${counter}. Собираю штампы за ужинами — присоединяйся: ${link}`,
+      /** A shorter story caption when the full one is too long. */
+      storyTextShort: (link: string) => `Собираю штампы за ужинами — присоединяйся: ${link}`,
+      /** Name of the story link widget (Premium only, ≤ 48 characters). */
+      storyLink: 'Открыть',
+      /** The repeated dish headline of the story caption. */
+      repeatHeadline: (dish: string) => `${dish} — блюдо засчитано`,
+      /**
+       * The `t.me/share/url` fallback text (the invite link goes as the URL); the same words as the
+       * caption of the server's share message.
+       */
+      messageText: (newCountry: boolean, country: string, dish: string, counter: string) =>
+        `${newCountry ? `${country} в паспорте — уже ${counter}!` : `${dish} — блюдо засчитано, уже ${counter}!`} ` +
+        'Готовлю ужины из кухонь разных стран и собираю штампы. Присоединяйся — посоревнуемся!',
+    },
   },
   map: {
     title: 'Мой паспорт',

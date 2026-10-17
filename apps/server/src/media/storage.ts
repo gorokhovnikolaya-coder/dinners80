@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { mkdir, readdir, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 /** Folders of `MEDIA_DIR` (ТЗ, «Фото»): private photos of cooks and public share cards. */
@@ -42,6 +42,22 @@ export class MediaStorage {
     const name = `${randomUUID()}.jpg`;
     await writeFile(join(dir, name), data, { flag: 'wx', mode: 0o644 });
     return name;
+  }
+
+  /** Whether the share card `{uuid}.jpg` exists (the worker deletes old ones, task 21). */
+  async shareCardExists(name: string): Promise<boolean> {
+    if (!PHOTO_FILE_RE.test(name)) return false;
+    try {
+      return (await stat(join(this.root, SHARE_DIR, name))).isFile();
+    } catch {
+      return false;
+    }
+  }
+
+  /** Deletes the share card `{uuid}.jpg`, if it is there. */
+  async deleteShareCard(name: string): Promise<void> {
+    if (!PHOTO_FILE_RE.test(name)) return;
+    await rm(join(this.root, SHARE_DIR, name), { force: true });
   }
 
   /** Whether the cook photo `{user_id}/{uuid}.jpg` exists. */

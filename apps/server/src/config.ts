@@ -116,3 +116,19 @@ export function documentLinks(env: Env = process.env): {
 export function supportContact(env: Env = process.env): string | null {
   return optional(env, 'SUPPORT_CONTACT');
 }
+
+/**
+ * `MINI_APP_LINK`: the direct link of the mini app `https://t.me/<bot>/<app>` (no query). The
+ * share message of a stamp carries it with the user's invite code (`startapp`); without it
+ * `POST /api/share/stamp/:cookId` answers `503 unavailable` and the client falls back to
+ * `t.me/share/url` (decision 0022).
+ */
+export function miniAppLink(env: Env = process.env): string | null {
+  const value = optionalUrl(env, 'MINI_APP_LINK', true);
+  if (value === null) return null;
+  const url = new URL(value);
+  if (url.hostname !== 't.me' || !/^\/[A-Za-z0-9_]+\/[A-Za-z0-9_]+\/?$/.test(url.pathname) || url.search !== '') {
+    throw new Error('MINI_APP_LINK must look like https://t.me/<bot>/<app>');
+  }
+  return `${url.origin}${url.pathname.replace(/\/$/, '')}`;
+}

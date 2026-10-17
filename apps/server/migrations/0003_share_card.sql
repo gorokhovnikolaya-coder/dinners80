@@ -1,0 +1,1 @@
+ALTER TABLE "cooks" ADD COLUMN "share_card" text;

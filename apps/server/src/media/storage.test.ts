@@ -62,4 +62,15 @@ describe('MediaStorage', () => {
     expect(name).toMatch(/^[0-9a-f-]{36}\.jpg$/);
     expect(new Uint8Array(await readFile(join(root, 'share', name)))).toEqual(JPEG);
   });
+
+  it('checks and deletes a share card only by a valid name', async () => {
+    const name = await storage.saveShareCard(JPEG);
+    expect(await storage.shareCardExists(name)).toBe(true);
+    expect(await storage.shareCardExists('../share.jpg')).toBe(false);
+    await storage.deleteShareCard('../x.jpg');
+    await storage.deleteShareCard(name);
+    expect(await storage.shareCardExists(name)).toBe(false);
+    // Deleting a missing card is fine.
+    await storage.deleteShareCard(name);
+  });
 });

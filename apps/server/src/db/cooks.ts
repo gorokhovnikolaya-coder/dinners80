@@ -9,7 +9,7 @@ import {
 
 import type { Db } from './client.ts';
 import type { PublishedDish } from './content.ts';
-import { cooks, countries, friendships, users } from './schema.ts';
+import { cooks, countries, dishes, friendships, users } from './schema.ts';
 import type { Executor } from './users.ts';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -72,6 +72,53 @@ async function countersOf(db: Executor, userIds: readonly string[]) {
     if (known) known.countries = row.countries;
   }
   return counters;
+}
+
+/** What the share message of a cook says (decision 0022), or `undefined` for a foreign cook. */
+export interface CookShareInfo {
+  /** `{uuid}.jpg` in the public `share` folder, or `null` before the card is uploaded. */
+  shareCard: string | null;
+  dishTitle: string;
+  countryName: string;
+  /** The first cook of the user in this country — the stamp. */
+  newCountry: boolean;
+  countriesCount: number;
+  countriesTotal: number;
+}
+
+/** The user's own cook with its dish, country and the user's counters now. */
+export async function cookShareInfo(
+  db: Executor,
+  userId: string,
+  cookId: string,
+): Promise<CookShareInfo | undefined> {
+  const [cook] = await db
+    .select({
+      shareCard: cooks.shareCard,
+      countryId: cooks.countryId,
+      dishTitle: dishes.title,
+      countryName: countries.nameRu,
+    })
+    .from(cooks)
+    .innerJoin(dishes, eq(dishes.id, cooks.dishId))
+    .innerJoin(countries, eq(countries.id, cooks.countryId))
+    .where(and(eq(cooks.id, cookId), eq(cooks.userId, userId)));
+  if (!cook) return undefined;
+  const [first] = await db
+    .select({ id: cooks.id })
+    .from(cooks)
+    .where(and(eq(cooks.userId, userId), eq(cooks.countryId, cook.countryId)))
+    .orderBy(asc(cooks.createdAt), asc(cooks.id))
+    .limit(1);
+  const counters = (await countersOf(db, [userId])).get(userId);
+  return {
+    shareCard: cook.shareCard,
+    dishTitle: cook.dishTitle,
+    countryName: cook.countryName,
+    newCountry: first?.id === cookId,
+    countriesCount: counters?.countries ?? 0,
+    countriesTotal: await publishedCountriesCount(db),
+  };
 }
 
 /** Number of published countries (the «из 30»). */

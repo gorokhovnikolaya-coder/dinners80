@@ -3,6 +3,7 @@ import { emitEvent, mockTelegramEnv } from '@tma.js/sdk-react';
 import { setMockBackButtonVisible } from './backButton.ts';
 import { buildMockInitData, parseMockStartParam } from './initData.ts';
 import { closeMockInvoice, parseMockInvoiceOutcome } from './invoice.ts';
+import { answerMockPreparedMessage, parseMockShareOutcome } from './share.ts';
 import { resolveTestUser } from './testUser.ts';
 import { answerMockWriteAccess, parseMockWriteAccessOutcome } from './writeAccess.ts';
 
@@ -43,8 +44,9 @@ const contentSafeArea = { top: 0, bottom: 0, left: 0, right: 0 };
  * Imitates the Telegram client in a regular browser (`VITE_TG_MOCK=1`): launch parameters with
  * the test user from `?user=<id>`, light theme, viewport and safe area; an opened invoice closes
  * with the status from `?mock_invoice=` (`paid` by default); a request to let the bot write is
- * answered from `?mock_write_access=` (`allowed` by default); `?startapp=<code>` launches the app
- * by an invitation link (`start_param`).
+ * answered from `?mock_write_access=` (`allowed` by default); a prepared message is shared with
+ * the outcome from `?mock_share=` (`sent` by default); `?mock_premium=1` makes the user Premium;
+ * `?startapp=<code>` launches the app by an invitation link (`start_param`).
  */
 export function mockTelegram(): void {
   const user = resolveTestUser(window.location.search);
@@ -55,13 +57,20 @@ export function mockTelegram(): void {
   // Read at start: navigation inside the app drops the query string.
   const invoiceOutcome = parseMockInvoiceOutcome(window.location.search);
   const writeAccessOutcome = parseMockWriteAccessOutcome(window.location.search);
+  const shareOutcome = parseMockShareOutcome(window.location.search);
+  // `?mock_premium=1` — a Telegram Premium user (a story may carry a link widget).
+  const premium = new URLSearchParams(window.location.search).get('mock_premium') === '1';
   // `?startapp=<code>` — a launch by an invitation link; not remembered, like in Telegram.
   const startParam = parseMockStartParam(window.location.search);
 
   mockTelegramEnv({
     launchParams: {
       tgWebAppThemeParams: themeParams,
-      tgWebAppData: buildMockInitData(user.tg, new Date(), startParam),
+      tgWebAppData: buildMockInitData(
+        premium ? { ...user.tg, is_premium: true } : user.tg,
+        new Date(),
+        startParam,
+      ),
       ...(startParam === null ? {} : { tgWebAppStartParam: startParam }),
       // `?mock_tg_version=6.0` imitates an old client (e.g. without BackButton, added in 6.1).
       tgWebAppVersion:
@@ -109,6 +118,9 @@ export function mockTelegram(): void {
           return;
         case 'web_app_request_write_access':
           answerMockWriteAccess(user.tg.id, writeAccessOutcome);
+          return;
+        case 'web_app_send_prepared_message':
+          answerMockPreparedMessage(shareOutcome);
           return;
         default:
           // Other methods (ready, expand, colours…) have no visible effect in the browser.

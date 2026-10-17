@@ -65,3 +65,21 @@ export const CHECKOUT_REFUSAL_TEXTS = {
   other_user: 'Этот счёт выставлен другому пользователю. Откройте оплату в приложении.',
   already_subscribed: 'Подписка уже оформлена.',
 } as const;
+
+/**
+ * Caption of the share message with the stamp card (`savePreparedInlineMessage`, decision 0022);
+ * the client says the same in the `t.me/share/url` fallback (`ru.cooked.share.messageText`).
+ */
+export function shareMessageCaption(share: {
+  newCountry: boolean;
+  countryName: string;
+  dishTitle: string;
+  countriesCount: number;
+  countriesTotal: number;
+}): string {
+  const counter = `${String(share.countriesCount)} из ${String(share.countriesTotal)} стран`;
+  const headline = share.newCountry
+    ? `${share.countryName} в паспорте — уже ${counter}!`
+    : `${share.dishTitle} — блюдо засчитано, уже ${counter}!`;
+  return `${headline} Готовлю ужины из кухонь разных стран и собираю штампы. Присоединяйся — посоревнуемся!`;
+}

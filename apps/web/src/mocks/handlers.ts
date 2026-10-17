@@ -25,6 +25,7 @@ import {
   scaleAmount,
   suggestDishes,
   updateMeRequestSchema,
+  uploadShareCardQuerySchema,
   type AddShoppingResponse,
   type ApiError,
   type ClearShoppingResponse,
@@ -36,6 +37,7 @@ import {
   type CreateInvoiceResponse,
   type UploadCookPhotoResponse,
   type UploadShareCardResponse,
+  type ShareStampResponse,
   type DishPreview,
   type DishResponse,
   type FeedResponse,
@@ -615,12 +617,21 @@ export const createHandlers = (
     },
   ),
 
-  // The share card (task 20 draws it): the server puts it into the public `share` folder.
+  // The share card of a cook: the server puts it into the public `share` folder, one per cook.
   http.post<never, never, UploadShareCardResponse | ApiError>(
     `${apiBase}/uploads/share-card`,
     async ({ request }) => {
       if (controls.delayMs > 0) await delay(controls.delayMs);
-      if (!authenticate(request, db)) return unauthorized();
+      if (takeFailure(controls, 'share_card'))
+        return apiError(500, 'internal', 'Mock error (mock_error=share_card)');
+      const auth = authenticate(request, db);
+      if (!auth) return unauthorized();
+      const query = uploadShareCardQuerySchema.safeParse({
+        cookId: new URL(request.url).searchParams.get('cookId') ?? undefined,
+      });
+      if (!query.success) return apiError(400, 'validation', 'Invalid cook');
+      if (db.shareCardOf(auth[0], query.data.cookId) === undefined)
+        return apiError(404, 'not_found', 'Cook not found');
       let card: FormDataEntryValue | null = null;
       try {
         card = (await request.formData()).get(SHARE_CARD_FIELD);
@@ -631,10 +642,45 @@ export const createHandlers = (
         return apiError(400, 'validation', 'A JPEG card is expected');
       if (card.size === 0 || card.size > SHARE_CARD_MAX_BYTES)
         return apiError(413, 'validation', 'The card is too large');
-      return HttpResponse.json<UploadShareCardResponse>(
-        { url: `/media/share/${crypto.randomUUID()}.jpg` },
-        { status: 201 },
+      const attached = db.attachShareCard(
+        auth[0],
+        query.data.cookId,
+        `/media/share/${crypto.randomUUID()}.jpg`,
+        card,
       );
+      if (!attached) return apiError(404, 'not_found', 'Cook not found');
+      return HttpResponse.json<UploadShareCardResponse>(
+        { url: attached.url },
+        { status: attached.created ? 201 : 200 },
+      );
+    },
+  ),
+
+  // The public `share` folder (nginx in production): the cards uploaded in this page.
+  http.get<{ name: string }>('*/media/share/:name', ({ params }) => {
+    const card = db.shareCardFile(`/media/share/${params.name}`);
+    return card
+      ? new HttpResponse(card, { headers: { 'Content-Type': SHARE_CARD_TYPE } })
+      : new HttpResponse(null, { status: 404 });
+  }),
+
+  // The prepared share message (`savePreparedInlineMessage`) with the card of the cook.
+  http.post<{ cookId: string }, never, ShareStampResponse | ApiError>(
+    `${apiBase}/share/stamp/:cookId`,
+    async ({ request, params }) => {
+      if (controls.delayMs > 0) await delay(controls.delayMs);
+      if (takeFailure(controls, 'share_stamp'))
+        return apiError(500, 'internal', 'Mock error (mock_error=share_stamp)');
+      const auth = authenticate(request, db);
+      if (!auth) return unauthorized();
+      const card = db.shareCardOf(auth[0], params.cookId);
+      if (card === undefined) return apiError(404, 'not_found', 'Cook not found');
+      if (card === null) return apiError(400, 'validation', 'Upload the share card first');
+      if (takeFailure(controls, 'share_unavailable'))
+        return apiError(503, 'unavailable', 'Mock error (mock_error=share_unavailable)');
+      return HttpResponse.json<ShareStampResponse>({
+        preparedMessageId: `mock-prepared-${params.cookId}`,
+      });
     },
   ),
 

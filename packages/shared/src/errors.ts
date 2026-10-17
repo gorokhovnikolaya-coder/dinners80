@@ -9,6 +9,8 @@ export const API_ERROR_CODES = [
   'validation',
   /** The action conflicts with the current state (e.g. a second monthly subscription). */
   'conflict',
+  /** The server cannot do it now (e.g. a share message without the bot settings), HTTP 503. */
+  'unavailable',
   /** Unexpected server error (HTTP 5xx). */
   'internal',
 ] as const;

@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
+import { SHARE_MESSAGE_CAPTION_MAX } from '@tma80/shared';
+
 import { startPayload } from './bot.ts';
 import { webhookSecret } from './secret.ts';
-import { inviteText, paySupportText, termsText } from './texts.ts';
+import {
+  inviteText,
+  paySupportText,
+  shareMessageCaption,
+  termsText,
+} from './texts.ts';
 
 describe('bot texts', () => {
   it('names the inviter', () => {
@@ -48,5 +55,29 @@ describe('webhookSecret', () => {
     expect(secret).not.toBe(webhookSecret('1:abd'));
     expect(secret).toMatch(/^[A-Za-z0-9_-]{1,256}$/);
     expect(secret).not.toContain('abc');
+  });
+});
+
+describe('shareMessageCaption', () => {
+  const share = {
+    countryName: 'Перу',
+    dishTitle: 'Ломо сальтадо',
+    countriesCount: 8,
+    countriesTotal: 30,
+  };
+
+  it('tells about the new country or the counted dish', () => {
+    expect(shareMessageCaption({ ...share, newCountry: true })).toBe(
+      'Перу в паспорте — уже 8 из 30 стран! Готовлю ужины из кухонь разных стран и собираю ' +
+        'штампы. Присоединяйся — посоревнуемся!',
+    );
+    expect(shareMessageCaption({ ...share, newCountry: false })).toMatch(
+      /^Ломо сальтадо — блюдо засчитано, уже 8 из 30 стран! /,
+    );
+  });
+
+  it('fits a photo caption', () => {
+    const long = { ...share, dishTitle: 'Б'.repeat(200), newCountry: false };
+    expect(shareMessageCaption(long).length).toBeLessThanOrEqual(SHARE_MESSAGE_CAPTION_MAX);
   });
 });

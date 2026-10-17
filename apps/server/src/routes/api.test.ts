@@ -1,10 +1,11 @@
 import { randomUUID } from 'node:crypto';
-import { mkdtemp, rm, stat } from 'node:fs/promises';
+import { mkdtemp, readdir, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { asc, eq, inArray } from 'drizzle-orm';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import type { Transformer } from 'grammy';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import {
   COOK_PHOTO_FIELD,
@@ -30,6 +31,7 @@ import {
   shoppingItemSchema,
   shoppingResponseSchema,
   uploadCookPhotoResponseSchema,
+  shareStampResponseSchema,
   uploadShareCardResponseSchema,
   type UserProfile,
 } from '@tma80/shared';
@@ -55,6 +57,22 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('API endpoints', () => {
   const base = 9_000_000_000 + Math.floor(Math.random() * 1_000_000) * 100;
   let next = 0;
   const tgIds: number[] = [];
+  /** Bot API calls of the share route, intercepted instead of the network. */
+  let botCalls: { method: string; payload: Record<string, unknown> }[] = [];
+  let botFailure: string | null = null;
+  const transformer: Transformer = (_prev, method, payload) => {
+    botCalls.push({ method, payload });
+    if (botFailure !== null)
+      return Promise.resolve({ ok: false, error_code: 400, description: botFailure });
+    return Promise.resolve({
+      ok: true,
+      result: { id: `prepared-${String(botCalls.length)}`, expiration_date: 0 } as never,
+    });
+  };
+  const SHARE_LINKS = {
+    webAppUrl: 'https://tma80.example/',
+    miniAppLink: 'https://t.me/tma80_bot/app',
+  };
   /** Published dishes by country, in `sort` order of the countries. */
   let dishesByCountry: { countryId: string; dishIds: string[] }[] = [];
 
@@ -138,6 +156,14 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('API endpoints', () => {
   const errorCode = (response: { json: () => unknown }) =>
     apiErrorSchema.parse(response.json()).error.code;
 
+  /** Records one cook of the dish of the `n`-th country (1-based) through the API; its id. */
+  const cookOnce = async (user: TestUser, n = 1) => {
+    const dishId = dishesByCountry[n - 1]?.dishIds[0] ?? '';
+    const response = await call(user, 'POST', '/cooks', { dishId });
+    expect(response.statusCode).toBe(201);
+    return createCookResponseSchema.parse(response.json()).cookId;
+  };
+
   /** Cooks of the first `n` countries (one dish each), `daysAgo` days ago. */
   const addCooks = async (user: TestUser, n: number, daysAgo = 30) => {
     const rows = dishesByCountry.slice(0, n).map(({ countryId, dishIds }) => ({
@@ -165,6 +191,8 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('API endpoints', () => {
       mediaUrl: '/media',
       mediaDir,
       mediaSigningKey: MEDIA_KEY,
+      apiTransformer: transformer,
+      shareLinks: SHARE_LINKS,
     });
     const rows = await database.db
       .select({ countryId: dishes.countryId, dishId: dishes.id })
@@ -190,6 +218,11 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('API endpoints', () => {
     await app.close();
     await database.pool.end();
     await rm(mediaDir, { recursive: true, force: true });
+  });
+
+  beforeEach(() => {
+    botCalls = [];
+    botFailure = null;
   });
 
   describe('PATCH /me', () => {
@@ -524,20 +557,149 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('API endpoints', () => {
       await uploadPhoto(other);
     });
 
-    it('stores a share card in the public folder and returns its public URL', async () => {
+    it('stores one share card per own cook in the public folder', async () => {
       const user = await newUser();
-      const url = '/uploads/share-card';
+      const other = await newUser();
+      const cookId = await cookOnce(user);
+      const url = `/uploads/share-card?cookId=${cookId}`;
       const response = await upload(user, url, SHARE_CARD_FIELD, jpeg(SHARE_CARD_MAX_BYTES));
       expect(response.statusCode).toBe(201);
       const card = uploadShareCardResponseSchema.parse(response.json()).url;
       expect(card).toMatch(/^\/media\/share\/[0-9a-f-]{36}\.jpg$/);
-      expect((await stat(join(mediaDir, card.slice('/media/'.length)))).size).toBe(
-        SHARE_CARD_MAX_BYTES,
+      const file = join(mediaDir, card.slice('/media/'.length));
+      expect((await stat(file)).size).toBe(SHARE_CARD_MAX_BYTES);
+
+      // A repeated upload for the same cook gets the same card, no new file.
+      const again = await upload(user, url, SHARE_CARD_FIELD, jpeg(500));
+      expect(again.statusCode).toBe(200);
+      expect(uploadShareCardResponseSchema.parse(again.json()).url).toBe(card);
+      expect((await readdir(join(mediaDir, 'share'))).filter((name) => card.endsWith(name))).toHaveLength(1);
+
+      // Parallel uploads of another cook store one card.
+      const second = await cookOnce(user);
+      const parallel = await Promise.all(
+        [1, 2, 3].map(() =>
+          upload(user, `/uploads/share-card?cookId=${second}`, SHARE_CARD_FIELD, jpeg()),
+        ),
       );
+      const urls = new Set(
+        parallel.map((item) => uploadShareCardResponseSchema.parse(item.json()).url),
+      );
+      expect(urls.size).toBe(1);
+
+      // The card was deleted (the worker, after 30 days): a new upload replaces it.
+      await rm(file);
+      const replaced = await upload(user, url, SHARE_CARD_FIELD, jpeg());
+      expect(replaced.statusCode).toBe(201);
+      expect(uploadShareCardResponseSchema.parse(replaced.json()).url).not.toBe(card);
+
+      expect((await upload(other, url, SHARE_CARD_FIELD, jpeg())).statusCode).toBe(404);
+      const noCook = await upload(user, '/uploads/share-card', SHARE_CARD_FIELD, jpeg());
+      expect(noCook.statusCode).toBe(400);
       const large = await upload(user, url, SHARE_CARD_FIELD, jpeg(SHARE_CARD_MAX_BYTES + 1));
       expect(large.statusCode).toBe(413);
       expect((await upload(user, url, COOK_PHOTO_FIELD, jpeg())).statusCode).toBe(400);
       expect((await upload(null, url, SHARE_CARD_FIELD, jpeg())).statusCode).toBe(401);
+    });
+  });
+
+  describe('POST /share/stamp/:cookId', () => {
+    const shareCard = async (user: TestUser, cookId: string) => {
+      const response = await upload(
+        user,
+        `/uploads/share-card?cookId=${cookId}`,
+        SHARE_CARD_FIELD,
+        jpeg(),
+      );
+      return uploadShareCardResponseSchema.parse(response.json()).url;
+    };
+
+    it('prepares a photo message with the card and the invite link of the user', async () => {
+      const user = await newUser();
+      await addCooks(user, 2);
+      const cookId = await cookOnce(user, 3);
+      const card = await shareCard(user, cookId);
+      const response = await call(user, 'POST', `/share/stamp/${cookId}`);
+      expect(response.statusCode).toBe(200);
+      expect(shareStampResponseSchema.parse(response.json()).preparedMessageId).toBe('prepared-1');
+      expect(botCalls).toHaveLength(1);
+      const [prepared] = botCalls;
+      expect(prepared?.method).toBe('savePreparedInlineMessage');
+      const photoUrl = `https://tma80.example${card}`;
+      expect(prepared?.payload).toMatchObject({
+        user_id: user.profile.tgId,
+        allow_user_chats: true,
+        allow_group_chats: true,
+        result: {
+          type: 'photo',
+          id: cookId,
+          photo_url: photoUrl,
+          thumbnail_url: photoUrl,
+          photo_width: 1080,
+          photo_height: 1920,
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  text: 'Открыть',
+                  url: `https://t.me/tma80_bot/app?startapp=${user.profile.inviteCode}`,
+                },
+              ],
+            ],
+          },
+        },
+      });
+      expect(prepared?.payload).not.toHaveProperty('allow_channel_chats');
+      const result = prepared?.payload.result as { caption: string };
+      expect(result.caption).toMatch(/ в паспорте — уже 3 из \d+ стран! /);
+
+      // A repeated dish of the country: no stamp in the caption.
+      const repeat = await cookOnce(user, 3);
+      await shareCard(user, repeat);
+      expect((await call(user, 'POST', `/share/stamp/${repeat}`)).statusCode).toBe(200);
+      const repeated = botCalls[1]?.payload.result as { caption: string };
+      expect(repeated.caption).toMatch(/ — блюдо засчитано, уже 3 из \d+ стран! /);
+    });
+
+    it('needs the own cook with an uploaded card', async () => {
+      const user = await newUser();
+      const other = await newUser();
+      const cookId = await cookOnce(user);
+      expect((await call(user, 'POST', `/share/stamp/${cookId}`)).statusCode).toBe(400);
+      await shareCard(user, cookId);
+      const foreign = await call(other, 'POST', `/share/stamp/${cookId}`);
+      expect(foreign.statusCode).toBe(404);
+      expect((await call(user, 'POST', '/share/stamp/not-a-uuid')).statusCode).toBe(404);
+      expect(botCalls).toEqual([]);
+    });
+
+    it('answers 503 unavailable when the Bot API refuses or the links are not set', async () => {
+      const user = await newUser();
+      const cookId = await cookOnce(user);
+      await shareCard(user, cookId);
+      botFailure = 'Bad Request: wrong file identifier/HTTP URL specified';
+      const refused = await call(user, 'POST', `/share/stamp/${cookId}`);
+      expect(refused.statusCode).toBe(503);
+      expect(errorCode(refused)).toBe('unavailable');
+
+      const bare = buildApp({
+        db: database.db,
+        botToken: TOKEN,
+        mediaDir,
+        mediaSigningKey: MEDIA_KEY,
+        apiTransformer: transformer,
+      });
+      try {
+        const response = await bare.inject({
+          method: 'POST',
+          url: `/api/share/stamp/${cookId}`,
+          headers: user.headers,
+        });
+        expect(response.statusCode).toBe(503);
+        expect(errorCode(response)).toBe('unavailable');
+      } finally {
+        await bare.close();
+      }
     });
   });
 

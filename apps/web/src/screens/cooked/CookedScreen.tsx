@@ -19,6 +19,7 @@ import { vibrateStamp } from '../../telegram/haptics.ts';
 import { useDarkTelegramChrome } from '../../telegram/hooks.ts';
 import { selectAwaitingStamp, stampScreenClosed } from '../cooking/cookingSlice.ts';
 import { compressCookPhoto } from './compress.ts';
+import { ShareSheet } from './ShareSheet.tsx';
 import { stampCountryClass, stampDate } from './stamp.ts';
 
 const t = ru.cooked;
@@ -60,11 +61,13 @@ function StampResult({
   result,
   photoUrl,
   timezone,
+  inviteCode,
 }: {
   dish: DishResponse;
   result: CreateCookResponse;
   photoUrl: string | undefined;
   timezone: string;
+  inviteCode: string;
 }) {
   const navigate = useNavigate();
   const toHome = useCallback(() => {
@@ -72,6 +75,7 @@ function StampResult({
   }, [navigate]);
   const [date] = useState(() => stampDate(new Date(), timezone));
   const heading = useRef<HTMLHeadingElement>(null);
+  const [sharing, setSharing] = useState(false);
   const { newCountry } = result;
 
   useEffect(() => {
@@ -139,8 +143,17 @@ function StampResult({
         )}
       </div>
 
-      {/* «Поделиться карточкой» comes with the share card (task 20). */}
       <div className="mt-auto flex w-full flex-col gap-2.5">
+        <Button
+          variant="inverse"
+          size="lg"
+          fullWidth
+          onClick={() => {
+            setSharing(true);
+          }}
+        >
+          {t.share.button}
+        </Button>
         <Button
           variant="outlineDark"
           size="lg"
@@ -152,6 +165,17 @@ function StampResult({
           {t.openMap}
         </Button>
       </div>
+      <ShareSheet
+        open={sharing}
+        onClose={() => {
+          setSharing(false);
+        }}
+        dish={dish}
+        result={result}
+        photoUrl={photoUrl}
+        stampDate={date}
+        inviteCode={inviteCode}
+      />
     </main>
   );
 }
@@ -160,7 +184,15 @@ function StampResult({
  * The light first step: take a photo (camera or gallery, a plain `input type=file`) or go on
  * without; the photo is compressed and uploaded, then the cook is recorded.
  */
-function Cooked({ dish, timezone }: { dish: DishResponse; timezone: string }) {
+function Cooked({
+  dish,
+  timezone,
+  inviteCode,
+}: {
+  dish: DishResponse;
+  timezone: string;
+  inviteCode: string;
+}) {
   const navigate = useNavigate();
   const onBack = useGoBack(dishPath(dish.id));
   const [phase, setPhase] = useState<Phase>({ kind: 'choose' });
@@ -223,7 +255,13 @@ function Cooked({ dish, timezone }: { dish: DishResponse; timezone: string }) {
 
   if (phase.kind === 'done') {
     return (
-      <StampResult dish={dish} result={phase.result} photoUrl={photoUrl} timezone={timezone} />
+      <StampResult
+        dish={dish}
+        result={phase.result}
+        photoUrl={photoUrl}
+        timezone={timezone}
+        inviteCode={inviteCode}
+      />
     );
   }
 
@@ -387,7 +425,10 @@ export default function CookedScreen() {
   }, [closedDishId, navigate]);
 
   if (!allowed) return <Navigate to={dishPath(id)} replace />;
-  if (data && auth) return <Cooked dish={data} timezone={auth.user.timezone} />;
+  if (data && auth)
+    return (
+      <Cooked dish={data} timezone={auth.user.timezone} inviteCode={auth.user.inviteCode} />
+    );
 
   return (
     <main className="flex min-h-dvh flex-col gap-4 bg-bg px-5 pt-13">

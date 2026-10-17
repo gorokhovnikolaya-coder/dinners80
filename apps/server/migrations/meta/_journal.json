@@ -22,6 +22,13 @@
       "when": 1792218525006,
       "tag": "0002_bot_started",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792224585805,
+      "tag": "0003_share_card",
+      "breakpoints": true
     }
   ]
 }
