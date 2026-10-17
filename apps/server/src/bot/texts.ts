@@ -44,3 +44,24 @@ export function paySupportText(contact: string | null): string {
     ? 'Контакт поддержки по оплате появится до запуска оплаты.'
     : `По вопросам оплаты напишите ${contact} — ответим и при необходимости вернём Stars.`;
 }
+
+/** Invoice of a plan (`createInvoiceLink`): title ≤ 32 and description ≤ 255 characters. */
+export const INVOICE_TEXTS = {
+  month: {
+    title: 'Подписка на месяц',
+    description:
+      'Все страны «Вокруг света за 80 ужинов». Продлевается каждые 30 дней, отключить можно в настройках Telegram.',
+  },
+  year: {
+    title: 'Подписка на год',
+    description:
+      'Все страны «Вокруг света за 80 ужинов» на 365 дней. Разовый платёж без автопродления.',
+  },
+} as const;
+
+/** Why `pre_checkout_query` is refused; Telegram shows the text to the payer. */
+export const CHECKOUT_REFUSAL_TEXTS = {
+  stale: 'Счёт устарел. Откройте оплату в приложении ещё раз.',
+  other_user: 'Этот счёт выставлен другому пользователю. Откройте оплату в приложении.',
+  already_subscribed: 'Подписка уже оформлена.',
+} as const;

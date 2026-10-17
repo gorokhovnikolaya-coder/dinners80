@@ -62,3 +62,70 @@ export const createInvoiceResponseSchema = z.object({
   invoiceLink: z.url({ protocol: /^https$/ }),
 });
 export type CreateInvoiceResponse = z.infer<typeof createInvoiceResponseSchema>;
+
+/** Currency of Telegram Stars in invoices and payments. */
+export const STARS_CURRENCY = 'XTR';
+
+/**
+ * `subscription_period` of the monthly invoice: Telegram allows only 30 days (2592000 s) for Stars
+ * subscriptions.
+ */
+export const SUBSCRIPTION_PERIOD_SECONDS = SUBSCRIPTION_PERIOD_DAYS.month * 24 * 60 * 60;
+
+/** What the bot puts into an invoice (`invoice_payload`): the plan and our user id. */
+export interface InvoicePayload {
+  plan: SubscriptionPlan;
+  userId: string;
+}
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** `invoice_payload` of a plan invoice: `<plan>:<user uuid>` (≤ 128 bytes, decision 0021). */
+export function invoicePayload({ plan, userId }: InvoicePayload): string {
+  return `${plan}:${userId}`;
+}
+
+/** Parses `invoice_payload`; `null` if it is not ours (unknown plan, not a uuid). */
+export function parseInvoicePayload(payload: string): InvoicePayload | null {
+  const [plan, userId, ...rest] = payload.split(':');
+  if (rest.length > 0 || userId === undefined || !UUID_RE.test(userId)) return null;
+  const known = SUBSCRIPTION_PLANS.find((value) => value === plan);
+  return known === undefined ? null : { plan: known, userId: userId.toLowerCase() };
+}
+
+/** The plan with this price in Stars, `null` if none: a fallback for a payment with a foreign payload. */
+export function planByStars(amount: number): SubscriptionPlan | null {
+  return SUBSCRIPTION_PLANS.find((plan) => SUBSCRIPTION_PRICES_STARS[plan] === amount) ?? null;
+}
+
+/**
+ * How far `subscription_expiration_date` may fall short of a full plan period after the start and
+ * still be taken as is: Telegram counts the period from its own charge time, we — from the end of
+ * the previous record, and the two differ by the delivery delay of the update.
+ */
+const EXPIRATION_TOLERANCE_MS = DAY_MS;
+
+/**
+ * The period a `successful_payment` pays for (ТЗ, «Оплата в Stars»): it starts when the active
+ * subscription ends, or now (`subscriptionPeriod`). A monthly payment carries Telegram's
+ * `subscription_expiration_date`, and the period ends then (a renewal thus moves `expires_at` to
+ * Telegram's date). Only when that date is more than a day short of a full period after the start
+ * — the month was stacked after a longer period, e.g. bought during the year — the period is a full
+ * plan period, so a paid month is not cut short.
+ * @param subscriptionExpiration - `subscription_expiration_date` of the payment, `null` if absent.
+ */
+export function paymentPeriod(
+  plan: SubscriptionPlan,
+  currentExpiresAt: string | null,
+  subscriptionExpiration: Date | null,
+  now: Date,
+): { startsAt: Date; expiresAt: Date } {
+  const period = subscriptionPeriod(plan, currentExpiresAt, now);
+  if (
+    subscriptionExpiration !== null &&
+    subscriptionExpiration.getTime() >= period.expiresAt.getTime() - EXPIRATION_TOLERANCE_MS
+  ) {
+    return { startsAt: period.startsAt, expiresAt: subscriptionExpiration };
+  }
+  return period;
+}

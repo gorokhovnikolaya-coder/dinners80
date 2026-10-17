@@ -1,4 +1,5 @@
 import Fastify, { type FastifyInstance, type FastifyServerOptions } from 'fastify';
+import { Api, type Transformer } from 'grammy';
 
 import { registerAuth } from './auth/plugin.ts';
 import { createBot, type BotSettings } from './bot/bot.ts';
@@ -14,6 +15,7 @@ import { friendsRoutes } from './routes/friends.ts';
 import { healthRoutes } from './routes/health.ts';
 import { homeRoutes } from './routes/home.ts';
 import { meRoutes } from './routes/me.ts';
+import { paymentRoutes } from './routes/payments.ts';
 import { shoppingRoutes } from './routes/shopping.ts';
 import { uploadRoutes } from './routes/uploads.ts';
 
@@ -32,6 +34,8 @@ export interface AppDeps {
    * registered.
    */
   bot?: BotSettings;
+  /** Bot API call transformer of the invoice API: tests intercept `createInvoiceLink` with it. */
+  apiTransformer?: Transformer;
   /** Current time; injected in tests. */
   now?: () => Date;
 }
@@ -58,8 +62,19 @@ export function buildApp(deps: AppDeps, options: FastifyServerOptions = {}): Fas
   friendsRoutes(app, routeDeps);
   shoppingRoutes(app, routeDeps);
   uploadRoutes(app, routeDeps);
+  const botApi = new Api(deps.botToken);
+  if (deps.apiTransformer) botApi.config.use(deps.apiTransformer);
+  paymentRoutes(app, { ...routeDeps, botApi });
   if (deps.bot) {
-    const bot = createBot({ ...deps.bot, db: deps.db, token: deps.botToken, now });
+    const bot = createBot({
+      ...deps.bot,
+      db: deps.db,
+      token: deps.botToken,
+      now,
+      log: (message, details) => {
+        app.log.error(details, message);
+      },
+    });
     botWebhookRoutes(app, { bot, botToken: deps.botToken });
   }
   return app;

@@ -17,8 +17,8 @@ const api = new Api(token);
 
 await api.setWebhook(`${publicUrl()}${BOT_WEBHOOK_PATH}`, {
   secret_token: webhookSecret(token),
-  // Payments (`pre_checkout_query`) are added with task 19: run the setup again then.
-  allowed_updates: ['message', 'my_chat_member'],
+  // `successful_payment` and `refunded_payment` come as messages.
+  allowed_updates: ['message', 'my_chat_member', 'pre_checkout_query'],
 });
 await api.setMyCommands([...BOT_COMMANDS]);
 await api.setChatMenuButton({
@@ -26,4 +26,4 @@ await api.setChatMenuButton({
 });
 
 const info = await api.getWebhookInfo();
-console.info(`Webhook: ${info.url ?? "-"} (pending updates: ${String(info.pending_update_count)})`);
+console.info(`Webhook: ${info.url ?? '-'} (pending updates: ${String(info.pending_update_count)})`);

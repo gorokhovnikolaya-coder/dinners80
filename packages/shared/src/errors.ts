@@ -7,6 +7,8 @@ export const API_ERROR_CODES = [
   'rate_limited',
   'not_found',
   'validation',
+  /** The action conflicts with the current state (e.g. a second monthly subscription). */
+  'conflict',
   /** Unexpected server error (HTTP 5xx). */
   'internal',
 ] as const;

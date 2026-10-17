@@ -2,8 +2,10 @@ import { Bot, GrammyError, InlineKeyboard, type Context, type Transformer } from
 import type { UserFromGetMe } from 'grammy/types';
 
 import type { Db } from '../db/client.ts';
+import { checkoutRefusal, markRefunded, recordPayment } from '../db/payments.ts';
 import { setBotCanWrite, startBot, type BotUser } from '../db/users.ts';
 import {
+  CHECKOUT_REFUSAL_TEXTS,
   inviteText,
   OPEN_BUTTON,
   paySupportText,
@@ -27,6 +29,8 @@ export interface BotDeps extends BotSettings {
   db: Db;
   token: string;
   now: () => Date;
+  /** Log of payments that need a human (e.g. a payment of an unknown user). */
+  log?: (message: string, details: Record<string, unknown>) => void;
 }
 
 /** Longest `start` parameter Telegram allows (deep links, `[A-Za-z0-9_-]{1,64}`). */
@@ -50,7 +54,8 @@ const botUserOf = (from: NonNullable<Context['from']>): BotUser => ({
  * The bot (grammY, webhook mode; ТЗ, «Бот»): `/start` with an optional invite code, `/terms`,
  * `/paysupport`, a greeting for any other text, and `bot_can_write` from `/start`,
  * `write_access_allowed` and the blocked / unblocked status. Only private chats are served.
- * Payments (`pre_checkout_query`, `successful_payment`) are added in task 19.
+ * Payments in Stars (decision 0021): `pre_checkout_query` checks the invoice, `successful_payment`
+ * records the subscription, `refunded_payment` ends it; the bot sends nothing after a payment.
  */
 export function createBot(deps: BotDeps): Bot {
   const bot = new Bot(deps.token, deps.botInfo === undefined ? {} : { botInfo: deps.botInfo });
@@ -97,6 +102,30 @@ export function createBot(deps: BotDeps): Bot {
   // The user allowed the bot to write from the mini app (`requestWriteAccess`).
   chat.on('message:write_access_allowed', async (ctx) => {
     await setBotCanWrite(deps.db, ctx.from.id, true);
+  });
+
+  // The payment is confirmed only after `successful_payment`; answer within 10 s.
+  bot.on('pre_checkout_query', async (ctx) => {
+    const refusal = await checkoutRefusal(deps.db, ctx.preCheckoutQuery, deps.now());
+    await (refusal === null
+      ? ctx.answerPreCheckoutQuery(true)
+      : ctx.answerPreCheckoutQuery(false, { error_message: CHECKOUT_REFUSAL_TEXTS[refusal] }));
+  });
+
+  chat.on('message:successful_payment', async (ctx) => {
+    const payment = ctx.message.successful_payment;
+    const result = await recordPayment(deps.db, payment, ctx.from.id, deps.now());
+    if (result.kind === 'unknown_user') {
+      deps.log?.('Payment of an unknown user is not recorded', {
+        tgId: ctx.from.id,
+        chargeId: payment.telegram_payment_charge_id,
+        amount: payment.total_amount,
+      });
+    }
+  });
+
+  chat.on('message:refunded_payment', async (ctx) => {
+    await markRefunded(deps.db, ctx.message.refunded_payment.telegram_payment_charge_id);
   });
 
   chat.on('message:text', async (ctx) => {

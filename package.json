@@ -28,6 +28,7 @@
     "db:reset": "npm run db:reset -w @tma80/server",
     "db:generate": "npm run db:generate -w @tma80/server",
     "bot:setup": "npm run bot:setup -w @tma80/server",
+    "payments:refund": "npm run payments:refund -w @tma80/server --",
     "e2e": "playwright test",
     "db:seed:dev": "npm run db:seed:dev -w @tma80/server"
   },

@@ -5,7 +5,12 @@ import {
   SUBSCRIPTION_PRICES_STARS,
   createInvoiceRequestSchema,
   createInvoiceResponseSchema,
+  SUBSCRIPTION_PERIOD_SECONDS,
+  invoicePayload,
   monthlyPriceStars,
+  parseInvoicePayload,
+  paymentPeriod,
+  planByStars,
   subscriptionPeriod,
 } from './payments.ts';
 
@@ -63,5 +68,79 @@ describe('invoice schemas', () => {
       createInvoiceResponseSchema.safeParse({ invoiceLink: 'javascript:alert(1)' }).success,
     ).toBe(false);
     expect(createInvoiceResponseSchema.safeParse({ invoiceLink: '' }).success).toBe(false);
+  });
+});
+
+describe('invoice payload', () => {
+  const userId = '0b6f3c1e-8a2d-4c5b-9e7f-1a2b3c4d5e6f';
+
+  it('round-trips the plan and the user, within 128 bytes', () => {
+    for (const plan of ['month', 'year'] as const) {
+      const payload = invoicePayload({ plan, userId });
+      expect(payload).toMatch(/^[\x20-\x7e]{1,128}$/); // ASCII: bytes = characters
+      expect(parseInvoicePayload(payload)).toEqual({ plan, userId });
+    }
+    expect(parseInvoicePayload(`year:${userId.toUpperCase()}`)).toEqual({ plan: 'year', userId });
+  });
+
+  it('rejects foreign payloads', () => {
+    for (const payload of [
+      '',
+      'month',
+      `week:${userId}`,
+      'month:not-a-uuid',
+      `month:${userId}:extra`,
+      `:${userId}`,
+    ]) {
+      expect(parseInvoicePayload(payload)).toBeNull();
+    }
+  });
+});
+
+describe('planByStars', () => {
+  it('finds the plan by its price', () => {
+    expect(planByStars(150)).toBe('month');
+    expect(planByStars(1200)).toBe('year');
+    expect(planByStars(1)).toBeNull();
+  });
+});
+
+describe('paymentPeriod', () => {
+  it('is the 30-day Telegram subscription period', () => {
+    expect(SUBSCRIPTION_PERIOD_SECONDS).toBe(2_592_000);
+  });
+
+  it('ends at subscription_expiration_date of a renewal', () => {
+    const currentEnd = new Date(NOW.getTime() + 60_000);
+    const telegramEnd = new Date(currentEnd.getTime() + 30 * DAY_MS + 5_000);
+    expect(paymentPeriod('month', currentEnd.toISOString(), telegramEnd, NOW)).toEqual({
+      startsAt: currentEnd,
+      expiresAt: telegramEnd,
+    });
+  });
+
+  it("takes Telegram's date even a little earlier than a full period after the start", () => {
+    const currentEnd = new Date(NOW.getTime() + 60_000);
+    const telegramEnd = new Date(currentEnd.getTime() + 30 * DAY_MS - 30_000);
+    expect(paymentPeriod('month', currentEnd.toISOString(), telegramEnd, NOW).expiresAt).toEqual(
+      telegramEnd,
+    );
+    expect(
+      paymentPeriod('month', null, new Date(NOW.getTime() + 29 * DAY_MS), NOW).expiresAt,
+    ).toEqual(new Date(NOW.getTime() + 29 * DAY_MS));
+  });
+
+  it('is a full plan period when stacked after a longer one', () => {
+    // A month bought during the year: Telegram's date is long before the year ends.
+    const yearEnd = new Date(NOW.getTime() + 100 * DAY_MS);
+    const telegramEnd = new Date(NOW.getTime() + 30 * DAY_MS);
+    expect(paymentPeriod('month', yearEnd.toISOString(), telegramEnd, NOW)).toEqual({
+      startsAt: yearEnd,
+      expiresAt: new Date(yearEnd.getTime() + 30 * DAY_MS),
+    });
+  });
+
+  it('without subscription_expiration_date is the plan period', () => {
+    expect(paymentPeriod('year', null, null, NOW)).toEqual(subscriptionPeriod('year', null, NOW));
   });
 });
