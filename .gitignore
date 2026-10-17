@@ -8,6 +8,9 @@ coverage/
 .env
 .env.*
 !.env.example
+# прод: доступ к хранилищу бэкапов и локальные копии (deploy/scripts/backup.sh)
+deploy/rclone.conf
+deploy/backups/
 
 # локальные данные сервера (база в Docker, загруженные файлы)
 .data/

@@ -132,3 +132,20 @@ export function miniAppLink(env: Env = process.env): string | null {
   }
   return `${url.origin}${url.pathname.replace(/\/$/, '')}`;
 }
+
+/**
+ * `TRUST_PROXY`: addresses of the reverse proxies whose `X-Forwarded-For` the server trusts
+ * (Fastify `trustProxy`, the syntax of proxy-addr: IPs, CIDRs and the presets `loopback`,
+ * `linklocal`, `uniquelocal`, comma-separated). In production compose it is `uniquelocal`: only
+ * nginx reaches the server over the Docker network, so `request.ip` and the logs show the client
+ * address (decision 0025). Unset — `false`, the proxy headers are ignored. A hop count is not
+ * accepted: Fastify then trusts nobody.
+ */
+export function trustProxy(env: Env = process.env): string | false {
+  const value = optional(env, 'TRUST_PROXY');
+  if (value === null) return false;
+  if (!/^[\w.:/]+(\s*,\s*[\w.:/]+)*$/.test(value) || /^\d+$/.test(value)) {
+    throw new Error('TRUST_PROXY must list proxy addresses, CIDRs or presets (e.g. uniquelocal)');
+  }
+  return value;
+}

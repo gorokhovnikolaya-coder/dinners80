@@ -7,6 +7,7 @@ import {
   mediaUrl,
   miniAppLink,
   supportContact,
+  trustProxy,
   webAppUrl,
 } from './config.ts';
 import { connect } from './db/client.ts';
@@ -31,7 +32,7 @@ const app = buildApp(
           bot: { webAppUrl: appUrl, ...documentLinks(), supportContact: supportContact() },
         }),
   },
-  { logger: true },
+  { logger: true, trustProxy: trustProxy() },
 );
 app.addHook('onClose', () => pool.end());
 if (appUrl === null) app.log.warn('WEBAPP_URL is not set: the bot webhook is disabled');

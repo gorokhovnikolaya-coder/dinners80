@@ -14,7 +14,8 @@
     "db:reset": "node --env-file-if-exists=../../.env seed/reset.ts",
     "db:seed:dev": "node --env-file-if-exists=../../.env seed/devUsers.ts",
     "bot:setup": "node --env-file-if-exists=../../.env src/bot/setup.ts",
-    "payments:refund": "node --env-file-if-exists=../../.env src/bot/refundCli.ts"
+    "payments:refund": "node --env-file-if-exists=../../.env src/bot/refundCli.ts",
+    "metrics": "node --env-file-if-exists=../../.env src/metrics/cli.ts"
   },
   "dependencies": {
     "@fastify/multipart": "^10.1.4",

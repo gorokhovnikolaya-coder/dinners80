@@ -8,6 +8,7 @@ import {
   miniAppLink,
   publicUrl,
   supportContact,
+  trustProxy,
   webAppUrl,
 } from './config.ts';
 
@@ -83,5 +84,22 @@ describe('miniAppLink', () => {
     expect(() => miniAppLink({ MINI_APP_LINK: 'https://t.me/tma80_bot/app?startapp=x' })).toThrow(
       /t\.me/,
     );
+  });
+});
+
+describe('trustProxy', () => {
+  it('is off without TRUST_PROXY', () => {
+    expect(trustProxy({})).toBe(false);
+    expect(trustProxy({ TRUST_PROXY: ' ' })).toBe(false);
+  });
+
+  it('returns the trusted addresses', () => {
+    expect(trustProxy({ TRUST_PROXY: ' uniquelocal ' })).toBe('uniquelocal');
+    expect(trustProxy({ TRUST_PROXY: '10.0.0.0/8, ::1' })).toBe('10.0.0.0/8, ::1');
+  });
+
+  it('rejects a hop count and garbage', () => {
+    expect(() => trustProxy({ TRUST_PROXY: '1' })).toThrow(/TRUST_PROXY/);
+    expect(() => trustProxy({ TRUST_PROXY: 'a b' })).toThrow(/TRUST_PROXY/);
   });
 });

@@ -1,0 +1,83 @@
+# The site of the mini app (ТЗ, «Стек и архитектура»; decision 0025): TLS, the static build,
+# /api/* to the Node server, /media/* files. Rendered by the nginx image with envsubst; only the
+# variables set in the environment are substituted (DOMAIN, MEDIA_SIGNING_KEY), nginx's own
+# $variables stay as they are.
+
+server {
+    listen 80;
+    server_name ${DOMAIN};
+
+    # Certificate renewals (certbot --webroot) keep working over plain HTTP.
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# Requests by IP or by a foreign name get no certificate at all.
+server {
+    listen 443 ssl default_server;
+    ssl_reject_handshake on;
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${DOMAIN};
+
+    ssl_certificate /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    # Server-level headers apply to the locations below that add none of their own. No
+    # X-Frame-Options: Telegram Web opens the mini app in an iframe.
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    root /usr/share/nginx/html;
+
+    # The mini app: client-side routes fall back to index.html, which is never cached.
+    location / {
+        try_files $uri /index.html;
+        expires -1;
+    }
+
+    # Hashed build assets.
+    location /assets/ {
+        try_files $uri =404;
+        expires 1y;
+    }
+
+    # API and the bot webhook. Uploads: a photo ≤ 500 KB, a share card ≤ 2 MB (+ multipart).
+    location /api/ {
+        set $upstream http://server:3080;
+        proxy_pass $upstream;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection "";
+        client_max_body_size 3m;
+        proxy_read_timeout 30s;
+    }
+
+    # Photos of the content: only *.webp, copied into the image (the recipes stay behind the API).
+    location ~ ^/media/content/([A-Za-z0-9_-]+/[A-Za-z0-9_-]+\.webp)$ {
+        alias /usr/share/nginx/content/$1;
+        expires 7d;
+    }
+    location /media/content/ {
+        return 404;
+    }
+
+    # Uploaded photos: /media/cooks/ by a signed link, /media/share/ public (decision 0019).
+    include /etc/nginx/media.conf;
+}

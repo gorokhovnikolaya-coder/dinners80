@@ -1,0 +1,15 @@
+# Bootstrap site (decision 0025): there is no TLS certificate yet, port 80 serves only the ACME
+# HTTP-01 challenge for certbot (deploy/scripts/init-cert.sh). Rendered by the nginx image
+# (envsubst, only DOMAIN is substituted).
+server {
+    listen 80;
+    server_name ${DOMAIN};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 503;
+    }
+}

@@ -119,15 +119,31 @@ export async function seedContent(db: Db, content: Content): Promise<SeedResult>
   });
 }
 
-/** Validates `content/`, warns about missing photos and seeds the database. */
-export async function runSeed(db: Db): Promise<SeedResult> {
+export interface SeedOptions {
+  /**
+   * Fail instead of warning when dish photos are missing: production seeds with
+   * `--require-photos` so dishes never go live without a picture (decision 0025).
+   */
+  requirePhotos?: boolean;
+}
+
+/**
+ * The missing-photo check of the seed: `null` when every photo is in place, otherwise the message.
+ * With `requirePhotos` the seed throws it as a `ContentError`, without — prints it as a warning.
+ */
+export function missingPhotosMessage(missing: readonly string[], total: number): string | null {
+  if (missing.length === 0) return null;
+  const examples = missing.slice(0, 3).join(', ');
+  return `${String(missing.length)} of ${String(total)} dish photos are missing in content/ (${examples}${missing.length > 3 ? ', …' : ''})`;
+}
+
+/** Validates `content/`, checks dish photos and seeds the database. */
+export async function runSeed(db: Db, options: SeedOptions = {}): Promise<SeedResult> {
   const content = await loadContent();
-  const missing = missingPhotos(content.dishes);
-  if (missing.length > 0) {
-    const examples = missing.slice(0, 3).join(', ');
-    console.warn(
-      `Warning: ${String(missing.length)} of ${String(content.dishes.length)} dish photos are missing in content/ (${examples}${missing.length > 3 ? ', …' : ''})`,
-    );
+  const message = missingPhotosMessage(missingPhotos(content.dishes), content.dishes.length);
+  if (message !== null) {
+    if (options.requirePhotos === true) throw new ContentError([message]);
+    console.warn(`Warning: ${message}`);
   }
   const result = await seedContent(db, content);
   console.log(
@@ -153,12 +169,13 @@ export async function runCli(main: () => Promise<void>): Promise<void> {
   }
 }
 
-// `npm run db:seed`
+// `npm run db:seed [-- --require-photos]`
 if (import.meta.main) {
   await runCli(async () => {
+    const requirePhotos = process.argv.slice(2).includes('--require-photos');
     const { db, pool } = connect();
     try {
-      await runSeed(db);
+      await runSeed(db, { requirePhotos });
     } finally {
       await pool.end();
     }

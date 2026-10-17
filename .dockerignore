@@ -1,0 +1,21 @@
+# Build context of deploy/*.Dockerfile is the repository root (decision 0025): only sources go in.
+**/node_modules
+**/dist
+**/.tsbuild
+**/*.tsbuildinfo
+.git
+.claude
+.data
+.playwright-mcp
+.vite
+apps/server/media
+coverage
+docs
+e2e
+playwright-report
+test-results
+# Secrets never reach an image.
+**/.env
+**/.env.*
+deploy/rclone.conf
+deploy/backups

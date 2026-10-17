@@ -29,6 +29,32 @@
 - Осталось / сомнения: …
 ```
 
+### Задача 23a — Закрытый тест: инфраструктура (2026-10-17, ветка task/23-closed-test)
+- Сделано:
+  - Прод-стек `deploy/docker-compose.yml` (проект `tma80-prod`): Postgres с ролью `tma80` без прав суперпользователя (`deploy/postgres/initdb`), сервер, воркер, nginx, certbot.
+  - Образы `deploy/server.Dockerfile` и `deploy/web.Dockerfile`: сборка мини-аппа с `VITE_*`, из контента — только `*.webp`.
+  - nginx: TLS, HTTP/2, HSTS, SPA, `/api`, `/media/content`, `media.conf`; режим ACME, пока нет сертификата.
+  - Скрипты `deploy/scripts/`: `deploy.sh`, `init-cert.sh` (Let's Encrypt, webroot), `backup.sh` / `restore.sh` (pg_dump + фото, rclone, 14 копий), `check-availability.sh`.
+  - Отчёт по метрикам `npm run metrics` (`apps/server/src/metrics/`).
+  - `db:seed -- --require-photos`, `TRUST_PROXY` (Fastify `trustProxy`).
+  - Образец переменных `deploy/env.example`, инструкция `docs/deploy.md`. В ТЗ задача 23 разделена на 23a и 23b.
+- Проверено:
+  - `npm run check` ✓; `npm run test:db` для метрик ✓; `npm run test:nginx` ✓; shellcheck скриптов ✓.
+  - Локально весь стек собран и поднят (проект `tma80-smoke`, самоподписанный сертификат для `localhost`):
+    - режим ACME → после появления сертификата полный сайт;
+    - `check-availability.sh` — все проверки OK; `nginx -t` OK; HTTP/2, gzip, кеш `/assets`, 301 с http;
+    - `ssl_reject_handshake` для чужого имени; фото контента `.webp` отдаётся, `.json` — 404;
+    - `request.ip` за nginx — адрес клиента, подделанный `X-Forwarded-For` не проходит;
+    - миграции и seed ролью `tma80` (таблицы принадлежат ей); `seed --require-photos` без фото падает с кодом 1;
+    - бэкап ×3 с `BACKUP_KEEP=2` (локальный remote rclone) — остаются 2 копии; восстановление из хранилища возвращает базу и фото;
+    - метрики в контейнере.
+  - Выпуск настоящего сертификата не проверен: для `localhost` его не получить.
+- Решения: docs/decisions/0025-production-deploy.md
+- Осталось / сомнения:
+  - Задача 23b — человек (`docs/deploy.md`): VPS, домен и DNS, `deploy/.env`, `rclone.conf` и cron бэкапа, `init-cert.sh`, `bot:setup` в контейнере, проверка доступности из РФ, тестировщики, метрики через 14 дней.
+  - Деплой остановится на seed, пока нет 90 фото блюд.
+  - Образы закреплены на `node:24.22-alpine`, `nginx:1.28-alpine`, `postgres:17-alpine`, `certbot/certbot:v5.1.0`, `rclone/rclone:1.71.2` — обновлять вручную.
+
 ### Задача 22 — Аналитика (2026-10-17, ветка task/22-analytics)
 - Сделано: `POST /api/events` (`routes/events.ts`) — пачка до 50 клиентских событий по zod-схемам из `packages/shared/src/events.ts` (`clientEventSchema`, `eventsRequestSchema`), пользователь из initData, серверное время с сохранением порядка, серверные и неизвестные события → `400`; `cook_finished` пишет сервер в транзакции `POST /cooks`; кнопки бота открывают `WEBAPP_URL?from=menu`, напоминание — `?from=reminder` (`withAppOpenLabel`, `appOpenSource`). Клиент: очередь `api/events.ts` (`track`, пачка через 3 с, сразу при 50, при скрытии страницы; `fetch` с `keepalive`; 5xx/сеть — повтор со следующей пачкой, 4xx — отбрасывается, очередь ≤ 200); события `app_open` (раз за запуск), `onboarding_done`, `suggestions_shown`, `dish_opened` (+`from`), `cook_started`, `share_clicked`, `shopping_added`, `paywall_shown`, `reminder_toggled` в экранах; MSW-обработчик `POST /events` (`?mock_error=events`), `cook_finished` в моке, `window.tma80MockEvents()` для e2e. Тесты: `events.test.ts` (shared — схемы, источник запуска, метка), `api/events.test.ts` (очередь), `profile.test.ts` (`reminderToggledEvent`), `handlers.test.ts` (MSW), `api.test.ts` с базой — основной сценарий и отказы, e2e `analytics.spec.ts` (основной сценарий новичка по приглашению; запуск из напоминания, замок → пейвол, «Показать другие»). AGENTS.md (ключ `events`, мок-события, `bot:setup`), чекбокс ТЗ.
 - Проверено: npm run check ✓ (471 тест, стартовый JS 153.49 kB gzip), npm run test:db ✓ (147 тестов; «Готово» — `POST /events` основного сценария и `cook_finished` видны в таблице `events`), npm run e2e ✓ (82 сценария). Вид экранов не менялся — скриншотов нет.

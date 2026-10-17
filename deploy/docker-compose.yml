@@ -1,0 +1,146 @@
+# Production on the VPS (ТЗ, «Стек и архитектура»; decision 0025): Postgres, the Node server, the
+# worker, nginx with the mini app and certbot. Run from deploy/: variables come from deploy/.env
+# (sample — deploy/env.example), steps — docs/deploy.md. Only nginx publishes ports.
+# The project name differs from the local one (docker-compose.yml in the root, `tma80`).
+name: tma80-prod
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: '5'
+
+x-server-env: &server-env
+  DATABASE_URL: postgres://tma80:${APP_DB_PASSWORD:?set APP_DB_PASSWORD in deploy/.env}@postgres:5432/tma80
+  BOT_TOKEN: ${BOT_TOKEN:?set BOT_TOKEN in deploy/.env}
+  MEDIA_SIGNING_KEY: ${MEDIA_SIGNING_KEY:?set MEDIA_SIGNING_KEY in deploy/.env}
+  MEDIA_DIR: /srv/media
+  MEDIA_URL: /media
+  WEBAPP_URL: https://${DOMAIN:?set DOMAIN in deploy/.env}/
+  PUBLIC_URL: https://${DOMAIN}
+  MINI_APP_LINK: https://t.me/${BOT_USERNAME:?set BOT_USERNAME in deploy/.env}/${APP_SHORT_NAME:?set APP_SHORT_NAME in deploy/.env}
+  TERMS_URL: ${TERMS_URL:-}
+  PRIVACY_URL: ${PRIVACY_URL:-}
+  SUPPORT_CONTACT: ${SUPPORT_CONTACT:-}
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/.env}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d tma80']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    logging: *logging
+
+  server:
+    build:
+      context: ..
+      dockerfile: deploy/server.Dockerfile
+    image: tma80-server
+    restart: unless-stopped
+    environment:
+      <<: *server-env
+      HOST: 0.0.0.0
+      PORT: '3080'
+      # Only nginx reaches the server over the Docker network: request.ip comes from X-Forwarded-For.
+      TRUST_PROXY: uniquelocal
+    volumes:
+      - media:/srv/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3080/api/health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+    logging: *logging
+
+  worker:
+    # The same image as the server (the build is cached).
+    build:
+      context: ..
+      dockerfile: deploy/server.Dockerfile
+    image: tma80-server
+    restart: unless-stopped
+    command: ['node', 'src/worker/index.ts']
+    environment: *server-env
+    volumes:
+      - media:/srv/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+    logging: *logging
+
+  nginx:
+    build:
+      context: ..
+      dockerfile: deploy/web.Dockerfile
+      args:
+        VITE_API_URL: /api
+        VITE_BOT_USERNAME: ${BOT_USERNAME}
+        VITE_APP_SHORT_NAME: ${APP_SHORT_NAME}
+        VITE_TERMS_URL: ${TERMS_URL:-}
+        VITE_PRIVACY_URL: ${PRIVACY_URL:-}
+    image: tma80-nginx
+    restart: unless-stopped
+    # Reload every 6 hours to pick up certificates renewed by certbot. The image entrypoint (templates,
+    # 40-select-site.sh) runs only for an `nginx` command, so the shell calls it itself.
+    command:
+      [
+        '/bin/sh',
+        '-c',
+        'while :; do sleep 6h; nginx -s reload; done & exec /docker-entrypoint.sh nginx -g "daemon off;"',
+      ]
+    environment:
+      DOMAIN: ${DOMAIN}
+      MEDIA_SIGNING_KEY: ${MEDIA_SIGNING_KEY}
+      NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - media:/srv/media:ro
+      - certs:/etc/letsencrypt:ro
+      - acme:/var/www/certbot:ro
+    depends_on:
+      server:
+        condition: service_healthy
+    logging: *logging
+
+  certbot:
+    image: certbot/certbot:v5.1.0
+    restart: unless-stopped
+    # Renews the certificates (HTTP-01 over nginx's /.well-known/acme-challenge/) twice a day;
+    # the first one is issued by deploy/scripts/init-cert.sh.
+    entrypoint:
+      [
+        '/bin/sh',
+        '-c',
+        'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done',
+      ]
+    volumes:
+      - certs:/etc/letsencrypt
+      - acme:/var/www/certbot
+    logging: *logging
+
+volumes:
+  pgdata:
+  media:
+  certs:
+  acme:
