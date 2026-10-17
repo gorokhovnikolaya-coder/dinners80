@@ -360,6 +360,29 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('payments in Stars', () => {
         await preCheckout(user.tgId, invoicePayload({ plan: 'year', userId: user.id }), 1200),
       ).toMatchObject({ ok: true });
     });
+
+    it('lets a month through near the end of the active one: a renewal is never refused', async () => {
+      const user = await newUser();
+      const charge = chargeId();
+      await pay(user, { plan: 'month', chargeId: charge, recurring: 'first' });
+      const month = invoicePayload({ plan: 'month', userId: user.id });
+      const refused = { ok: false, error_message: CHECKOUT_REFUSAL_TEXTS.already_subscribed };
+
+      // Middle of the period: refused.
+      await database.db
+        .update(subscriptions)
+        .set({ expiresAt: new Date(Date.now() + 15 * DAY_MS) })
+        .where(eq(subscriptions.telegramPaymentChargeId, charge));
+      expect(await preCheckout(user.tgId, month, 150)).toMatchObject(refused);
+
+      // A day before the end: accepted (the invoice endpoint still answers 409).
+      await database.db
+        .update(subscriptions)
+        .set({ expiresAt: new Date(Date.now() + DAY_MS) })
+        .where(eq(subscriptions.telegramPaymentChargeId, charge));
+      expect(await preCheckout(user.tgId, month, 150)).toMatchObject({ ok: true });
+      expect((await invoice(user, 'month')).statusCode).toBe(409);
+    });
   });
 
   describe('successful_payment', () => {

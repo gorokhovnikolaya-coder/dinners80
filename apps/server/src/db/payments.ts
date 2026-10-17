@@ -19,8 +19,14 @@ export type SubscriptionRow = typeof subscriptions.$inferSelect;
 /**
  * Whether the user has an active monthly plan: a Telegram Stars subscription that renews itself.
  * A second one would be charged in parallel, so a new monthly invoice is refused (decision 0021).
+ * @param activeAfter - the plan must last beyond this moment (`now` by default).
  */
-export async function hasActiveMonth(db: Executor, userId: string, now: Date): Promise<boolean> {
+export async function hasActiveMonth(
+  db: Executor,
+  userId: string,
+  now: Date,
+  activeAfter: Date = now,
+): Promise<boolean> {
   const [row] = await db
     .select({ id: subscriptions.id })
     .from(subscriptions)
@@ -29,7 +35,7 @@ export async function hasActiveMonth(db: Executor, userId: string, now: Date): P
         eq(subscriptions.userId, userId),
         eq(subscriptions.plan, 'month'),
         eq(subscriptions.status, 'active'),
-        gt(subscriptions.expiresAt, now),
+        gt(subscriptions.expiresAt, activeAfter),
       ),
     )
     .limit(1);
@@ -163,6 +169,12 @@ export async function findPayment(
   return row === undefined ? undefined : { ...row.subscription, tgId: row.tgId };
 }
 
+/**
+ * `pre_checkout_query` refuses a second month only while the active one ends later than this: a
+ * possible pre-checkout of an automatic renewal near the period end is never refused.
+ */
+const RENEWAL_GRACE_MS = 3 * 24 * 60 * 60 * 1000;
+
 /** Why a checkout is refused: the invoice is outdated or foreign, or the month is already paid. */
 export type CheckoutRefusal = 'stale' | 'other_user' | 'already_subscribed';
 
@@ -191,7 +203,10 @@ export async function checkoutRefusal(
     .limit(1);
   if (!user) return 'stale';
   if (user.tgId !== query.from.id) return 'other_user';
-  if (payload.plan === 'month' && (await hasActiveMonth(db, payload.userId, now))) {
+  // Only a month far from its end: should Telegram send a pre-checkout for a renewal at the period
+  // boundary, it must not be refused (decision 0021).
+  const renewalWindow = new Date(now.getTime() + RENEWAL_GRACE_MS);
+  if (payload.plan === 'month' && (await hasActiveMonth(db, payload.userId, now, renewalWindow))) {
     return 'already_subscribed';
   }
   return null;

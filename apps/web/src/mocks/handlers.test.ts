@@ -1,5 +1,6 @@
 import {
   addShoppingResponseSchema,
+  apiErrorSchema,
   authResponseSchema,
   buildShoppingList,
   clearShoppingResponseSchema,
@@ -850,11 +851,26 @@ describe('POST /payments/invoice (MSW) and the mock payment', () => {
     const tgId = TEST_USER_IDS.tenCountriesSubscribed;
     const current = db.getUser(tgId)?.subscription.expiresAt ?? '';
     const { invoiceLink } = createInvoiceResponseSchema.parse(
-      await (await post(tgId, { plan: 'month' })).json(),
+      await (await post(tgId, { plan: 'year' })).json(),
     );
     expect(db.completePayment(slugOf(invoiceLink))?.expiresAt).toBe(
-      new Date(Date.parse(current) + 30 * DAY_MS).toISOString(),
+      new Date(Date.parse(current) + 365 * DAY_MS).toISOString(),
     );
+  });
+
+  it('refuses a second month with 409 conflict while the month is active, like the server', async () => {
+    const db = createMockDb();
+    server.use(...createHandlers(API_BASE, NO_MOCK_CONTROLS, db));
+    expect(db.getUser(TEST_USER_IDS.tenCountriesSubscribed)?.subscription).toMatchObject({
+      active: true,
+      plan: 'month',
+    });
+    const month = await post(TEST_USER_IDS.tenCountriesSubscribed, { plan: 'month' });
+    expect(month.status).toBe(409);
+    expect(apiErrorSchema.parse(await month.json()).error.code).toBe('conflict');
+    expect((await post(TEST_USER_IDS.tenCountriesSubscribed, { plan: 'year' })).status).toBe(201);
+    // The month ended: a new one is allowed.
+    expect((await post(TEST_USER_IDS.tenCountriesFree, { plan: 'month' })).status).toBe(201);
   });
 
   it('keeps the paid subscription through the storage', () => {

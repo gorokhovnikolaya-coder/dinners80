@@ -569,6 +569,16 @@ export const createHandlers = (
       if (!auth) return unauthorized();
       const body = createInvoiceRequestSchema.safeParse(await readJson(request));
       if (!body.success) return apiError(400, 'validation', 'Invalid plan');
+      // Like the server: no second monthly Stars subscription while one is active (decision 0021).
+      const { subscription } = auth[1];
+      if (
+        body.data.plan === 'month' &&
+        subscription.active &&
+        subscription.plan === 'month' &&
+        subscription.expiresAt !== null &&
+        Date.parse(subscription.expiresAt) > Date.now()
+      )
+        return apiError(409, 'conflict', 'The monthly subscription is already active');
       // The server creates the link with `createInvoiceLink` (price from the shared constants);
       // the mock Telegram client «pays» it by the slug (`?mock_invoice=`).
       const slug = db.createInvoice(auth[0], body.data.plan);
