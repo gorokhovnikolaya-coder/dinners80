@@ -6,9 +6,10 @@ import {
   type SuggestionMode,
   type UserProfile,
 } from '@tma80/shared';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 
+import { track } from '../../api/events.ts';
 import { useHomeQuery } from '../../api/home.ts';
 import { useShoppingQuery } from '../../api/shopping.ts';
 import { MainTabBar } from '../../app/MainTabBar.tsx';
@@ -147,13 +148,35 @@ function Suggestions({ data }: { data: HomeResponse }) {
   const open = data.suggestions.filter((card) => !card.locked);
   const locked = data.suggestions.filter((card) => card.locked);
   const [big, ...small] = open;
+  // Positions in the order on the screen: the big card, the small ones, the locked one.
+  const ids = [...open, ...locked].map((card) => card.dishId);
+  const { mode, page } = data;
+  const idsKey = ids.join(',');
+  // `suggestions_shown` once per set on the screen: not again on a refetch with the same cards
+  // (nor on the second effect run of StrictMode — the ref survives it, a new visit does not).
+  const reported = useRef<string | null>(null);
+  useEffect(() => {
+    const key = `${mode}:${String(page)}:${idsKey}`;
+    if (reported.current === key) return;
+    reported.current = key;
+    track({
+      name: 'suggestions_shown',
+      props: { mode, page, dish_ids: idsKey === '' ? [] : idsKey.split(',') },
+    });
+  }, [mode, page, idsKey]);
+  const opened = (dishId: string) => () => {
+    track({
+      name: 'dish_opened',
+      props: { dish_id: dishId, position: ids.indexOf(dishId) + 1, from: 'suggestions' },
+    });
+  };
   return (
     <section aria-label={t.suggestions} className="flex flex-col gap-3">
-      {big && <BigSuggestionCard card={big} />}
+      {big && <BigSuggestionCard card={big} onOpen={opened(big.dishId)} />}
       {small.length + locked.length > 0 && (
         <div className="grid grid-cols-2 gap-3">
           {small.map((card) => (
-            <SmallSuggestionCard key={card.dishId} card={card} />
+            <SmallSuggestionCard key={card.dishId} card={card} onOpen={opened(card.dishId)} />
           ))}
           {locked.map((card) => (
             <LockedSuggestionCard key={card.dishId} card={card} />

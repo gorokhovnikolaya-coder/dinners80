@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useId, useRef } from 'react';
 
+import { track } from '../../api/events.ts';
 import { useUpdateMeMutation } from '../../api/me.ts';
 import { BackNavigation } from '../../components/BackNavigation.tsx';
 import { Button } from '../../components/Button.tsx';
@@ -88,7 +89,21 @@ export default function OnboardingScreen() {
       : draft.customExclusions;
     if (customExclusions === null) return;
     const body = buildOnboardingRequest({ ...draft, customExclusions }, detectTimeZone());
-    if (body) void updateMe(body);
+    if (!body || draft.household === null || draft.weekdayMinutes === null) return;
+    const done = {
+      household: draft.household,
+      weekday_minutes: draft.weekdayMinutes,
+      exclusions: body.exclusions ?? [],
+      custom_exclusions: body.customExclusions?.length ?? 0,
+    };
+    updateMe(body)
+      .unwrap()
+      .then(() => {
+        track({ name: 'onboarding_done', props: done });
+      })
+      .catch(() => {
+        // The error state of the mutation shows the failure.
+      });
   };
 
   return (

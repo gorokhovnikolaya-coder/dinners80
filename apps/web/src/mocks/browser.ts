@@ -8,8 +8,11 @@ import {
   type MockWriteAccessDetail,
 } from '../telegram/mock/writeAccess.ts';
 import { parseMockControls, takeFailure } from './controls.ts';
-import { createMockDb, sessionMockDbStorage } from './db.ts';
+import { createMockDb, sessionMockDbStorage, type MockEvent } from './db.ts';
 import { createHandlers } from './handlers.ts';
+
+/** The window with the analytics events of the mock backend (e2e reads them). */
+export type MockEventsWindow = Window & { tma80MockEvents?: () => readonly MockEvent[] };
 
 /** sessionStorage key of the mock backend state (users changed by `PATCH /me`). */
 const DB_STORAGE_KEY = 'tma80:mock-db';
@@ -40,6 +43,8 @@ export async function startMockApi(): Promise<void> {
   window.addEventListener(MOCK_WRITE_ACCESS_EVENT, (event) => {
     db.allowWriteAccess((event as CustomEvent<MockWriteAccessDetail>).detail.tgId);
   });
+  // The `events` table of the mock backend, for e2e checks: `window.tma80MockEvents()`.
+  (window as MockEventsWindow).tma80MockEvents = db.listEvents;
   const controls = parseMockControls(search);
   const worker = setupWorker(
     ...createHandlers(apiBase, controls, db),

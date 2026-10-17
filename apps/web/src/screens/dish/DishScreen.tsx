@@ -8,6 +8,7 @@ import {
   useAddToShoppingMutation,
   useDishQuery,
 } from '../../api/dishes.ts';
+import { track } from '../../api/events.ts';
 import { cookingPath, paywallPath, ROUTES } from '../../app/routes.ts';
 import { useGoBack } from '../../app/useGoBack.ts';
 import { BackNavigation } from '../../components/BackNavigation.tsx';
@@ -136,6 +137,7 @@ function DishCard({ dish, servings }: { dish: DishResponse; servings: number }) 
       .unwrap()
       .then(({ added }) => {
         setNotice({ kind: 'added', count: added });
+        track({ name: 'shopping_added', props: { dish_id: dish.id, items: added } });
       })
       .catch(() => {
         setNotice({ kind: 'error' });
@@ -243,6 +245,7 @@ function DishCard({ dish, servings }: { dish: DishResponse; servings: number }) 
             size="lg"
             fullWidth
             onClick={() => {
+              track({ name: 'cook_started', props: { dish_id: dish.id, servings } });
               void navigate(cookingPath(dish.id));
             }}
           >

@@ -18,6 +18,7 @@ import { meRoutes } from './routes/me.ts';
 import { paymentRoutes } from './routes/payments.ts';
 import { shareRoutes, type ShareLinks } from './routes/share.ts';
 import { shoppingRoutes } from './routes/shopping.ts';
+import { eventRoutes } from './routes/events.ts';
 import { uploadRoutes } from './routes/uploads.ts';
 
 export interface AppDeps {
@@ -69,6 +70,7 @@ export function buildApp(deps: AppDeps, options: FastifyServerOptions = {}): Fas
   friendsRoutes(app, routeDeps);
   shoppingRoutes(app, routeDeps);
   uploadRoutes(app, routeDeps);
+  eventRoutes(app, routeDeps);
   const botApi = new Api(deps.botToken);
   if (deps.apiTransformer) botApi.config.use(deps.apiTransformer);
   paymentRoutes(app, { ...routeDeps, botApi });

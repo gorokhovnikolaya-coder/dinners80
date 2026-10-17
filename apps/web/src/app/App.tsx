@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
 
 import { useAuthQuery } from '../api/auth.ts';
+import { trackAppOpen } from '../api/events.ts';
 import { ErrorState } from '../components/ErrorState.tsx';
 import { Skeleton, SkeletonGroup } from '../components/Skeleton.tsx';
 import { ru } from '../i18n/ru.ts';
@@ -104,6 +106,11 @@ const DevUiPage = import.meta.env.DEV
  */
 function AuthenticatedApp() {
   const { data, isFetching, isError, refetch } = useAuthQuery(undefined);
+  const signedIn = data !== undefined;
+  // `app_open` after the sign-in: `POST /events` needs the user created by `POST /auth`.
+  useEffect(() => {
+    if (signedIn) trackAppOpen();
+  }, [signedIn]);
 
   // `isFetching` (not only `isLoading`) so a retry after an error shows the loading state too.
   if (isFetching && !data) return <ScreenSkeleton />;

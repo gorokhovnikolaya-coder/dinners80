@@ -1,7 +1,7 @@
 import { and, eq, inArray, isNull, ne, or } from 'drizzle-orm';
 import { GrammyError, HttpError, InlineKeyboard, type Api } from 'grammy';
 
-import { absoluteMediaUrl, dueReminderDate, suggestDishes } from '@tma80/shared';
+import { absoluteMediaUrl, dueReminderDate, suggestDishes, withAppOpenLabel } from '@tma80/shared';
 
 import {
   OPEN_BUTTON,
@@ -116,7 +116,11 @@ async function sendReminder(
   chatId: number,
   message: ReminderMessage,
 ): Promise<void> {
-  const reply_markup = new InlineKeyboard().webApp(OPEN_BUTTON, deps.webAppUrl);
+  // `?from=reminder`: the source of `app_open` (decision 0024).
+  const reply_markup = new InlineKeyboard().webApp(
+    OPEN_BUTTON,
+    withAppOpenLabel(deps.webAppUrl, 'reminder'),
+  );
   const { photoUrl } = message;
   if (photoUrl !== null) {
     try {

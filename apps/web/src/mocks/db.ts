@@ -79,6 +79,14 @@ const isShoppingItem = (value: unknown): value is MockShoppingItem => {
   );
 };
 
+/** A row of the `events` table in the mock backend. */
+export interface MockEvent {
+  tgId: number;
+  name: string;
+  props: Record<string, unknown>;
+  createdAt: string;
+}
+
 /** Where changed users are kept between page loads (sessionStorage in the browser). */
 export interface MockDbStorage {
   load(): unknown;
@@ -140,6 +148,8 @@ export function createMockDb(storage?: MockDbStorage) {
   const shareCards = new Map<string, string>();
   /** The pictures of the share cards by URL, served as the public `share` folder. */
   const shareCardFiles = new Map<string, Blob>();
+  /** The `events` table: analytics events as stored, oldest first; they live as long as the page. */
+  const events: MockEvent[] = [];
 
   const persist = () => {
     storage?.save(Object.fromEntries(changed));
@@ -152,7 +162,9 @@ export function createMockDb(storage?: MockDbStorage) {
     const profile = stored ? applyProfilePatch(fixture.profile, stored.patch) : fixture.profile;
     return {
       profile:
-        stored?.botCanWrite === undefined ? profile : { ...profile, botCanWrite: stored.botCanWrite },
+        stored?.botCanWrite === undefined
+          ? profile
+          : { ...profile, botCanWrite: stored.botCanWrite },
       onboarded: stored?.onboarded ?? fixture.onboarded,
       subscription: stored?.subscription ?? fixture.subscription,
       cooks: [
@@ -374,8 +386,20 @@ export function createMockDb(storage?: MockDbStorage) {
     return shareCards.get(cookId) ?? null;
   };
 
+  /** Stores analytics events of the user (`POST /events`, `cook_finished` of `POST /cooks`). */
+  const recordEvents = (tgId: number, batch: readonly Omit<MockEvent, 'tgId' | 'createdAt'>[]) => {
+    const createdAt = new Date().toISOString();
+    for (const event of batch)
+      events.push({ tgId, name: event.name, props: event.props, createdAt });
+  };
+
+  /** The stored analytics events, oldest first. */
+  const listEvents = (): readonly MockEvent[] => events;
+
   return {
     getUser,
+    recordEvents,
+    listEvents,
     updateUser,
     attachShareCard,
     shareCardFile,

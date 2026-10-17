@@ -10,6 +10,7 @@ import { Navigate, useNavigate, useSearchParams } from 'react-router';
 
 import { api } from '../../api/api.ts';
 import { authApi, useAuthQuery } from '../../api/auth.ts';
+import { track } from '../../api/events.ts';
 import { isNotFound, paywallPreview, useDishQuery } from '../../api/dishes.ts';
 import { useMapQuery } from '../../api/map.ts';
 import { useCreateInvoiceMutation } from '../../api/payments.ts';
@@ -250,9 +251,25 @@ export default function PaywallScreen() {
     }
   }, [createInvoice, plan, confirm]);
 
+  const dishFailed = dish.isError && !preview && !isNotFound(dish.error);
+  // `paywall_shown` once per visit, when the plans are on the screen (not the active subscription).
+  const plansShown =
+    !(dish.data && dishId !== null) &&
+    !map.isError &&
+    !dishFailed &&
+    map.data !== undefined &&
+    auth !== undefined &&
+    !auth.subscription.active &&
+    !(dishId !== null && dish.isLoading);
+  const paywallReported = useRef(false);
+  useEffect(() => {
+    if (!plansShown || paywallReported.current) return;
+    paywallReported.current = true;
+    track({ name: 'paywall_shown', props: { reason: dishId === null ? 'profile' : 'country_11' } });
+  }, [plansShown, dishId]);
+
   if (dish.data && dishId !== null) return <Navigate to={dishPath(dishId)} replace />;
 
-  const dishFailed = dish.isError && !preview && !isNotFound(dish.error);
   if (map.isError || dishFailed) {
     return (
       <main className={screenClass}>

@@ -126,7 +126,7 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('worker', () => {
       /^Идея ужина на сегодня — .+ \(.+\), \d+ мин\. Рецепт по шагам — в приложении\.$/,
     );
     expect(call?.payload.reply_markup).toEqual({
-      inline_keyboard: [[{ text: 'Открыть', web_app: { url: WEBAPP_URL } }]],
+      inline_keyboard: [[{ text: 'Открыть', web_app: { url: `${WEBAPP_URL}?from=reminder` } }]],
     });
     expect((await userRow(user.id))?.reminderSentOn).toBe('2026-10-16');
 

@@ -10,6 +10,7 @@ import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react'
 import { useLocation, useNavigate } from 'react-router';
 
 import { useAuthQuery } from '../../api/auth.ts';
+import { track } from '../../api/events.ts';
 import { meApi } from '../../api/me.ts';
 import { useMapQuery } from '../../api/map.ts';
 import { PROFILE_EXCLUSIONS_ID, ROUTES } from '../../app/routes.ts';
@@ -37,6 +38,7 @@ import { detectTimeZone } from '../onboarding/onboarding.ts';
 import { createAutosave } from './autosave.ts';
 import {
   documentLinks,
+  reminderToggledEvent,
   exclusionsPatch,
   reminderView,
   subscriptionView,
@@ -214,7 +216,9 @@ export default function ProfileScreen() {
     createAutosave(async (patch: UpdateMeRequest) => {
       const request = dispatch(meApi.endpoints.updateMe.initiate(patch));
       try {
-        await request.unwrap();
+        const { user: saved } = await request.unwrap();
+        const event = reminderToggledEvent(patch, saved);
+        if (event) track(event);
       } finally {
         // The result is in the auth cache now; drop the mutation entry from the store.
         request.reset();

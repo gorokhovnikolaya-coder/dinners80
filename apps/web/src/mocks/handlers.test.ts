@@ -720,8 +720,7 @@ describe('share card and message (MSW)', () => {
       body: form,
     });
   };
-  const stamp = (id: string) =>
-    fetch(`${API_BASE}/share/stamp/${id}`, { method: 'POST', headers });
+  const stamp = (id: string) => fetch(`${API_BASE}/share/stamp/${id}`, { method: 'POST', headers });
   const jpeg = (size: number) => new Blob([new Uint8Array(size)], { type: 'image/jpeg' });
 
   it('needs an upload before the message, then keeps one card per cook', async () => {
@@ -750,9 +749,7 @@ describe('share card and message (MSW)', () => {
   });
 
   it('answers 503 unavailable with mock_error=share_unavailable', async () => {
-    server.use(
-      ...createHandlers(API_BASE, parseMockControls('?mock_error=share_unavailable'), db),
-    );
+    server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=share_unavailable'), db));
     expect((await upload(jpeg(10))).status).toBeLessThan(300);
     const response = await stamp(cookId);
     expect(response.status).toBe(503);
@@ -937,5 +934,54 @@ describe('POST /payments/invoice (MSW) and the mock payment', () => {
     server.use(...createHandlers(API_BASE, parseMockControls('?mock_error=invoice')));
     expect((await post(TEST_USER_IDS.tenCountriesFree, { plan: 'year' })).status).toBe(500);
     expect((await post(TEST_USER_IDS.tenCountriesFree, { plan: 'year' })).status).toBe(201);
+  });
+});
+
+describe('POST /events (MSW)', () => {
+  const post = (tgId: number | null, body: unknown) =>
+    fetch(`${API_BASE}/events`, {
+      method: 'POST',
+      headers: {
+        ...(tgId === null ? {} : { Authorization: `tma ${initDataOf(tgId)}` }),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+  it('stores a batch like the server, with cook_finished from POST /cooks', async () => {
+    const db = createMockDb();
+    server.use(...createHandlers(API_BASE, NO_MOCK_CONTROLS, db));
+    const tgId = TEST_USER_IDS.eightCountries;
+    const response = await post(tgId, {
+      events: [
+        { name: 'app_open', props: { source: 'menu' } },
+        { name: 'cook_started', props: { dish_id: 'in-dal', servings: 2 } },
+      ],
+    });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ stored: 2 });
+    recordCook(db, tgId, { dishId: 'in-dal' });
+    expect(db.listEvents().map(({ tgId: id, name, props }) => ({ id, name, props }))).toEqual([
+      { id: tgId, name: 'app_open', props: { source: 'menu' } },
+      { id: tgId, name: 'cook_started', props: { dish_id: 'in-dal', servings: 2 } },
+      {
+        id: tgId,
+        name: 'cook_finished',
+        props: { dish_id: 'in-dal', new_country: true, has_photo: false },
+      },
+    ]);
+  });
+
+  it('rejects server-side events and needs the user', async () => {
+    const db = createMockDb();
+    server.use(...createHandlers(API_BASE, NO_MOCK_CONTROLS, db));
+    const rejected = await post(TEST_USER_IDS.eightCountries, {
+      events: [{ name: 'payment_success', props: {} }],
+    });
+    expect(rejected.status).toBe(400);
+    expect(
+      (await post(null, { events: [{ name: 'app_open', props: { source: 'link' } }] })).status,
+    ).toBe(401);
+    expect(db.listEvents()).toEqual([]);
   });
 });

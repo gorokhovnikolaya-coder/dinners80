@@ -8,6 +8,7 @@ import {
   SHARE_CARD_TYPE,
   COOKS_PER_DAY_LIMIT,
   addShoppingRequestSchema,
+  eventsRequestSchema,
   buildLeaderboard,
   updateShoppingItemRequestSchema,
   buildPassport,
@@ -27,6 +28,7 @@ import {
   updateMeRequestSchema,
   uploadShareCardQuerySchema,
   type AddShoppingResponse,
+  type EventsResponse,
   type ApiError,
   type ClearShoppingResponse,
   type ShoppingItem,
@@ -307,6 +309,13 @@ export const recordCook = (
   const after = countryCount([...user.cooks, dish]);
   const cook = db.addCook(tgId, { dishId: dish.id, countryId: dish.countryId, photoPath }, now);
   if (!cook) return { kind: 'notFound' };
+  // Like the server: `cook_finished` is written with the cook (decision 0024).
+  db.recordEvents(tgId, [
+    {
+      name: 'cook_finished',
+      props: { dish_id: dish.id, new_country: after > before, has_photo: photoPath !== null },
+    },
+  ]);
   const friends = friendsOf(db, tgId).map((friend) => ({
     name: friend.profile.firstName,
     countries: countryCount(friend.cooks),
@@ -560,6 +569,18 @@ export const createHandlers = (
       return HttpResponse.json<AddShoppingResponse>({ added }, { status: 201 });
     },
   ),
+
+  http.post<never, never, EventsResponse | ApiError>(`${apiBase}/events`, async ({ request }) => {
+    if (controls.delayMs > 0) await delay(controls.delayMs);
+    if (takeFailure(controls, 'events'))
+      return apiError(500, 'internal', 'Mock error (mock_error=events)');
+    const auth = authenticate(request, db);
+    if (!auth) return unauthorized();
+    const body = eventsRequestSchema.safeParse(await readJson(request));
+    if (!body.success) return apiError(400, 'validation', 'Invalid events');
+    db.recordEvents(auth[0], body.data.events);
+    return HttpResponse.json<EventsResponse>({ stored: body.data.events.length });
+  }),
 
   http.post<never, never, CreateInvoiceResponse | ApiError>(
     `${apiBase}/payments/invoice`,

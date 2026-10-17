@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
 import { useAuthQuery } from '../../api/auth.ts';
+import { track } from '../../api/events.ts';
 import { useMapQuery } from '../../api/map.ts';
 import { dishPath, paywallPath, ROUTES } from '../../app/routes.ts';
 import { useGoBack } from '../../app/useGoBack.ts';
@@ -47,6 +48,16 @@ function DishRow({ dish, locked }: { dish: MapDish; locked: boolean }) {
     <li>
       <Link
         to={locked ? paywallPath(dish.dishId) : dishPath(dish.dishId)}
+        onClick={
+          locked
+            ? undefined
+            : () => {
+                track({
+                  name: 'dish_opened',
+                  props: { dish_id: dish.dishId, position: null, from: 'map' },
+                });
+              }
+        }
         className="flex min-h-22 items-center gap-3 rounded-card bg-surface p-3 text-ink no-underline shadow-card transition-transform active:scale-[0.99]"
       >
         <DishPhoto url={dish.imageUrl} className="size-16 overflow-hidden rounded-tile">

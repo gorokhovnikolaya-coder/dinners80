@@ -9,7 +9,7 @@ import {
 
 import type { Db } from './client.ts';
 import type { PublishedDish } from './content.ts';
-import { cooks, countries, dishes, friendships, users } from './schema.ts';
+import { cooks, countries, dishes, events, friendships, users } from './schema.ts';
 import type { Executor } from './users.ts';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -136,7 +136,7 @@ export type RecordCookResult =
 /**
  * `POST /cooks` in one transaction, serialised per user by an advisory lock so parallel requests
  * cannot pass the daily limit: at most `COOKS_PER_DAY_LIMIT` cooks in 24 hours, access by
- * `has_access`, then the cook, the counters after it and the friend overtaken (ТЗ, «Обогнал друга»).
+ * `has_access`, then the cook with its `cook_finished` event, the counters after it and the friend overtaken (ТЗ, «Обогнал друга»).
  * @param photoPath - `{user_id}/{uuid}.jpg` in the private `cooks` folder, or `null`.
  */
 export async function recordCook(
@@ -162,6 +162,15 @@ export async function recordCook(
       .returning({ id: cooks.id });
     if (!cook) throw new Error('cook insert returned no row');
     const after = (await countersOf(tx, [userId])).get(userId) ?? before;
+    const newCountry = after.countries > before.countries;
+    // `cook_finished` is written by the server with the cook (decision 0024): `has_photo` is the
+    // photo at this moment, a photo added later by `PATCH /cooks/:id` does not change it.
+    await tx.insert(events).values({
+      userId,
+      name: 'cook_finished',
+      props: { dish_id: dish.id, new_country: newCountry, has_photo: photoPath !== null },
+      createdAt: now,
+    });
 
     const friends = await friendsOf(tx, userId);
     const friendCounters = await countersOf(
@@ -180,7 +189,7 @@ export async function recordCook(
       kind: 'ok',
       result: {
         cookId: cook.id,
-        newCountry: after.countries > before.countries,
+        newCountry,
         countriesCount: after.countries,
         countriesTotal: await publishedCountriesCount(tx),
         dishesCount: after.dishes,

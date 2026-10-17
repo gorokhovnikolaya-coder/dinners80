@@ -245,7 +245,7 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('POST /api/bot/webhook', () =
           chat_id: tgId,
           text: START_TEXT,
           reply_markup: {
-            inline_keyboard: [[{ text: 'Открыть', web_app: { url: WEBAPP_URL } }]],
+            inline_keyboard: [[{ text: 'Открыть', web_app: { url: `${WEBAPP_URL}?from=menu` } }]],
           },
         }) as unknown,
       },
@@ -346,7 +346,10 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('POST /api/bot/webhook', () =
     expect(sent().map((call) => [call.payload.text, call.payload.reply_markup])).toEqual([
       ['Условия использования: https://example.com/terms', undefined],
       ['По вопросам оплаты напишите @help — ответим и при необходимости вернём Stars.', undefined],
-      [START_TEXT, { inline_keyboard: [[{ text: 'Открыть', web_app: { url: WEBAPP_URL } }]] }],
+      [
+        START_TEXT,
+        { inline_keyboard: [[{ text: 'Открыть', web_app: { url: `${WEBAPP_URL}?from=menu` } }]] },
+      ],
     ]);
     // Other commands and texts do not create users.
     expect(await userByTgId(tgId)).toBeUndefined();

@@ -1,5 +1,7 @@
 import { Api } from 'grammy';
 
+import { withAppOpenLabel } from '@tma80/shared';
+
 import { botToken, publicUrl, webAppUrl } from '../config.ts';
 import { BOT_WEBHOOK_PATH } from '../routes/botWebhook.ts';
 import { webhookSecret } from './secret.ts';
@@ -22,7 +24,11 @@ await api.setWebhook(`${publicUrl()}${BOT_WEBHOOK_PATH}`, {
 });
 await api.setMyCommands([...BOT_COMMANDS]);
 await api.setChatMenuButton({
-  menu_button: { type: 'web_app', text: OPEN_BUTTON, web_app: { url: appUrl } },
+  menu_button: {
+    type: 'web_app',
+    text: OPEN_BUTTON,
+    web_app: { url: withAppOpenLabel(appUrl, 'menu') },
+  },
 });
 
 const info = await api.getWebhookInfo();

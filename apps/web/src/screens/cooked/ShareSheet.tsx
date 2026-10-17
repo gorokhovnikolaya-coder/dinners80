@@ -2,6 +2,7 @@ import { absoluteMediaUrl, type CreateCookResponse, type DishResponse } from '@t
 import { useEffect, useId, useRef, useState } from 'react';
 
 import { errorStatus } from '../../api/cooks.ts';
+import { track } from '../../api/events.ts';
 import { usePrepareShareStampMutation, useUploadShareCardMutation } from '../../api/share.ts';
 import { Button } from '../../components/Button.tsx';
 import { ru } from '../../i18n/ru.ts';
@@ -84,6 +85,8 @@ export function ShareSheet({
 
   const share = async (channel: Channel) => {
     if (busy) return;
+    // Every tap of a channel, the `t.me/share/url` fallback included (decision 0024).
+    track({ name: 'share_clicked', props: { channel } });
     setFailed(null);
     if (channel === 'chat' && !canShareMessage()) {
       onClose();

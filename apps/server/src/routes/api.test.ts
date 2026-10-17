@@ -18,6 +18,7 @@ import {
   authResponseSchema,
   clearShoppingResponseSchema,
   createCookResponseSchema,
+  eventsResponseSchema,
   dishResponseSchema,
   feedResponseSchema,
   homeResponseSchema,
@@ -39,7 +40,15 @@ import {
 import { buildApp } from '../app.ts';
 import { signInitData } from '../auth/initData.ts';
 import { connect, type Database } from '../db/client.ts';
-import { cooks, countries, dishes, friendships, subscriptions, users } from '../db/schema.ts';
+import {
+  cooks,
+  countries,
+  dishes,
+  events,
+  friendships,
+  subscriptions,
+  users,
+} from '../db/schema.ts';
 import { secureLinkHash } from '../media/signedLink.ts';
 
 /**
@@ -213,7 +222,11 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('API endpoints', () => {
       .from(users)
       .where(inArray(users.tgId, tgIds));
     const ids = created.map((row) => row.id);
-    if (ids.length > 0) await database.db.delete(users).where(inArray(users.id, ids));
+    if (ids.length > 0) {
+      // `events.user_id` is `on delete set null`: the test events go explicitly.
+      await database.db.delete(events).where(inArray(events.userId, ids));
+      await database.db.delete(users).where(inArray(users.id, ids));
+    }
     dishesByCountry = [];
     await app.close();
     await database.pool.end();
@@ -573,7 +586,9 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('API endpoints', () => {
       const again = await upload(user, url, SHARE_CARD_FIELD, jpeg(500));
       expect(again.statusCode).toBe(200);
       expect(uploadShareCardResponseSchema.parse(again.json()).url).toBe(card);
-      expect((await readdir(join(mediaDir, 'share'))).filter((name) => card.endsWith(name))).toHaveLength(1);
+      expect(
+        (await readdir(join(mediaDir, 'share'))).filter((name) => card.endsWith(name)),
+      ).toHaveLength(1);
 
       // Parallel uploads of another cook store one card.
       const second = await cookOnce(user);
@@ -810,6 +825,96 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('API endpoints', () => {
       });
       expect(closed.statusCode).toBe(403);
       expect(errorCode(closed)).toBe('paywall');
+    });
+  });
+  describe('POST /events', () => {
+    const eventsOf = async (user: TestUser) =>
+      database.db
+        .select({ name: events.name, props: events.props })
+        .from(events)
+        .where(eq(events.userId, user.profile.id))
+        .orderBy(asc(events.createdAt));
+
+    it('stores the events of the main scenario in the table, with cook_finished from the server', async () => {
+      const user = await newUser();
+      const dishId = dishesByCountry[0]?.dishIds[0] ?? '';
+      const batch = (list: object[]) => call(user, 'POST', '/events', { events: list });
+
+      const first = await batch([
+        { name: 'app_open', props: { source: 'menu' } },
+        {
+          name: 'onboarding_done',
+          props: { household: 'couple', weekday_minutes: 30, exclusions: [], custom_exclusions: 0 },
+        },
+        { name: 'suggestions_shown', props: { mode: 'weekday', page: 0, dish_ids: [dishId] } },
+        { name: 'dish_opened', props: { dish_id: dishId, position: 1, from: 'suggestions' } },
+        { name: 'shopping_added', props: { dish_id: dishId, items: 4 } },
+        { name: 'cook_started', props: { dish_id: dishId, servings: 2 } },
+      ]);
+      expect(first.statusCode).toBe(200);
+      expect(eventsResponseSchema.parse(first.json())).toEqual({ stored: 6 });
+      await uploadPhoto(user).then((photoPath) =>
+        call(user, 'POST', '/cooks', { dishId, photoPath }),
+      );
+      await batch([
+        { name: 'share_clicked', props: { channel: 'story' } },
+        { name: 'paywall_shown', props: { reason: 'profile' } },
+        { name: 'reminder_toggled', props: { enabled: true, time: '19:00' } },
+      ]);
+
+      const stored = await eventsOf(user);
+      expect(stored.map((event) => event.name)).toEqual([
+        'app_open',
+        'onboarding_done',
+        'suggestions_shown',
+        'dish_opened',
+        'shopping_added',
+        'cook_started',
+        'cook_finished',
+        'share_clicked',
+        'paywall_shown',
+        'reminder_toggled',
+      ]);
+      expect(stored.find((event) => event.name === 'cook_finished')?.props).toEqual({
+        dish_id: dishId,
+        new_country: true,
+        has_photo: true,
+      });
+      await call(user, 'POST', '/cooks', { dishId });
+      expect((await eventsOf(user)).at(-1)?.props).toEqual({
+        dish_id: dishId,
+        new_country: false,
+        has_photo: false,
+      });
+    });
+
+    it('rejects server-side, unknown and malformed events without storing any of the batch', async () => {
+      const user = await newUser();
+      for (const list of [
+        [],
+        [
+          {
+            name: 'payment_success',
+            props: { plan: 'year', stars_amount: 1, is_recurring: false },
+          },
+        ],
+        [
+          { name: 'app_open', props: { source: 'menu' } },
+          { name: 'whatever', props: {} },
+        ],
+        [{ name: 'cook_started', props: { dish_id: 'x', servings: 99 } }],
+      ]) {
+        const response = await call(user, 'POST', '/events', { events: list });
+        expect(response.statusCode).toBe(400);
+        expect(errorCode(response)).toBe('validation');
+      }
+      expect(await eventsOf(user)).toEqual([]);
+      const anonymous = await app.inject({
+        method: 'POST',
+        url: '/api/events',
+        payload: { events: [{ name: 'app_open', props: { source: 'menu' } }] },
+      });
+      expect(anonymous.statusCode).toBe(401);
     });
   });
 });

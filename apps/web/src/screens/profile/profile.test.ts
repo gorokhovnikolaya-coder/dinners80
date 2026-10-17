@@ -5,6 +5,7 @@ import {
   DEV_DOCUMENT_URLS,
   documentLinks,
   exclusionsPatch,
+  reminderToggledEvent,
   reminderView,
   subscriptionView,
   withTimeZone,
@@ -172,7 +173,13 @@ function controlledSend() {
   const calls: { patch: ProfilePatch; resolve: () => void; reject: () => void }[] = [];
   const send = (patch: ProfilePatch) =>
     new Promise<void>((resolve, reject) => {
-      calls.push({ patch, resolve, reject: () => { reject(new Error('500')); } });
+      calls.push({
+        patch,
+        resolve,
+        reject: () => {
+          reject(new Error('500'));
+        },
+      });
     });
   return { calls, send };
 }
@@ -253,5 +260,26 @@ describe('createAutosave', () => {
     // A change made after the failure removes the field from the failed ones too.
     autosave.save({ weekdayMinutes: 30 });
     expect(autosave.getSnapshot().failed).toBe(null);
+  });
+});
+
+describe('reminderToggledEvent', () => {
+  const saved = { reminderEnabled: true, reminderTime: '19:30' };
+
+  it('reports turning the reminder on or off and a new time with the saved state', () => {
+    expect(
+      reminderToggledEvent({ reminderEnabled: true, timezone: 'Europe/Moscow' }, saved),
+    ).toEqual({ name: 'reminder_toggled', props: { enabled: true, time: '19:30' } });
+    expect(reminderToggledEvent({ reminderTime: '19:30' }, saved)).toEqual({
+      name: 'reminder_toggled',
+      props: { enabled: true, time: '19:30' },
+    });
+    expect(
+      reminderToggledEvent({ reminderEnabled: false }, { ...saved, reminderEnabled: false }),
+    ).toEqual({ name: 'reminder_toggled', props: { enabled: false, time: '19:30' } });
+  });
+
+  it('ignores other changes', () => {
+    expect(reminderToggledEvent({ household: 'solo' }, saved)).toBeNull();
   });
 });

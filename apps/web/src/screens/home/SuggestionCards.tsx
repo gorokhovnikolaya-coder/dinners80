@@ -13,6 +13,12 @@ const t = ru.home;
 const linkClass =
   'flex flex-col overflow-hidden bg-surface text-ink no-underline shadow-card transition-transform active:scale-[0.99]';
 
+/** A card; `onOpen` — the tap that opens the dish (the `dish_opened` event). */
+interface CardProps {
+  card: SuggestionCard;
+  onOpen?: () => void;
+}
+
 /** The mark of a dish («Новая страна» / «N-е блюдо» / «Уже готовили»): big card, dish card. */
 export function LabelBadge({ label }: { label: SuggestionCard['label'] }) {
   switch (label.kind) {
@@ -42,9 +48,9 @@ function smallLabel(label: SuggestionCard['label']): { text: string; tone: strin
 }
 
 /** The first suggestion: big photo, country, title, time and level. */
-export function BigSuggestionCard({ card }: { card: SuggestionCard }) {
+export function BigSuggestionCard({ card, onOpen }: CardProps) {
   return (
-    <Link to={dishPath(card.dishId)} className={cx(linkClass, 'rounded-card-lg')}>
+    <Link to={dishPath(card.dishId)} onClick={onOpen} className={cx(linkClass, 'rounded-card-lg')}>
       <DishPhoto url={card.imageUrl} className="h-37.5">
         <span className="absolute top-3 left-3">
           <LabelBadge label={card.label} />
@@ -65,10 +71,10 @@ export function BigSuggestionCard({ card }: { card: SuggestionCard }) {
 }
 
 /** One of the two small suggestions. */
-export function SmallSuggestionCard({ card }: { card: SuggestionCard }) {
+export function SmallSuggestionCard({ card, onOpen }: CardProps) {
   const label = smallLabel(card.label);
   return (
-    <Link to={dishPath(card.dishId)} className={cx(linkClass, 'rounded-card')}>
+    <Link to={dishPath(card.dishId)} onClick={onOpen} className={cx(linkClass, 'rounded-card')}>
       <DishPhoto url={card.imageUrl} className="h-23" />
       <span className="flex flex-1 flex-col gap-1 px-3 pt-2.5 pb-3">
         <span className={cx('text-2xs font-bold tracking-caps uppercase', label.tone)}>

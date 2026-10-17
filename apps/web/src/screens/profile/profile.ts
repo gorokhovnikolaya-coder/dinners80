@@ -1,4 +1,5 @@
 import {
+  type ClientEvent,
   normalizeCustomExclusions,
   normalizeExclusions,
   type SubscriptionStatus,
@@ -127,4 +128,19 @@ export function documentLinks(env: {
     const url = httpsUrl(env[kind]) ?? (env.dev ? DEV_DOCUMENT_URLS[kind] : undefined);
     return url === undefined ? [] : [{ kind, url }];
   });
+}
+
+/**
+ * `reminder_toggled` for a saved `PATCH /me` (decision 0024): when the reminder was turned on or
+ * off or its time changed — with the saved state; `null` for other changes.
+ */
+export function reminderToggledEvent(
+  patch: UpdateMeRequest,
+  saved: Pick<UserProfile, 'reminderEnabled' | 'reminderTime'>,
+): ClientEvent | null {
+  if (patch.reminderEnabled === undefined && patch.reminderTime === undefined) return null;
+  return {
+    name: 'reminder_toggled',
+    props: { enabled: saved.reminderEnabled, time: saved.reminderTime },
+  };
 }

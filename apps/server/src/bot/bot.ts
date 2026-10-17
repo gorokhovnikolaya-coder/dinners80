@@ -1,6 +1,8 @@
 import { Bot, GrammyError, InlineKeyboard, type Context, type Transformer } from 'grammy';
 import type { UserFromGetMe } from 'grammy/types';
 
+import { withAppOpenLabel } from '@tma80/shared';
+
 import type { Db } from '../db/client.ts';
 import { checkoutRefusal, markRefunded, recordPayment } from '../db/payments.ts';
 import { setBotCanWrite, startBot, type BotUser } from '../db/users.ts';
@@ -60,7 +62,11 @@ const botUserOf = (from: NonNullable<Context['from']>): BotUser => ({
 export function createBot(deps: BotDeps): Bot {
   const bot = new Bot(deps.token, deps.botInfo === undefined ? {} : { botInfo: deps.botInfo });
   if (deps.apiTransformer) bot.api.config.use(deps.apiTransformer);
-  const openKeyboard = new InlineKeyboard().webApp(OPEN_BUTTON, deps.webAppUrl);
+  // The launch label `?from=menu` tells `app_open` the bot's button from a direct link (0024).
+  const openKeyboard = new InlineKeyboard().webApp(
+    OPEN_BUTTON,
+    withAppOpenLabel(deps.webAppUrl, 'menu'),
+  );
 
   /**
    * Sends a message; if the user has blocked the bot meanwhile (403), resets `bot_can_write`
