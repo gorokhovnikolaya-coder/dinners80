@@ -88,6 +88,10 @@ export interface MetricsCounts {
   invitedUsers: number;
   /** `payment_success` events within the period (for reference). */
   payments: number;
+  /** Users shown the paywall (`paywall_shown`) within the period. */
+  paywallUsers: number;
+  /** Of them, users with `payment_success` after the first show, before the end of the period. */
+  paywallPaidUsers: number;
 }
 
 const count = (column: string) => `coalesce(${column}, 0)::int`;
@@ -107,6 +111,12 @@ cohort as (
 period_events as (
   select e.name from events e join outside u on u.id = e.user_id
   where e.created_at >= $1 and e.created_at < $2
+),
+paywall_users as (
+  select e.user_id, min(e.created_at) as first_shown
+  from events e join outside u on u.id = e.user_id
+  where e.name = 'paywall_shown' and e.created_at >= $1 and e.created_at < $2
+  group by e.user_id
 ),
 period_cooks as (
   select k.user_id, k.photo_path from cooks k join outside u on u.id = k.user_id
@@ -134,7 +144,11 @@ select
   ${count(`(select count(*) from outside u
     where u.created_at >= $1 and u.created_at < $2 and u.invited_by is not null
       and u.invited_by not in (select id from team))`)} as invited_users,
-  ${count(`(select count(*) from period_events where name = 'payment_success')`)} as payments
+  ${count(`(select count(*) from period_events where name = 'payment_success')`)} as payments,
+  ${count('(select count(*) from paywall_users)')} as paywall_users,
+  ${count(`(select count(*) from paywall_users p where exists (
+    select 1 from events e where e.user_id = p.user_id and e.name = 'payment_success'
+      and e.created_at >= p.first_shown and e.created_at < $2))`)} as paywall_paid_users
 `;
 
 interface MetricsRow {
@@ -150,6 +164,8 @@ interface MetricsRow {
   active_users: number;
   invited_users: number;
   payments: number;
+  paywall_users: number;
+  paywall_paid_users: number;
 }
 
 export async function queryMetrics(
@@ -178,6 +194,8 @@ export async function queryMetrics(
     activeUsers: row.active_users,
     invitedUsers: row.invited_users,
     payments: row.payments,
+    paywallUsers: row.paywall_users,
+    paywallPaidUsers: row.paywall_paid_users,
   };
 }
 
@@ -209,7 +227,7 @@ const metric = (
   kind,
 });
 
-/** The five metrics of ТЗ in its order, with its targets. */
+/** The six metrics of ТЗ in its order, with its targets. */
 export function computeMetrics(counts: MetricsCounts): Metric[] {
   return [
     metric(
@@ -237,6 +255,12 @@ export function computeMetrics(counts: MetricsCounts): Metric[] {
       counts.activeUsers,
       0.3,
       'ratio',
+    ),
+    metric(
+      'Конверсия из показа пейвола в оплату',
+      counts.paywallPaidUsers,
+      counts.paywallUsers,
+      0.05,
     ),
   ];
 }

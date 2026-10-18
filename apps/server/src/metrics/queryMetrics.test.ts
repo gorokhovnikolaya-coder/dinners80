@@ -76,6 +76,8 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('queryMetrics', () => {
     const team = await user({ tgId: TEAM_TG, created: day(0), onboarded: day(0) });
     await cook(team, 0, day(1));
     await event(team, 'cook_started', day(1));
+    await event(team, 'paywall_shown', day(2));
+    await event(team, 'payment_success', day(2));
 
     // Starts within 7 days, two dishes within 14 days, one cook with a photo.
     const a = await user({ created: day(1), onboarded: day(1) });
@@ -85,18 +87,27 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('queryMetrics', () => {
     await event(a, 'cook_started', day(10));
     await event(a, 'cook_finished', day(10));
     await cook(a, 1, day(10));
+    // Shown the paywall, pays after the show.
+    await event(a, 'paywall_shown', day(10));
+    await event(a, 'paywall_shown', day(11));
     await event(a, 'payment_success', day(11));
 
     // Invited by `a`; starts on day 9 after onboarding — too late; one dish only.
     const b = await user({ created: day(2), onboarded: day(2), invitedBy: a });
     await event(b, 'cook_started', day(11));
     await cook(b, 0, day(11));
+    // Shown the paywall, does not pay.
+    await event(b, 'paywall_shown', day(12));
 
     // Invited by the team: not counted as an invitation; never onboarded.
     await user({ created: day(3), invitedBy: team });
     // Onboarded before the period: not in the cohort, but its cook makes it active.
     const old = await user({ created: day(-30), onboarded: day(-30) });
     await cook(old, 0, day(5));
+    // Paid before the show in the period: the show does not convert; the earlier show is outside.
+    await event(old, 'paywall_shown', day(-2));
+    await event(old, 'payment_success', day(4));
+    await event(old, 'paywall_shown', day(6));
     // Onboarded at the end of the period: windows are still open at `now`.
     await user({ created: day(13), onboarded: day(13) });
 
@@ -113,7 +124,9 @@ describe.skipIf(process.env.TEST_DATABASE !== '1')('queryMetrics', () => {
       cooksWithPhoto: 1,
       activeUsers: 3,
       invitedUsers: 1,
-      payments: 1,
+      payments: 2,
+      paywallUsers: 3,
+      paywallPaidUsers: 1,
     });
   });
 });

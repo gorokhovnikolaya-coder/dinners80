@@ -3,6 +3,8 @@
 # (NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx, rendered to /etc/nginx/media.conf, so it is not auto-included at the http level);
 # only the variables set in the environment are substituted — MEDIA_SIGNING_KEY, the same secret
 # as the server's. Files are mounted at /srv/media (MEDIA_DIR of the server).
+# A location with its own add_header inherits none of the server's, so the security headers of
+# the app domain (HSTS, Referrer-Policy, nosniff) are repeated here.
 
 # Private photos of cooks: only by a link signed by the server for an hour,
 # `/media/cooks/{user_id}/{uuid}.jpg?md5=<base64url md5>&expires=<unix time>`.
@@ -22,7 +24,9 @@ location /media/cooks/ {
     alias /srv/media/cooks/;
     autoindex off;
     add_header Cache-Control "private, max-age=3600" always;
+    add_header Strict-Transport-Security "max-age=31536000" always;
     add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 }
 
 # Share cards: public (shareToStory needs a public URL), unguessable `{uuid}.jpg` names.
@@ -30,5 +34,7 @@ location /media/share/ {
     alias /srv/media/share/;
     autoindex off;
     add_header Cache-Control "public, max-age=86400" always;
+    add_header Strict-Transport-Security "max-age=31536000" always;
     add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 }

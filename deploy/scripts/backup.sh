@@ -5,6 +5,9 @@
 # Cron on the VPS: 30 3 * * * /srv/tma80/deploy/scripts/backup.sh >> /var/log/tma80-backup.log 2>&1
 . "$(dirname "$0")/lib.sh"
 
+# The dump and the photos are private: not readable by other users of the host.
+umask 077
+
 remote=$(require_env BACKUP_REMOTE)
 keep=$(env_value BACKUP_KEEP)
 keep=${keep:-14}
@@ -12,13 +15,15 @@ stamp=$(date -u +%Y%m%d-%H%M%S)
 name="tma80-$stamp"
 mkdir -p backups
 work="backups/$name"
-trap 'rm -rf "$work"' EXIT
+trap 'rm -rf "$work" "backups/$name.tar.part"' EXIT
 mkdir "$work"
 
 echo "$(date -u +%FT%TZ) backup $name"
 compose exec -T postgres pg_dump -U postgres -d tma80 --format=custom > "$work/db.dump"
 compose exec -T server tar -C /srv/media -czf - . > "$work/media.tar.gz"
-tar -C backups -cf "backups/$name.tar" "$name"
+# Written under a temporary name: an incomplete archive never counts as one of the newest.
+tar -C backups -cf "backups/$name.tar.part" "$name"
+mv "backups/$name.tar.part" "backups/$name.tar"
 rm -rf "$work"
 
 rclone copyto "/backups/$name.tar" "$remote/$name.tar"
@@ -30,7 +35,9 @@ for file in backups/tma80-*.tar; do
 done | sort -r | tail -n +"$((keep + 1))" | while read -r old; do
     rm -f "$old"
 done
-rclone lsf --files-only --include 'tma80-*.tar' "$remote" | sort -r | tail -n +"$((keep + 1))" |
+# No pipefail in POSIX sh: the listing goes to a variable first, so its failure stops the script.
+listing=$(rclone lsf --files-only --include 'tma80-*.tar' "$remote")
+printf '%s\n' "$listing" | sed '/^$/d' | sort -r | tail -n +"$((keep + 1))" |
     while read -r old; do
         rclone deletefile "$remote/$old"
         echo "removed $remote/$old"

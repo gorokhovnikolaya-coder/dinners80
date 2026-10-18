@@ -36,8 +36,9 @@ server {
     ssl_session_timeout 1d;
     ssl_session_tickets off;
 
-    # Server-level headers apply to the locations below that add none of their own. No
-    # X-Frame-Options: Telegram Web opens the mini app in an iframe.
+    # Server-level headers apply to the locations below that add none of their own; the
+    # /media/cooks/ and /media/share/ locations of media.conf repeat them. No X-Frame-Options:
+    # Telegram Web opens the mini app in an iframe.
     add_header Strict-Transport-Security "max-age=31536000" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;

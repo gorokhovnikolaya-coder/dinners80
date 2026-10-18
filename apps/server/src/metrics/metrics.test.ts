@@ -54,6 +54,8 @@ const counts: MetricsCounts = {
   activeUsers: 20,
   invitedUsers: 5,
   payments: 2,
+  paywallUsers: 30,
+  paywallPaidUsers: 2,
 };
 
 describe('computeMetrics', () => {
@@ -64,13 +66,15 @@ describe('computeMetrics', () => {
       [12 / 31, null],
       [9 / 40, 0.25],
       [5 / 20, 0.3],
+      [2 / 30, 0.05],
     ]);
   });
 
   it('has no value without a denominator', () => {
-    const empty = computeMetrics({ ...counts, onboarded: 0, cooksStarted: 0 });
+    const empty = computeMetrics({ ...counts, onboarded: 0, cooksStarted: 0, paywallUsers: 0 });
     expect(empty[0]?.value).toBeNull();
     expect(empty[1]?.value).toBeNull();
+    expect(empty[5]?.value).toBeNull();
   });
 });
 
@@ -91,6 +95,7 @@ describe('formatMetricsReport', () => {
     expect(report).toContain('с фото (справочно): 38.7% (12 / 31)\n');
     expect(report).toContain('за 14 дней: 22.5% (9 / 40) · цель ≥ 25.0%: нет');
     expect(report).toContain('на активного пользователя: 0.25 (5 / 20) · цель ≥ 0.30: нет');
+    expect(report).toContain('пейвола в оплату: 6.7% (2 / 30) · цель ≥ 5.0%: да');
     expect(report).toContain('у 3 не прошло 14 дней после регистрации');
     expect(report).not.toContain('7 дней после онбординга');
   });
